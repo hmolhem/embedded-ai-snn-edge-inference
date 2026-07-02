@@ -11,15 +11,16 @@
 - [x] Implement DOA-sector label generation.
 - [x] Compute sample covariance matrix `Rxx`.
 - [x] Extract compact beamspace or covariance-derived features.
-- [ ] Normalize features using training-set statistics.
+- [x] Implement stratified train/test split by SNR and class.
+- [x] Normalize features using training-set statistics.
 - [ ] Implement rate-based spike encoding.
 - [ ] Implement lightweight LIF-inspired DOA-sector classifier.
-- [ ] Implement nearest-centroid baseline.
-- [ ] Evaluate accuracy versus SNR.
-- [ ] Generate confusion matrix.
+- [x] Implement nearest-centroid baseline.
+- [x] Evaluate accuracy versus SNR.
+- [x] Generate confusion matrix.
 - [ ] Generate spike-count distribution.
 - [x] Save first dataset summary.
-- [ ] Save full metrics and figures.
+- [x] Save baseline metrics and figures.
 - [ ] Write handoff after first DOA Run 001.
 
 ## Deliverables

@@ -213,7 +213,12 @@ def train_test_split_by_index(
     train_fraction: float = 0.70,
     random_seed: int = 42,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Return randomized train/test indices for a dataset."""
+    """Return randomized train/test indices for a dataset.
+
+    This simple splitter is kept for quick checks. The production Phase 1
+    baseline should use ``stratified_train_test_split_by_snr_and_class`` so that
+    every SNR/class cell is represented equally in train and test sets.
+    """
 
     if not 0.0 < train_fraction < 1.0:
         raise ValueError("train_fraction must be between 0 and 1.")
@@ -222,6 +227,73 @@ def train_test_split_by_index(
     indices = rng.permutation(num_samples)
     num_train = int(round(train_fraction * num_samples))
     return indices[:num_train], indices[num_train:]
+
+
+def stratified_train_test_split_by_snr_and_class(
+    labels: np.ndarray,
+    snr_db: np.ndarray,
+    snr_values: Iterable[float],
+    num_classes: int,
+    train_fraction: float = 0.70,
+    random_seed: int = 42,
+) -> tuple[np.ndarray, np.ndarray, str]:
+    """Return train/test indices stratified by both SNR and class.
+
+    This splitter prevents accidental imbalance in accuracy-versus-SNR plots.
+    Each SNR/class cell is split independently. With the current default dataset
+    of 100 samples per class per SNR and a 70/30 split, each cell contributes 70
+    train samples and 30 test samples.
+    """
+
+    if not 0.0 < train_fraction < 1.0:
+        raise ValueError("train_fraction must be between 0 and 1.")
+
+    labels = np.asarray(labels, dtype=int)
+    snr_db = np.asarray(snr_db, dtype=float)
+    rng = np.random.default_rng(random_seed)
+
+    train_indices: list[np.ndarray] = []
+    test_indices: list[np.ndarray] = []
+    summary_lines = [
+        "stratified_split:",
+        "  method: by SNR and class",
+        f"  train_fraction: {train_fraction:.2f}",
+        "  cells:",
+    ]
+
+    for snr_value in snr_values:
+        for class_index in range(num_classes):
+            cell_indices = np.where((np.isclose(snr_db, snr_value)) & (labels == class_index))[0]
+            if cell_indices.size == 0:
+                raise ValueError(f"No samples found for SNR={snr_value} dB, class={class_index}.")
+
+            shuffled = rng.permutation(cell_indices)
+            num_train = int(round(train_fraction * shuffled.size))
+            if num_train <= 0 or num_train >= shuffled.size:
+                raise ValueError(
+                    "Each SNR/class cell must contain enough samples for both train and test sets."
+                )
+
+            train_cell = shuffled[:num_train]
+            test_cell = shuffled[num_train:]
+            train_indices.append(train_cell)
+            test_indices.append(test_cell)
+            summary_lines.append(
+                f"    SNR={float(snr_value):>5.1f} dB, class={class_index}: "
+                f"train={train_cell.size}, test={test_cell.size}"
+            )
+
+    train_index = rng.permutation(np.concatenate(train_indices).astype(int))
+    test_index = rng.permutation(np.concatenate(test_indices).astype(int))
+
+    summary_lines.extend(
+        [
+            f"  total_train: {train_index.size}",
+            f"  total_test: {test_index.size}",
+        ]
+    )
+
+    return train_index, test_index, "\n".join(summary_lines)
 
 
 def minmax_normalize_train_test(
