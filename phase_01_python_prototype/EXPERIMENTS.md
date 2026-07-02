@@ -158,3 +158,53 @@ Interpretation:
 The accuracy comparison plot overlays the continuous-valued nearest-centroid baseline and the sparse LIF-inspired spike classifier across the same SNR grid. The latency plot shows the mean stable-decision latency of the LIF classifier versus SNR, with the full spike window used as a reference.
 
 This run supports the Phase 1 accuracy-latency-energy narrative for embedded neuromorphic inference.
+
+## Run 005 — LIF Time-Step and Leak Parameter Sweep
+
+Status: completed locally.
+
+Purpose: evaluate the sensitivity of the LIF-inspired spike classifier to spike-window length and membrane leak factor.
+
+Sweep grid:
+
+```text
+num_time_steps = [10, 20, 30, 40]
+leak = [0.90, 0.95, 0.97, 0.99]
+total_configurations = 16
+```
+
+Reference baseline:
+
+```text
+baseline_nearest_centroid_accuracy: 0.869048
+```
+
+Best accuracy configuration:
+
+```text
+num_time_steps: 40
+leak: 0.99
+overall_accuracy: 0.841667
+mean_latency_steps: 8.396429
+```
+
+Lowest latency configuration:
+
+```text
+num_time_steps: 10
+leak: 0.99
+overall_accuracy: 0.776190
+mean_latency_steps: 3.782143
+```
+
+Generated outputs:
+
+```text
+results/run_005_lif_parameter_sweep.csv
+results/run_005_lif_parameter_sweep_summary.txt
+figures/run_005_lif_accuracy_latency_tradeoff.png
+```
+
+Interpretation:
+
+Run 005 confirms the expected accuracy-latency trade-off. Increasing the spike-window length generally improves LIF accuracy, while shorter windows reduce stable-decision latency. Higher leak values tend to preserve accumulated evidence better. The best LIF configuration improves over the fixed Run 003 setting but remains below the continuous nearest-centroid baseline, which is consistent with the intended embedded sparse-inference narrative.
