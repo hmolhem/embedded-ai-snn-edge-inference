@@ -85,3 +85,29 @@ Confusion matrix (rows=true, columns=predicted):
       0    29     1     0
       0     3    27     0
       0     0     5    25
+
+Run 002 rate-based spike encoding
+=================================
+Train spike-encoding summary
+============================
+num_samples: 1960
+num_time_steps: 20
+num_features: 9
+max_possible_spikes_per_sample: 180
+mean_firing_rate: 0.144436
+mean_spike_count_per_sample: 25.998469
+std_spike_count_per_sample: 28.827628
+min_spike_count_per_sample: 1
+max_spike_count_per_sample: 116
+
+Test spike-encoding summary
+===========================
+num_samples: 840
+num_time_steps: 20
+num_features: 9
+max_possible_spikes_per_sample: 180
+mean_firing_rate: 0.143201
+mean_spike_count_per_sample: 25.776190
+std_spike_count_per_sample: 28.698223
+min_spike_count_per_sample: 2
+max_spike_count_per_sample: 113
