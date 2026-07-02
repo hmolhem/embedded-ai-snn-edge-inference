@@ -6,9 +6,10 @@ Run from the repository root with:
 
 This run generates a physics-based ULA/DOA dataset, extracts beamspace
 features, normalizes them, evaluates a nearest-centroid DOA-sector baseline,
-and validates a rate-based spike encoder. The train/test split is stratified
-by both SNR and DOA sector so that accuracy-versus-SNR results are not distorted
-by sampling imbalance.
+validates a rate-based spike encoder, and evaluates a lightweight LIF-inspired
+class accumulator on the encoded spike trains. The train/test split is
+stratified by both SNR and DOA sector so that accuracy-versus-SNR results are
+not distorted by sampling imbalance.
 """
 
 from __future__ import annotations
@@ -24,6 +25,11 @@ from .dataset import (
     generate_doa_dataset,
     minmax_normalize_train_test,
     stratified_train_test_split_by_snr_and_class,
+)
+from .lif import (
+    fit_lif_prototype_weights,
+    lif_classify,
+    lif_inference_summary,
 )
 from .metrics import (
     accuracy_by_snr,
@@ -59,8 +65,58 @@ def _write_accuracy_csv(
             writer.writerow([f"{snr_db:.1f}", f"{accuracy:.6f}", count])
 
 
+def _latency_by_snr(
+    latency_steps: np.ndarray,
+    snr_db: np.ndarray,
+    snr_values: tuple[float, ...],
+) -> list[tuple[float, float, int]]:
+    """Return mean stable-decision latency for each SNR value."""
+
+    rows: list[tuple[float, float, int]] = []
+    for value in snr_values:
+        mask = np.isclose(snr_db, value)
+        count = int(np.sum(mask))
+        if count == 0:
+            rows.append((float(value), float("nan"), 0))
+            continue
+        rows.append((float(value), float(np.mean(latency_steps[mask])), count))
+    return rows
+
+
+def _write_latency_csv(
+    output_path: Path,
+    rows: list[tuple[float, float, int]],
+) -> None:
+    """Write SNR latency rows to CSV."""
+
+    with output_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["snr_db", "mean_latency_steps", "num_test_samples"])
+        for snr_db, mean_latency, count in rows:
+            writer.writerow([f"{snr_db:.1f}", f"{mean_latency:.6f}", count])
+
+
+def _format_accuracy_rows(rows: list[tuple[float, float, int]]) -> list[str]:
+    """Format accuracy-versus-SNR rows for text reports."""
+
+    return [
+        f"  {snr_value:>5.1f} dB: accuracy={accuracy:.6f}, num_test_samples={count}"
+        for snr_value, accuracy, count in rows
+    ]
+
+
+def _format_latency_rows(rows: list[tuple[float, float, int]]) -> list[str]:
+    """Format latency-versus-SNR rows for text reports."""
+
+    return [
+        f"  {snr_value:>5.1f} dB: mean_latency_steps={latency:.6f}, "
+        f"num_test_samples={count}"
+        for snr_value, latency, count in rows
+    ]
+
+
 def main() -> None:
-    """Run the Phase 1 DOA reference baseline and spike-encoding validation."""
+    """Run the Phase 1 DOA reference baseline, spike encoder, and LIF model."""
 
     phase_dir = Path(__file__).resolve().parents[1]
     results_dir = phase_dir / "results"
@@ -98,29 +154,30 @@ def main() -> None:
         test_features_raw,
     )
 
+    # Run 001: non-spiking nearest-centroid baseline on normalized features.
     centroids = fit_nearest_centroid(
         train_features,
         train_labels,
         num_classes=config.num_classes,
     )
-    predicted_labels = predict_nearest_centroid(test_features, centroids)
-
-    overall_accuracy = accuracy_score(test_labels, predicted_labels)
-    accuracy_rows = accuracy_by_snr(
+    baseline_predicted_labels = predict_nearest_centroid(test_features, centroids)
+    baseline_overall_accuracy = accuracy_score(test_labels, baseline_predicted_labels)
+    baseline_accuracy_rows = accuracy_by_snr(
         test_labels,
-        predicted_labels,
+        baseline_predicted_labels,
         test_snr_db,
         config.snr_db_values,
     )
 
     selected_snr = 10.0
     selected_mask = np.isclose(test_snr_db, selected_snr)
-    selected_confusion = confusion_matrix(
+    baseline_confusion = confusion_matrix(
         test_labels[selected_mask],
-        predicted_labels[selected_mask],
+        baseline_predicted_labels[selected_mask],
         num_classes=config.num_classes,
     )
 
+    # Run 002: rate-based spike encoding of the normalized features.
     num_spike_time_steps = 20
     train_spikes = rate_encode_features(
         train_features,
@@ -141,14 +198,47 @@ def main() -> None:
         ]
     )
 
+    # Run 003: LIF-inspired class-level inference on spike trains.
+    lif_weights, lif_bias = fit_lif_prototype_weights(centroids)
+    lif_result = lif_classify(
+        test_spikes,
+        weights=lif_weights,
+        bias=lif_bias,
+        leak=0.97,
+    )
+    lif_predicted_labels = lif_result.predicted_labels
+    lif_overall_accuracy = accuracy_score(test_labels, lif_predicted_labels)
+    lif_accuracy_rows = accuracy_by_snr(
+        test_labels,
+        lif_predicted_labels,
+        test_snr_db,
+        config.snr_db_values,
+    )
+    lif_latency_rows = _latency_by_snr(
+        lif_result.latency_steps,
+        test_snr_db,
+        config.snr_db_values,
+    )
+    lif_confusion = confusion_matrix(
+        test_labels[selected_mask],
+        lif_predicted_labels[selected_mask],
+        num_classes=config.num_classes,
+    )
+    lif_summary = lif_inference_summary(lif_result)
+
     dataset_summary_path = results_dir / "run_001_dataset_summary.txt"
     metrics_path = results_dir / "run_001_metrics.txt"
-    accuracy_csv_path = results_dir / "run_001_accuracy_vs_snr.csv"
+    baseline_accuracy_csv_path = results_dir / "run_001_accuracy_vs_snr.csv"
     spike_summary_path = results_dir / "run_002_spike_encoding_summary.txt"
+    lif_metrics_path = results_dir / "run_003_lif_metrics.txt"
+    lif_accuracy_csv_path = results_dir / "run_003_lif_accuracy_vs_snr.csv"
+    lif_latency_csv_path = results_dir / "run_003_lif_latency_vs_snr.csv"
 
     dataset_summary_path.write_text(summary + "\n", encoding="utf-8")
-    _write_accuracy_csv(accuracy_csv_path, accuracy_rows)
+    _write_accuracy_csv(baseline_accuracy_csv_path, baseline_accuracy_rows)
     spike_summary_path.write_text(spike_summary + "\n", encoding="utf-8")
+    _write_accuracy_csv(lif_accuracy_csv_path, lif_accuracy_rows)
+    _write_latency_csv(lif_latency_csv_path, lif_latency_rows)
 
     metrics_lines = [
         summary,
@@ -159,27 +249,70 @@ def main() -> None:
         "=================================",
         f"train_samples: {train_features.shape[0]}",
         f"test_samples: {test_features.shape[0]}",
-        f"overall_accuracy: {overall_accuracy:.6f}",
+        f"overall_accuracy: {baseline_overall_accuracy:.6f}",
         "",
         "accuracy_vs_snr:",
+        *_format_accuracy_rows(baseline_accuracy_rows),
+        "",
+        f"confusion_matrix_at_{selected_snr:.1f}_dB:",
+        format_confusion_matrix(baseline_confusion),
+        "",
+        "Run 002 rate-based spike encoding",
+        "=================================",
+        spike_summary,
+        "",
+        "Run 003 LIF-inspired spike classifier",
+        "====================================",
+        f"overall_accuracy: {lif_overall_accuracy:.6f}",
+        f"leak: {0.97:.2f}",
+        f"num_time_steps: {num_spike_time_steps}",
+        "",
+        lif_summary,
+        "",
+        "accuracy_vs_snr:",
+        *_format_accuracy_rows(lif_accuracy_rows),
+        "",
+        "mean_latency_vs_snr:",
+        *_format_latency_rows(lif_latency_rows),
+        "",
+        f"confusion_matrix_at_{selected_snr:.1f}_dB:",
+        format_confusion_matrix(lif_confusion),
     ]
-    for snr_value, accuracy, count in accuracy_rows:
-        metrics_lines.append(
-            f"  {snr_value:>5.1f} dB: accuracy={accuracy:.6f}, num_test_samples={count}"
-        )
-    metrics_lines.extend(["", f"confusion_matrix_at_{selected_snr:.1f}_dB:"])
-    metrics_lines.append(format_confusion_matrix(selected_confusion))
-    metrics_lines.extend(["", "Run 002 rate-based spike encoding", "================================="])
-    metrics_lines.append(spike_summary)
 
-    metrics_path.write_text("\n".join(metrics_lines) + "\n", encoding="utf-8")
+    metrics_text = "\n".join(metrics_lines) + "\n"
+    metrics_path.write_text(metrics_text, encoding="utf-8")
+    lif_metrics_path.write_text(
+        "\n".join(
+            [
+                "Run 003 LIF-inspired spike classifier",
+                "====================================",
+                f"overall_accuracy: {lif_overall_accuracy:.6f}",
+                f"leak: {0.97:.2f}",
+                f"num_time_steps: {num_spike_time_steps}",
+                "",
+                lif_summary,
+                "",
+                "accuracy_vs_snr:",
+                *_format_accuracy_rows(lif_accuracy_rows),
+                "",
+                "mean_latency_vs_snr:",
+                *_format_latency_rows(lif_latency_rows),
+                "",
+                f"confusion_matrix_at_{selected_snr:.1f}_dB:",
+                format_confusion_matrix(lif_confusion),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
     plot_accuracy_vs_snr(
-        accuracy_rows,
+        baseline_accuracy_rows,
         figures_dir / "run_001_accuracy_vs_snr.png",
+        title="Nearest-Centroid DOA-Sector Accuracy vs SNR",
     )
     plot_confusion_matrix(
-        selected_confusion,
+        baseline_confusion,
         figures_dir / "run_001_confusion_matrix_snr_10db.png",
         title="Nearest-Centroid Confusion Matrix at 10 dB",
     )
@@ -198,35 +331,29 @@ def main() -> None:
         num_time_steps=num_spike_time_steps,
         num_features=test_features.shape[1],
     )
+    plot_accuracy_vs_snr(
+        lif_accuracy_rows,
+        figures_dir / "run_003_lif_accuracy_vs_snr.png",
+        title="LIF-Inspired Spike Classifier Accuracy vs SNR",
+    )
+    plot_confusion_matrix(
+        lif_confusion,
+        figures_dir / "run_003_lif_confusion_matrix_snr_10db.png",
+        title="LIF-Inspired Confusion Matrix at 10 dB",
+    )
 
-    print(summary)
-    print("")
-    print(split_summary)
-    print("")
-    print("Run 001 nearest-centroid baseline")
-    print("=================================")
-    print(f"train_samples: {train_features.shape[0]}")
-    print(f"test_samples: {test_features.shape[0]}")
-    print(f"overall_accuracy: {overall_accuracy:.4f}")
-    print("")
-    print("accuracy_vs_snr:")
-    for snr_value, accuracy, count in accuracy_rows:
-        print(f"  {snr_value:>5.1f} dB: accuracy={accuracy:.4f}, num_test_samples={count}")
-    print("")
-    print(format_confusion_matrix(selected_confusion))
-    print("")
-    print("Run 002 rate-based spike encoding")
-    print("=================================")
-    print(spike_summary)
-    print("")
+    print(metrics_text)
     print(f"Saved dataset summary to: {dataset_summary_path}")
-    print(f"Saved metrics to: {metrics_path}")
-    print(f"Saved accuracy CSV to: {accuracy_csv_path}")
+    print(f"Saved combined metrics to: {metrics_path}")
+    print(f"Saved baseline accuracy CSV to: {baseline_accuracy_csv_path}")
     print(f"Saved spike-encoding summary to: {spike_summary_path}")
+    print(f"Saved LIF metrics to: {lif_metrics_path}")
+    print(f"Saved LIF accuracy CSV to: {lif_accuracy_csv_path}")
+    print(f"Saved LIF latency CSV to: {lif_latency_csv_path}")
     print(f"Saved figures to: {figures_dir}")
     print("")
-    print("Step 3A complete: rate-based spike encoding is working.")
-    print("Next step: implement LIF-inspired DOA-sector inference.")
+    print("Step 3B complete: LIF-inspired spike classifier is implemented.")
+    print("Next step: run locally, inspect accuracy/latency, then create the next handoff.")
 
 
 if __name__ == "__main__":
