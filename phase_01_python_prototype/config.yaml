@@ -1,7 +1,43 @@
-# Phase 1 configuration stub
+# Phase 1 DOA prototype configuration reference
+#
+# The current Python runner uses the DOAConfig dataclass in src/dataset.py.
+# This YAML file is kept as a human-readable reference for the initial run.
 
 random_seed: 42
-num_samples: 1000
-num_classes: 4
-num_features: 8
-num_time_steps: 20
+
+array:
+  type: ULA
+  num_elements: 8
+  num_snapshots: 128
+  spacing_wavelengths: 0.5
+
+source_model:
+  source_count: 1
+  signal_type: narrowband_complex_baseband
+  noise_model: complex_awgn
+
+doa_task:
+  doa_min_deg: -60.0
+  doa_max_deg: 60.0
+  sector_edges_deg: [-60.0, -30.0, 0.0, 30.0, 60.0]
+  num_classes: 4
+
+features:
+  type: beamspace_energy
+  beam_grid_deg: [-60.0, -45.0, -30.0, -15.0, 0.0, 15.0, 30.0, 45.0, 60.0]
+  num_features: 9
+  normalization: train_set_minmax
+
+experiment:
+  snr_db_values: [-10.0, -5.0, 0.0, 5.0, 10.0, 15.0, 20.0]
+  samples_per_class_per_snr: 100
+  train_fraction: 0.70
+
+spike_encoding:
+  type: rate_based_bernoulli
+  num_time_steps: 20
+
+lif_classifier:
+  type: class_level_leaky_template_accumulator
+  leak: 0.97
+  weights: prototype_from_nearest_centroid

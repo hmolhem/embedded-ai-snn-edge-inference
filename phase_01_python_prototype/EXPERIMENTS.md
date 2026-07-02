@@ -4,23 +4,24 @@ This file tracks Phase 1 runs.
 
 ## Run 001 — DOA Python Reference Baseline
 
-Status: pending.
+Status: completed locally.
 
 Purpose: first end-to-end DOA-sector inference baseline using a physics-based ULA model.
 
-Planned pipeline:
+Pipeline:
 
 ```text
 ULA snapshots
     -> sample covariance matrix
-    -> beamspace or covariance-derived features
+    -> beamspace energy features
     -> feature normalization
+    -> nearest-centroid baseline
     -> rate-based spike encoding
     -> LIF-inspired DOA-sector inference
-    -> baseline comparison
+    -> accuracy, confusion, spike, and latency metrics
 ```
 
-Initial configuration:
+Configuration:
 
 ```text
 N = 8
@@ -29,16 +30,112 @@ d = lambda/2
 DOA range = -60 deg to +60 deg
 Sectors = 4
 SNR sweep = [-10, -5, 0, 5, 10, 15, 20] dB
+Samples per class per SNR = 100
+Total samples = 2800
+Train/test split = 70/30, stratified by SNR and class
 Spike time steps = 20
+LIF leak = 0.97
 ```
 
-Expected outputs:
+Dataset summary:
 
 ```text
+num_samples: 2800
+num_features: 9
+train_samples: 1960
+test_samples: 840
+class_counts: 700 per class
+snr_counts: 400 per SNR value
+```
+
+Nearest-centroid baseline:
+
+```text
+overall_accuracy: 0.869048
+```
+
+Baseline accuracy versus SNR:
+
+```text
+-10.0 dB: 0.758333
+ -5.0 dB: 0.908333
+  0.0 dB: 0.891667
+  5.0 dB: 0.858333
+ 10.0 dB: 0.866667
+ 15.0 dB: 0.925000
+ 20.0 dB: 0.875000
+```
+
+Rate-based spike encoding:
+
+```text
+num_time_steps: 20
+num_features: 9
+max_possible_spikes_per_sample: 180
+mean_test_firing_rate: 0.143201
+mean_test_spike_count_per_sample: 25.776190
+```
+
+LIF-inspired spike classifier:
+
+```text
+overall_accuracy: 0.825000
+mean_latency_steps: 6.423810
+std_latency_steps: 6.148086
+min_latency_steps: 1
+max_latency_steps: 20
+```
+
+LIF accuracy versus SNR:
+
+```text
+-10.0 dB: 0.658333
+ -5.0 dB: 0.816667
+  0.0 dB: 0.800000
+  5.0 dB: 0.866667
+ 10.0 dB: 0.883333
+ 15.0 dB: 0.883333
+ 20.0 dB: 0.866667
+```
+
+LIF mean latency versus SNR:
+
+```text
+-10.0 dB: 8.775000
+ -5.0 dB: 8.641667
+  0.0 dB: 7.383333
+  5.0 dB: 5.566667
+ 10.0 dB: 4.783333
+ 15.0 dB: 4.841667
+ 20.0 dB: 4.975000
+```
+
+Generated outputs:
+
+```text
+results/run_001_dataset_summary.txt
 results/run_001_metrics.txt
 results/run_001_accuracy_vs_snr.csv
+results/run_002_spike_encoding_summary.txt
+results/run_003_lif_metrics.txt
+results/run_003_lif_accuracy_vs_snr.csv
+results/run_003_lif_latency_vs_snr.csv
 figures/run_001_example_beamspace_response.png
 figures/run_001_accuracy_vs_snr.png
 figures/run_001_confusion_matrix_snr_10db.png
-figures/run_001_spike_count_distribution.png
+figures/run_002_spike_count_distribution.png
+figures/run_003_lif_accuracy_vs_snr.png
+figures/run_003_lif_confusion_matrix_snr_10db.png
 ```
+
+Interpretation:
+
+The first complete Phase 1 run is successful. The nearest-centroid baseline confirms that compact beamspace features are informative for coarse DOA-sector inference. The LIF-inspired spike classifier achieves 82.5% accuracy using sparse rate-coded spike trains, far above the 25% random baseline. The mean stable-decision latency decreases as SNR improves, supporting the edge-inference interpretation.
+
+Next tasks:
+
+1. Inspect local figures.
+2. Commit generated local result files and figures.
+3. Add comparison and latency plots.
+4. Sweep number of spike time steps and leakage factor.
+5. Convert the run into a formal course-report section.

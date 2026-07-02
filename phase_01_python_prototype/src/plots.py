@@ -11,6 +11,7 @@ import numpy as np
 def plot_accuracy_vs_snr(
     accuracy_rows: list[tuple[float, float, int]],
     output_path: Path,
+    title: str = "DOA-Sector Accuracy vs SNR",
 ) -> None:
     """Save accuracy-versus-SNR plot."""
 
@@ -21,7 +22,7 @@ def plot_accuracy_vs_snr(
     ax.plot(snr_values, accuracies, marker="o")
     ax.set_xlabel("SNR (dB)")
     ax.set_ylabel("Accuracy (%)")
-    ax.set_title("Nearest-Centroid DOA-Sector Accuracy vs SNR")
+    ax.set_title(title)
     ax.grid(True)
     ax.set_ylim(0.0, 105.0)
     fig.tight_layout()
