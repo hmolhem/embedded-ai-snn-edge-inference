@@ -30,6 +30,62 @@ def plot_accuracy_vs_snr(
     plt.close(fig)
 
 
+def plot_accuracy_comparison_vs_snr(
+    baseline_rows: list[tuple[float, float, int]],
+    lif_rows: list[tuple[float, float, int]],
+    output_path: Path,
+    title: str = "Baseline vs LIF-Inspired Accuracy vs SNR",
+) -> None:
+    """Save baseline/LIF accuracy comparison versus SNR."""
+
+    baseline_snr = np.asarray([row[0] for row in baseline_rows], dtype=float)
+    baseline_accuracy = 100.0 * np.asarray([row[1] for row in baseline_rows], dtype=float)
+
+    lif_snr = np.asarray([row[0] for row in lif_rows], dtype=float)
+    lif_accuracy = 100.0 * np.asarray([row[1] for row in lif_rows], dtype=float)
+
+    if baseline_snr.shape != lif_snr.shape or not np.allclose(baseline_snr, lif_snr):
+        raise ValueError("baseline_rows and lif_rows must use the same SNR grid.")
+
+    fig, ax = plt.subplots(figsize=(7.0, 4.5))
+    ax.plot(baseline_snr, baseline_accuracy, marker="o", label="Nearest-centroid baseline")
+    ax.plot(lif_snr, lif_accuracy, marker="s", label="LIF-inspired spike classifier")
+    ax.set_xlabel("SNR (dB)")
+    ax.set_ylabel("Accuracy (%)")
+    ax.set_title(title)
+    ax.grid(True)
+    ax.set_ylim(0.0, 105.0)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200)
+    plt.close(fig)
+
+
+def plot_latency_vs_snr(
+    latency_rows: list[tuple[float, float, int]],
+    output_path: Path,
+    num_time_steps: int,
+    title: str = "LIF Stable-Decision Latency vs SNR",
+) -> None:
+    """Save mean stable-decision latency versus SNR."""
+
+    snr_values = np.asarray([row[0] for row in latency_rows], dtype=float)
+    mean_latency = np.asarray([row[1] for row in latency_rows], dtype=float)
+
+    fig, ax = plt.subplots(figsize=(7.0, 4.5))
+    ax.plot(snr_values, mean_latency, marker="o")
+    ax.axhline(float(num_time_steps), linestyle="--", label="Full spike window")
+    ax.set_xlabel("SNR (dB)")
+    ax.set_ylabel("Mean stable-decision latency (time steps)")
+    ax.set_title(title)
+    ax.grid(True)
+    ax.set_ylim(0.0, float(num_time_steps) + 1.0)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200)
+    plt.close(fig)
+
+
 def plot_confusion_matrix(
     matrix: np.ndarray,
     output_path: Path,
