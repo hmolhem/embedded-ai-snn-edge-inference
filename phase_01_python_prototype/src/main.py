@@ -369,8 +369,8 @@ def main() -> None:
     print(f"Saved LIF latency figure to: {figures_dir / 'run_004_lif_latency_vs_snr.png'}")
     print(f"Saved figures to: {figures_dir}")
     print("")
-    print("Step 3B complete: LIF-inspired spike classifier is implemented.")
-    print("Next step: run locally, inspect accuracy/latency, then create the next handoff.")
+    print("Step 3C complete: accuracy comparison and LIF latency plots are generated.")
+    print("Next step: review Run 004 figures and continue with the next focused branch action.")
 
 
 if __name__ == "__main__":
