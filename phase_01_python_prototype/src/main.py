@@ -5,9 +5,10 @@ Run from the repository root with:
     python phase_01_python_prototype/run_phase_01.py
 
 This run generates a physics-based ULA/DOA dataset, extracts beamspace
-features, normalizes them, and evaluates a nearest-centroid DOA-sector
-baseline. The train/test split is stratified by both SNR and DOA sector so that
-accuracy-versus-SNR results are not distorted by sampling imbalance.
+features, normalizes them, evaluates a nearest-centroid DOA-sector baseline,
+and validates a rate-based spike encoder. The train/test split is stratified
+by both SNR and DOA sector so that accuracy-versus-SNR results are not distorted
+by sampling imbalance.
 """
 
 from __future__ import annotations
@@ -36,6 +37,12 @@ from .plots import (
     plot_accuracy_vs_snr,
     plot_beamspace_response,
     plot_confusion_matrix,
+    plot_spike_count_distribution,
+)
+from .spike_encoding import (
+    rate_encode_features,
+    spike_count_per_sample,
+    spike_count_summary,
 )
 
 
@@ -53,7 +60,7 @@ def _write_accuracy_csv(
 
 
 def main() -> None:
-    """Run the Phase 1 DOA reference baseline."""
+    """Run the Phase 1 DOA reference baseline and spike-encoding validation."""
 
     phase_dir = Path(__file__).resolve().parents[1]
     results_dir = phase_dir / "results"
@@ -114,12 +121,34 @@ def main() -> None:
         num_classes=config.num_classes,
     )
 
+    num_spike_time_steps = 20
+    train_spikes = rate_encode_features(
+        train_features,
+        num_time_steps=num_spike_time_steps,
+        random_seed=config.random_seed + 101,
+    )
+    test_spikes = rate_encode_features(
+        test_features,
+        num_time_steps=num_spike_time_steps,
+        random_seed=config.random_seed + 102,
+    )
+    test_spike_counts = spike_count_per_sample(test_spikes)
+
+    spike_summary = "\n\n".join(
+        [
+            spike_count_summary(train_spikes, label="Train"),
+            spike_count_summary(test_spikes, label="Test"),
+        ]
+    )
+
     dataset_summary_path = results_dir / "run_001_dataset_summary.txt"
     metrics_path = results_dir / "run_001_metrics.txt"
     accuracy_csv_path = results_dir / "run_001_accuracy_vs_snr.csv"
+    spike_summary_path = results_dir / "run_002_spike_encoding_summary.txt"
 
     dataset_summary_path.write_text(summary + "\n", encoding="utf-8")
     _write_accuracy_csv(accuracy_csv_path, accuracy_rows)
+    spike_summary_path.write_text(spike_summary + "\n", encoding="utf-8")
 
     metrics_lines = [
         summary,
@@ -140,6 +169,8 @@ def main() -> None:
         )
     metrics_lines.extend(["", f"confusion_matrix_at_{selected_snr:.1f}_dB:"])
     metrics_lines.append(format_confusion_matrix(selected_confusion))
+    metrics_lines.extend(["", "Run 002 rate-based spike encoding", "================================="])
+    metrics_lines.append(spike_summary)
 
     metrics_path.write_text("\n".join(metrics_lines) + "\n", encoding="utf-8")
 
@@ -161,6 +192,12 @@ def main() -> None:
         theta_deg=float(theta_deg[example_index]),
         output_path=figures_dir / "run_001_example_beamspace_response.png",
     )
+    plot_spike_count_distribution(
+        test_spike_counts,
+        figures_dir / "run_002_spike_count_distribution.png",
+        num_time_steps=num_spike_time_steps,
+        num_features=test_features.shape[1],
+    )
 
     print(summary)
     print("")
@@ -178,13 +215,18 @@ def main() -> None:
     print("")
     print(format_confusion_matrix(selected_confusion))
     print("")
+    print("Run 002 rate-based spike encoding")
+    print("=================================")
+    print(spike_summary)
+    print("")
     print(f"Saved dataset summary to: {dataset_summary_path}")
     print(f"Saved metrics to: {metrics_path}")
     print(f"Saved accuracy CSV to: {accuracy_csv_path}")
+    print(f"Saved spike-encoding summary to: {spike_summary_path}")
     print(f"Saved figures to: {figures_dir}")
     print("")
-    print("Step 2B complete: stratified nearest-centroid DOA-sector baseline is working.")
-    print("Next step: implement spike encoding and LIF-inspired inference.")
+    print("Step 3A complete: rate-based spike encoding is working.")
+    print("Next step: implement LIF-inspired DOA-sector inference.")
 
 
 if __name__ == "__main__":
