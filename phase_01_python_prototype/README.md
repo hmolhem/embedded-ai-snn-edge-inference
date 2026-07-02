@@ -76,6 +76,8 @@ figures/run_001_confusion_matrix_snr_10db.png
 figures/run_002_spike_count_distribution.png
 figures/run_003_lif_accuracy_vs_snr.png
 figures/run_003_lif_confusion_matrix_snr_10db.png
+figures/run_004_accuracy_comparison_vs_snr.png
+figures/run_004_lif_latency_vs_snr.png
 ```
 
 ## Run Command
