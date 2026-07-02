@@ -56,24 +56,34 @@ DOA range:           -60 deg to +60 deg
 Sectors:             4
 SNR sweep:           -10, -5, 0, 5, 10, 15, 20 dB
 Spike time steps:    20
+LIF leak factor:     0.97
 ```
 
-## Planned Outputs
-
-- `src/` — Python implementation
-- `notebooks/` — optional exploratory notebooks
-- `figures/` — generated plots
-- `results/` — metrics, CSV summaries, and run logs
-
-Recommended first output files:
+## Current Output Files
 
 ```text
+results/run_001_dataset_summary.txt
 results/run_001_metrics.txt
 results/run_001_accuracy_vs_snr.csv
+results/run_002_spike_encoding_summary.txt
+results/run_003_lif_metrics.txt
+results/run_003_lif_accuracy_vs_snr.csv
+results/run_003_lif_latency_vs_snr.csv
+
 figures/run_001_example_beamspace_response.png
 figures/run_001_accuracy_vs_snr.png
 figures/run_001_confusion_matrix_snr_10db.png
-figures/run_001_spike_count_distribution.png
+figures/run_002_spike_count_distribution.png
+figures/run_003_lif_accuracy_vs_snr.png
+figures/run_003_lif_confusion_matrix_snr_10db.png
+```
+
+## Run Command
+
+From the repository root:
+
+```powershell
+python phase_01_python_prototype\run_phase_01.py
 ```
 
 ## Success Criteria
@@ -88,6 +98,7 @@ Phase 1 is successful if it produces a complete end-to-end DOA-sector inference 
 - accuracy versus SNR,
 - confusion matrix,
 - spike-count analysis,
+- latency proxy in time steps,
 - clear figures and reproducible metrics.
 
 ## Non-Goals
