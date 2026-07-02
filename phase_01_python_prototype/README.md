@@ -44,6 +44,7 @@ Metrics and figures
 12. Generate confusion matrices and spike-count plots.
 13. Save all figures and results.
 14. Sweep LIF time-window and leak parameters.
+15. Convert Phase 1 results into a report-ready engineering section.
 
 ## Initial Parameters
 
@@ -79,6 +80,16 @@ lowest_latency_configuration: T=10, leak=0.99, mean_latency_steps=3.782143
 ```
 
 This run supports the embedded-inference accuracy-latency trade-off narrative: longer spike windows and higher leak values generally improve accuracy, while shorter windows reduce stable-decision latency.
+
+## Report Section
+
+A report-ready Phase 1 narrative is available at:
+
+```text
+REPORT_SECTION.md
+```
+
+It summarizes the signal model, dataset, baseline classifier, spike encoding, LIF-inspired inference path, Run 005 parameter sweep, and accuracy-latency interpretation.
 
 ## Current Output Files
 
@@ -132,6 +143,7 @@ Phase 1 is successful if it produces a complete end-to-end DOA-sector inference 
 - spike-count analysis,
 - latency proxy in time steps,
 - LIF parameter sensitivity analysis,
+- report-ready engineering interpretation,
 - clear figures and reproducible metrics.
 
 ## Non-Goals
