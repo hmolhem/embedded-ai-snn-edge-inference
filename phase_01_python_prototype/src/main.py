@@ -6,8 +6,8 @@ Run from the repository root with:
 
 This run generates a physics-based ULA/DOA dataset, extracts beamspace
 features, normalizes them, and evaluates a nearest-centroid DOA-sector
-baseline. Spike encoding and LIF inference will be added after this baseline
-is verified.
+baseline. The train/test split is stratified by both SNR and DOA sector so that
+accuracy-versus-SNR results are not distorted by sampling imbalance.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from .dataset import (
     dataset_summary,
     generate_doa_dataset,
     minmax_normalize_train_test,
-    train_test_split_by_index,
+    stratified_train_test_split_by_snr_and_class,
 )
 from .metrics import (
     accuracy_by_snr,
@@ -71,8 +71,11 @@ def main() -> None:
     theta_deg = np.asarray(dataset["theta_deg"], dtype=float)
     beam_grid_deg = np.asarray(dataset["beam_grid_deg"], dtype=float)
 
-    train_index, test_index = train_test_split_by_index(
-        num_samples=features.shape[0],
+    train_index, test_index, split_summary = stratified_train_test_split_by_snr_and_class(
+        labels=labels,
+        snr_db=snr_db,
+        snr_values=config.snr_db_values,
+        num_classes=config.num_classes,
         train_fraction=0.70,
         random_seed=config.random_seed,
     )
@@ -121,6 +124,8 @@ def main() -> None:
     metrics_lines = [
         summary,
         "",
+        split_summary,
+        "",
         "Run 001 nearest-centroid baseline",
         "=================================",
         f"train_samples: {train_features.shape[0]}",
@@ -159,6 +164,8 @@ def main() -> None:
 
     print(summary)
     print("")
+    print(split_summary)
+    print("")
     print("Run 001 nearest-centroid baseline")
     print("=================================")
     print(f"train_samples: {train_features.shape[0]}")
@@ -176,7 +183,7 @@ def main() -> None:
     print(f"Saved accuracy CSV to: {accuracy_csv_path}")
     print(f"Saved figures to: {figures_dir}")
     print("")
-    print("Step 2 complete: nearest-centroid DOA-sector baseline is working.")
+    print("Step 2B complete: stratified nearest-centroid DOA-sector baseline is working.")
     print("Next step: implement spike encoding and LIF-inspired inference.")
 
 
