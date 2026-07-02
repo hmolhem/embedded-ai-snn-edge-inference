@@ -1,0 +1,30 @@
+Phase 1 DOA dataset summary
+===========================
+num_samples: 2800
+num_features: 9
+num_elements: 8
+num_snapshots: 128
+spacing_wavelengths: 0.5
+theta_range_deg: [-59.95, 59.97]
+snr_values_db: [-10.0, -5.0, 0.0, 5.0, 10.0, 15.0, 20.0]
+beam_grid_deg: [-60.0, -45.0, -30.0, -15.0, 0.0, 15.0, 30.0, 45.0, 60.0]
+
+class_counts:
+  class_0: 700
+  class_1: 700
+  class_2: 700
+  class_3: 700
+
+snr_counts:
+  -10.0 dB: 400
+   -5.0 dB: 400
+    0.0 dB: 400
+    5.0 dB: 400
+   10.0 dB: 400
+   15.0 dB: 400
+   20.0 dB: 400
+
+feature_range:
+  min: 0.000885
+  max: 3.007279
+  mean: 0.392332
