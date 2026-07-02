@@ -2,7 +2,7 @@
 
 ## Title
 
-**Lightweight Spike-Based Edge Inference for Embedded Sensing**
+**Spike-Based Edge Inference for Physics-Based DOA Sector Estimation**
 
 ## Student
 
@@ -13,90 +13,145 @@ EE 6900 Edge AI for Robotics
 
 ## 1. Project Motivation
 
-Edge-AI systems are increasingly used in embedded and robotic applications where computation must be performed close to the sensor. These systems often operate under strict constraints on power consumption, memory footprint, latency, and communication bandwidth. Conventional dense neural-network inference can be effective, but it may be inefficient for always-on sensing tasks when the useful information is sparse, temporal, or event-like.
+Edge-AI systems for autonomous and robotic sensing often need to estimate the direction of relevant signals under constraints on power, latency, memory, and communication bandwidth. Direction-of-arrival (DOA) estimation is an important sensing primitive in radar, wireless sensing, acoustic sensing, and array-based perception. In many embedded or robotic systems, a coarse directional decision may be sufficient for navigation, tracking, alerting, or sensor steering, even when a full high-resolution DOA estimate is computationally expensive.
 
-Spiking neural networks and spike-inspired inference models provide a useful framework for exploring sparse temporal computation. Instead of processing dense activations at every step, spike-based systems can represent information through event activity over time. This makes them relevant to embedded sensing and neuromorphic edge-AI systems.
-
-This project proposes a modest, software-level prototype to study the basic behavior of spike-based edge inference. The goal is not to design a complete neuromorphic processor or a full robotic autonomy system. The goal is to build a clean, measurable, and defensible prototype that demonstrates spike encoding, lightweight LIF-inspired inference, and edge-relevant metrics.
+Spiking neural networks and spike-inspired inference models provide a hardware-friendly framework for sparse temporal computation. Instead of processing dense activations continuously, spike-based systems represent information through event activity over time. This project investigates whether physically generated array-sensing data can be converted into spike representations and used for lightweight DOA sector inference suitable for future FPGA or edge-chip implementation.
 
 ## 2. Problem Statement
 
-The project investigates whether a compact spike-based inference workflow can classify a small simulated sensing dataset while producing useful edge-AI metrics such as classification accuracy, spike count, and inference latency in time steps.
+The project addresses the following problem:
 
-The central problem is:
+> Can physics-based array-sensing data be used to generate spike-encoded features for lightweight edge inference of DOA sectors, and can the resulting inference pipeline be prepared for hardware implementation?
 
-> Can normalized sensing features be converted into spike-like temporal representations and classified using a lightweight LIF-inspired model in a way that is simple, interpretable, and suitable for future embedded implementation?
+The goal is not to claim a complete neuromorphic radar processor. The goal is to build a defensible engineering prototype that connects array-signal modeling, spike encoding, LIF-inspired inference, and hardware-aware implementation.
 
 ## 3. Project Objective
 
-The objective is to implement an end-to-end Python prototype with the following stages:
+The main objective is to implement and evaluate an end-to-end DOA-sector inference workflow with the following stages:
 
-1. generate a small simulated sensing dataset,
-2. normalize feature vectors,
-3. convert normalized features into spike-like representations,
-4. classify samples using a lightweight LIF-inspired model,
-5. evaluate performance using accuracy, confusion matrix, spike count, and latency proxy.
+1. generate array-sensing data from a physical DOA model,
+2. extract compact features from the received array data,
+3. normalize and encode the features into spike trains,
+4. classify the DOA sector using a lightweight LIF-inspired classifier,
+5. evaluate accuracy, confusion matrix, spike activity, latency proxy, and hardware-relevant complexity,
+6. prepare a hardware-facing implementation path for PYNQ/Zynq or FPGA-based edge deployment.
 
 ## 4. Technical Scope
 
 ### Included in the Project
 
-- simulated embedded-sensing dataset
-- four-class classification problem
-- eight-dimensional feature vector
-- rate-based spike encoding
-- lightweight LIF-inspired classifier
-- accuracy evaluation
-- confusion matrix
-- average spike count per sample
-- latency proxy in time steps
-- result figures and metrics summary
-- discussion of future embedded and hardware-aware extensions
+- uniform linear array (ULA) signal model,
+- physics-based synthetic DOA dataset,
+- single-source narrowband signal model,
+- additive complex Gaussian noise,
+- SNR-controlled data generation,
+- DOA-sector labels,
+- compact feature extraction from array snapshots or covariance-derived quantities,
+- rate-based spike encoding,
+- LIF-inspired edge classifier,
+- classical baseline comparison,
+- accuracy versus SNR,
+- confusion matrices,
+- spike-count and latency-proxy analysis,
+- hardware-aware discussion,
+- optional PYNQ/Zynq or Vitis HLS kernel preparation.
 
-### Not Included in the Initial Scope
+### Controlled Initial Assumptions
 
-- full neuromorphic-chip design
-- full robotic autonomy stack
-- ROS, Gazebo, Isaac Sim, or Habitat dependency
-- full radar, DOA, or MIMO implementation
-- PYNQ deployment as a required deliverable
-- FPGA implementation as a required deliverable
-- Vitis HLS synthesis as a required deliverable
-- claim of publication-level novelty in the initial course version
-
-## 5. Methodology
-
-### 5.1 Dataset Generation
-
-The first dataset will be a synthetic embedded-sensing dataset with four classes and eight features. Each class will have a different feature-space signature. Gaussian noise will be added to create realistic overlap between classes.
-
-Initial parameters:
+The first implementation will use a controlled model:
 
 ```text
-num_samples    = 1000
-num_classes    = 4
-num_features   = 8
-random_seed    = 42
+Number of array elements: 8
+Array type: Uniform Linear Array
+Element spacing: lambda / 2
+Signal model: single narrowband source
+Snapshots per sample: M
+Noise model: additive complex Gaussian noise
+DOA range: -60 degrees to +60 degrees
+Task: classify coarse DOA sector
 ```
 
-The class labels will be treated generically as four sensing states:
+Initial DOA sectors:
 
 ```text
-Class 0: sensing state A
-Class 1: sensing state B
-Class 2: sensing state C
-Class 3: sensing state D
+Class 0: -60 deg to -30 deg
+Class 1: -30 deg to   0 deg
+Class 2:   0 deg to  30 deg
+Class 3:  30 deg to  60 deg
 ```
 
-This intentionally keeps the first implementation general and course-facing.
+### Not Included in the First Required Deliverable
 
-### 5.2 Feature Normalization
+- full multi-source high-resolution DOA estimation,
+- full MUSIC or ESPRIT hardware implementation,
+- ASIC-level neuromorphic-chip design,
+- complete robotic autonomy stack,
+- mandatory ROS, Gazebo, Isaac Sim, or Habitat integration,
+- complete FPGA accelerator for the full signal-processing chain.
 
-Each feature vector will be normalized into the interval `[0, 1]`. This normalized representation is required before spike encoding because each feature value will be interpreted as a spike probability or spike-rate parameter.
+These items may be discussed as future work or implemented partially if time permits.
 
-### 5.3 Spike Encoding
+## 5. Physical Data-Generation Model
 
-The initial encoding method will be rate-based spike encoding. For each normalized feature value, binary spikes will be generated over a fixed number of time steps. Larger feature values will produce higher spike rates.
+The dataset will be generated from a narrowband array-processing model. For a single source arriving from angle theta, the received array snapshot is modeled as
+
+```text
+x[m] = a(theta) s[m] + n[m]
+```
+
+where
+
+```text
+x[m]      : received array vector at snapshot m
+a(theta) : steering vector of the ULA
+s[m]      : complex source signal
+n[m]      : complex Gaussian noise
+m         : snapshot index
+```
+
+For a ULA with half-wavelength spacing, the steering vector can be written as
+
+```text
+a_n(theta) = exp(-j 2 pi d n sin(theta) / lambda)
+```
+
+where `n` is the array-element index and `d = lambda/2`.
+
+For each simulated sample:
+
+1. randomly select a DOA angle from the desired angular range,
+2. assign the angle to a coarse DOA sector,
+3. generate source snapshots,
+4. generate additive complex Gaussian noise at a specified SNR,
+5. form the received array snapshots,
+6. compute compact features for spike-based inference.
+
+## 6. Feature Extraction
+
+The initial feature set will be intentionally compact and hardware-friendly. Candidate features include:
+
+- diagonal power features from the sample covariance matrix,
+- magnitudes of selected off-diagonal covariance entries,
+- real and imaginary parts of selected covariance terms,
+- beamspace energy features over a small number of steering directions.
+
+The sample covariance matrix is
+
+```text
+R_xx = (1/M) sum_m x[m] x[m]^H
+```
+
+The first baseline will use a compact feature vector rather than the full covariance matrix. This keeps the computation suitable for edge hardware and allows the project to focus on spike encoding and lightweight inference.
+
+## 7. Spike Encoding
+
+The compact feature vector will be normalized to the range `[0, 1]`. Each normalized feature will then be converted into a spike train using rate-based encoding:
+
+```text
+P(spike_k[t] = 1) = feature_k
+```
+
+where `k` indexes the feature and `t` indexes the discrete time step.
 
 Initial parameter:
 
@@ -104,96 +159,139 @@ Initial parameter:
 num_time_steps = 20
 ```
 
-The spike tensor will have the shape:
+The spike tensor will have the form:
 
 ```text
-num_samples × num_time_steps × num_features
+num_samples x num_time_steps x num_features
 ```
 
-### 5.4 LIF-Inspired Classifier
+## 8. LIF-Inspired Edge Classifier
 
-The classifier will use a lightweight leaky-integrate-and-fire inspired accumulation model. Input spike trains will be accumulated into class-level membrane states. A leak factor may be applied at each time step. The predicted class will be selected using the largest final membrane potential.
+The first classifier will be a lightweight leaky-integrate-and-fire inspired class accumulator. Spike trains will be integrated into class-level membrane states. A leak factor will be applied over time, and the predicted class will be selected using the largest final membrane potential.
 
-The first decision rule will be:
+First decision rule:
 
-> predict the class with the largest final membrane potential.
+```text
+Predicted class = argmax(final membrane potential)
+```
 
-This rule is selected because it is stable and easy to explain for the baseline implementation.
+This classifier is selected because it is interpretable, simple to implement, and suitable for later fixed-point or hardware-oriented implementation.
 
-### 5.5 Evaluation
+## 9. Baseline Comparison
 
-The project will evaluate both classification performance and edge-relevant behavior. Accuracy alone is not sufficient. Spike count and latency proxy are included because they are relevant to sparse temporal inference and future embedded implementation.
+The spike-based inference method will be compared against at least one non-spiking baseline. Candidate baselines include:
 
-## 6. Expected Deliverables
+- nearest-centroid classifier,
+- logistic regression,
+- small multilayer perceptron,
+- classical beam-scanning sector decision.
 
-The expected deliverables are:
+The baseline comparison is important because the project should evaluate the spike-based method against a conventional alternative rather than only demonstrate spike generation.
 
-- Python source code,
-- experiment runner,
-- dataset visualization,
-- confusion-matrix figure,
-- spike-count distribution figure,
-- metrics summary file,
-- short technical report section,
+## 10. Evaluation Metrics
+
+The project will report:
+
+- classification accuracy,
+- confusion matrix,
+- accuracy versus SNR,
+- average spike count per sample,
+- latency proxy in time steps,
+- feature-vector dimension,
+- rough operation-count estimate,
+- memory-footprint estimate,
+- hardware-facing discussion of implementation cost.
+
+## 11. Hardware Implementation Path
+
+The intended hardware path is staged.
+
+### Stage 1: Python Reference Model
+
+A complete Python model will generate the DOA dataset, extract features, encode spikes, perform inference, and report metrics.
+
+### Stage 2: Hardware-Friendly Refactoring
+
+The spike encoder and LIF update will be rewritten in a form suitable for fixed-point arithmetic and loop-based hardware implementation.
+
+### Stage 3: PYNQ/Zynq or FPGA-Facing Demonstration
+
+A minimal hardware-facing demonstration may implement one or more of the following:
+
+- spike encoding kernel,
+- LIF update kernel,
+- fixed-point class accumulator,
+- DOA-sector inference on precomputed features.
+
+The practical course target is a hardware-facing DOA-sector inference pipeline. Full continuous-angle DOA estimation on FPGA is a research extension and may be discussed as future work unless sufficient time and hardware access are available.
+
+## 12. Expected Deliverables
+
+Expected deliverables include:
+
+- Python source code for DOA data generation,
+- feature extraction module,
+- spike-encoding module,
+- LIF-inspired inference module,
+- baseline comparison module,
+- accuracy-versus-SNR results,
+- confusion matrices,
+- spike-count and latency analysis,
+- hardware-aware discussion,
+- project proposal,
+- final report,
 - GitHub documentation,
-- final handoff after baseline results.
+- handoff/checkpoint documents.
 
-Expected output locations:
+Expected repository locations:
 
 ```text
 phase_01_python_prototype/src/
 phase_01_python_prototype/results/
 phase_01_python_prototype/figures/
+phase_02_radar_sensing_case_study/src/
+phase_02_radar_sensing_case_study/results/
+phase_02_radar_sensing_case_study/figures/
 docs/reports/
 docs/handoffs/
 ```
 
-## 7. Evaluation Metrics
+## 13. Success Criteria
 
-Minimum metrics:
+The minimum success criteria are:
 
-- classification accuracy,
-- confusion matrix,
-- average spike count per sample,
-- latency proxy in time steps.
+1. physics-based ULA/DOA dataset generation works correctly,
+2. DOA-sector labels are generated from physical angles,
+3. compact features are extracted from array data,
+4. spike encoding is implemented and measured,
+5. LIF-inspired classifier produces meaningful sector classification,
+6. at least one baseline comparison is included,
+7. accuracy versus SNR is reported,
+8. hardware-facing implementation path is documented.
 
-Optional metrics if time permits:
+The preferred success criterion is to produce a working edge-inference prototype whose core spike-encoding and LIF-inference steps are suitable for PYNQ/Zynq or FPGA-oriented implementation.
 
-- accuracy versus number of time steps,
-- spike count versus number of time steps,
-- accuracy versus noise level,
-- comparison with a simple non-spiking baseline.
+## 14. Risks and Limitations
 
-## 8. Success Criteria
+The main technical risk is scope control. A full DOA estimator, full SNN training workflow, and full FPGA accelerator are each substantial projects. The project will therefore focus on a controlled DOA-sector inference problem and a hardware-friendly spike-based inference pipeline.
 
-For a four-class problem, random guessing is approximately 25 percent. The first baseline target is:
+Another risk is overcomplicating the first implementation. The first version will use a single-source ULA model and coarse sector labels. More advanced cases such as multiple sources, high-resolution continuous-angle estimation, or full MUSIC/ESPRIT acceleration will be treated as extensions.
 
-```text
-accuracy > 75 percent
-```
+## 15. Future Work
 
-This target is intended only as a practical baseline. The main success criterion is a complete, reproducible, and well-documented end-to-end spike-based edge-inference workflow.
+Possible future extensions include:
 
-## 9. Risks and Limitations
+1. continuous-angle DOA estimation instead of sector classification,
+2. multi-source DOA cases,
+3. MUSIC or ESPRIT comparison,
+4. covariance-matrix acceleration using HLS,
+5. PYNQ deployment with fixed-point spike/LIF kernels,
+6. integration with prior FPGA acceleration work,
+7. paper-oriented hardware-aware spike-based DOA inference.
 
-The main risk is choosing a synthetic dataset that is either too easy or too difficult. A dataset that is too easy may not demonstrate meaningful behavior, while a dataset that is too difficult may obscure the purpose of the spike-based prototype. The first dataset will therefore be simple but not trivial.
+## 16. Project Management Plan
 
-Another limitation is that the initial prototype is a software-level model. It should not be presented as a hardware implementation. PYNQ, FPGA, and Vitis HLS extensions are future directions, not required results for the first course deliverable.
-
-## 10. Future Work
-
-After the baseline prototype is stable, the project can be extended in several directions:
-
-1. sensing-specific case study using radar or array-derived features,
-2. coarse direction-sector classification,
-3. comparison with classical or small DNN baselines,
-4. PYNQ ARM-side deployment,
-5. Vitis HLS implementation of one small kernel such as spike encoding or LIF update,
-6. hardware-aware analysis for possible portfolio or paper development.
-
-## 11. Project Management Plan
-
-The project will be developed in a staged GitHub repository. Each major discussion, design decision, result, or phase transition will be documented using Markdown handoff files.
+The project will be developed in a staged GitHub repository. Each major design decision, technical result, risk, and phase transition will be documented using Markdown handoff files.
 
 Current repository:
 
@@ -207,4 +305,4 @@ Current local path:
 C:\MyDocument\embedded-ai-snn-edge-inference
 ```
 
-The immediate next step is to implement the Phase 1 baseline prototype according to the frozen design notes.
+The immediate next step is to implement the physics-based DOA data-generation model and then build the spike-based inference pipeline on top of it.
