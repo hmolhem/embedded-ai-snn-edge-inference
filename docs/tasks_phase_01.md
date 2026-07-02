@@ -11,6 +11,7 @@
 - [x] Implement DOA-sector label generation.
 - [x] Compute sample covariance matrix `Rxx`.
 - [x] Extract compact beamspace or covariance-derived features.
+- [x] Implement stratified train/test split by SNR and class.
 - [x] Normalize features using training-set statistics.
 - [ ] Implement rate-based spike encoding.
 - [ ] Implement lightweight LIF-inspired DOA-sector classifier.
