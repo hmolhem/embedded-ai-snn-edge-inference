@@ -1,0 +1,38 @@
+Run 005 LIF parameter sweep
+===========================
+baseline_nearest_centroid_accuracy: 0.869048
+
+sweep_grid:
+  num_time_steps: [10, 20, 30, 40]
+  leak_values: [0.9, 0.95, 0.97, 0.99]
+  total_configurations: 16
+
+best_accuracy_configuration:
+  num_time_steps: 40
+  leak: 0.99
+  overall_accuracy: 0.841667
+  mean_latency_steps: 8.396429
+
+lowest_latency_configuration:
+  num_time_steps: 10
+  leak: 0.99
+  overall_accuracy: 0.776190
+  mean_latency_steps: 3.782143
+
+all_configurations:
+  T=10, leak=0.90, accuracy=0.773810, mean_latency=4.280952
+  T=10, leak=0.95, accuracy=0.778571, mean_latency=4.011905
+  T=10, leak=0.97, accuracy=0.779762, mean_latency=3.914286
+  T=10, leak=0.99, accuracy=0.776190, mean_latency=3.782143
+  T=20, leak=0.90, accuracy=0.809524, mean_latency=7.732143
+  T=20, leak=0.95, accuracy=0.816667, mean_latency=6.579762
+  T=20, leak=0.97, accuracy=0.819048, mean_latency=6.340476
+  T=20, leak=0.99, accuracy=0.816667, mean_latency=5.753571
+  T=30, leak=0.90, accuracy=0.802381, mean_latency=10.946429
+  T=30, leak=0.95, accuracy=0.829762, mean_latency=8.870238
+  T=30, leak=0.97, accuracy=0.838095, mean_latency=8.126190
+  T=30, leak=0.99, accuracy=0.832143, mean_latency=7.352381
+  T=40, leak=0.90, accuracy=0.801190, mean_latency=14.945238
+  T=40, leak=0.95, accuracy=0.822619, mean_latency=10.778571
+  T=40, leak=0.97, accuracy=0.830952, mean_latency=9.697619
+  T=40, leak=0.99, accuracy=0.841667, mean_latency=8.396429

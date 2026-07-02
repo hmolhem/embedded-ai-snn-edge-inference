@@ -43,6 +43,7 @@ Metrics and figures
 11. Evaluate accuracy versus SNR.
 12. Generate confusion matrices and spike-count plots.
 13. Save all figures and results.
+14. Sweep LIF time-window and leak parameters.
 
 ## Initial Parameters
 
@@ -59,6 +60,26 @@ Spike time steps:    20
 LIF leak factor:     0.97
 ```
 
+## Run 005 Parameter Sweep
+
+Run 005 evaluates the sensitivity of the LIF-inspired classifier to the spike time-window length and leak factor:
+
+```text
+num_time_steps = [10, 20, 30, 40]
+leak = [0.90, 0.95, 0.97, 0.99]
+total configurations = 16
+```
+
+Key results:
+
+```text
+baseline_nearest_centroid_accuracy: 0.869048
+best_lif_accuracy: 0.841667 at T=40, leak=0.99
+lowest_latency_configuration: T=10, leak=0.99, mean_latency_steps=3.782143
+```
+
+This run supports the embedded-inference accuracy-latency trade-off narrative: longer spike windows and higher leak values generally improve accuracy, while shorter windows reduce stable-decision latency.
+
 ## Current Output Files
 
 ```text
@@ -69,6 +90,8 @@ results/run_002_spike_encoding_summary.txt
 results/run_003_lif_metrics.txt
 results/run_003_lif_accuracy_vs_snr.csv
 results/run_003_lif_latency_vs_snr.csv
+results/run_005_lif_parameter_sweep.csv
+results/run_005_lif_parameter_sweep_summary.txt
 
 figures/run_001_example_beamspace_response.png
 figures/run_001_accuracy_vs_snr.png
@@ -78,14 +101,21 @@ figures/run_003_lif_accuracy_vs_snr.png
 figures/run_003_lif_confusion_matrix_snr_10db.png
 figures/run_004_accuracy_comparison_vs_snr.png
 figures/run_004_lif_latency_vs_snr.png
+figures/run_005_lif_accuracy_latency_tradeoff.png
 ```
 
-## Run Command
+## Run Commands
 
-From the repository root:
+Main Phase 1 pipeline from the repository root:
 
 ```powershell
 python phase_01_python_prototype\run_phase_01.py
+```
+
+Run 005 LIF parameter sweep from the repository root:
+
+```powershell
+python phase_01_python_prototype\run_phase_01_parameter_sweep.py
 ```
 
 ## Success Criteria
@@ -101,6 +131,7 @@ Phase 1 is successful if it produces a complete end-to-end DOA-sector inference 
 - confusion matrix,
 - spike-count analysis,
 - latency proxy in time steps,
+- LIF parameter sensitivity analysis,
 - clear figures and reproducible metrics.
 
 ## Non-Goals

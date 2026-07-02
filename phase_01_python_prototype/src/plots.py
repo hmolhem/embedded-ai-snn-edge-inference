@@ -86,6 +86,47 @@ def plot_latency_vs_snr(
     plt.close(fig)
 
 
+def plot_lif_parameter_sweep_tradeoff(
+    sweep_rows: list[dict[str, float]],
+    output_path: Path,
+    title: str = "LIF Parameter Sweep: Accuracy-Latency Trade-off",
+) -> None:
+    """Save accuracy-latency trade-off plot for the LIF parameter sweep."""
+
+    if not sweep_rows:
+        raise ValueError("sweep_rows must not be empty.")
+
+    leak_values = sorted({float(row["leak"]) for row in sweep_rows})
+
+    fig, ax = plt.subplots(figsize=(7.0, 4.8))
+    for leak in leak_values:
+        leak_rows = [row for row in sweep_rows if np.isclose(float(row["leak"]), leak)]
+        leak_rows = sorted(leak_rows, key=lambda row: int(row["num_time_steps"]))
+        latency = [float(row["mean_latency_steps"]) for row in leak_rows]
+        accuracy = [100.0 * float(row["overall_accuracy"]) for row in leak_rows]
+        labels = [int(row["num_time_steps"]) for row in leak_rows]
+
+        ax.plot(latency, accuracy, marker="o", label=f"leak={leak:.2f}")
+        for x_value, y_value, num_steps in zip(latency, accuracy, labels):
+            ax.annotate(
+                f"T={num_steps}",
+                (x_value, y_value),
+                textcoords="offset points",
+                xytext=(4, 4),
+                fontsize=8,
+            )
+
+    ax.set_xlabel("Mean stable-decision latency (time steps)")
+    ax.set_ylabel("Overall accuracy (%)")
+    ax.set_title(title)
+    ax.grid(True)
+    ax.set_ylim(0.0, 105.0)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200)
+    plt.close(fig)
+
+
 def plot_confusion_matrix(
     matrix: np.ndarray,
     output_path: Path,
