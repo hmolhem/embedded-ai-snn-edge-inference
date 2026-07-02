@@ -40,9 +40,11 @@ from .metrics import (
     predict_nearest_centroid,
 )
 from .plots import (
+    plot_accuracy_comparison_vs_snr,
     plot_accuracy_vs_snr,
     plot_beamspace_response,
     plot_confusion_matrix,
+    plot_latency_vs_snr,
     plot_spike_count_distribution,
 )
 from .spike_encoding import (
@@ -342,6 +344,19 @@ def main() -> None:
         title="LIF-Inspired Confusion Matrix at 10 dB",
     )
 
+    plot_accuracy_comparison_vs_snr(
+        baseline_accuracy_rows,
+        lif_accuracy_rows,
+        figures_dir / "run_004_accuracy_comparison_vs_snr.png",
+        title="Nearest-Centroid vs LIF-Inspired Accuracy vs SNR",
+    )
+    plot_latency_vs_snr(
+        lif_latency_rows,
+        figures_dir / "run_004_lif_latency_vs_snr.png",
+        num_time_steps=num_spike_time_steps,
+        title="LIF Stable-Decision Latency vs SNR",
+    )
+
     print(metrics_text)
     print(f"Saved dataset summary to: {dataset_summary_path}")
     print(f"Saved combined metrics to: {metrics_path}")
@@ -350,6 +365,8 @@ def main() -> None:
     print(f"Saved LIF metrics to: {lif_metrics_path}")
     print(f"Saved LIF accuracy CSV to: {lif_accuracy_csv_path}")
     print(f"Saved LIF latency CSV to: {lif_latency_csv_path}")
+    print(f"Saved accuracy comparison figure to: {figures_dir / 'run_004_accuracy_comparison_vs_snr.png'}")
+    print(f"Saved LIF latency figure to: {figures_dir / 'run_004_lif_latency_vs_snr.png'}")
     print(f"Saved figures to: {figures_dir}")
     print("")
     print("Step 3B complete: LIF-inspired spike classifier is implemented.")

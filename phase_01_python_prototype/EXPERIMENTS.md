@@ -139,3 +139,22 @@ Next tasks:
 3. Add comparison and latency plots.
 4. Sweep number of spike time steps and leakage factor.
 5. Convert the run into a formal course-report section.
+
+## Run 004 — Accuracy and Latency Comparison Plots
+
+Status: completed locally.
+
+Purpose: generate report-ready comparison plots for the Phase 1 DOA nearest-centroid baseline and LIF-inspired spike classifier.
+
+Generated figures:
+
+```text
+figures/run_004_accuracy_comparison_vs_snr.png
+figures/run_004_lif_latency_vs_snr.png
+```
+
+Interpretation:
+
+The accuracy comparison plot overlays the continuous-valued nearest-centroid baseline and the sparse LIF-inspired spike classifier across the same SNR grid. The latency plot shows the mean stable-decision latency of the LIF classifier versus SNR, with the full spike window used as a reference.
+
+This run supports the Phase 1 accuracy-latency-energy narrative for embedded neuromorphic inference.
