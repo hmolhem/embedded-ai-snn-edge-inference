@@ -74,3 +74,33 @@ def plot_beamspace_response(
     fig.tight_layout()
     fig.savefig(output_path, dpi=200)
     plt.close(fig)
+
+
+def plot_spike_count_distribution(
+    spike_counts: np.ndarray,
+    output_path: Path,
+    num_time_steps: int,
+    num_features: int,
+) -> None:
+    """Save a histogram of total spike count per sample."""
+
+    counts = np.asarray(spike_counts, dtype=float)
+    if counts.ndim != 1:
+        raise ValueError("spike_counts must be a one-dimensional array.")
+
+    max_possible_spikes = num_time_steps * num_features
+
+    fig, ax = plt.subplots(figsize=(7.0, 4.5))
+    ax.hist(counts, bins=30)
+    ax.axvline(float(counts.mean()), linestyle="--")
+    ax.set_xlabel("Spike count per sample")
+    ax.set_ylabel("Number of samples")
+    ax.set_title(
+        "Rate-Encoded Spike-Count Distribution "
+        f"(T={num_time_steps}, F={num_features})"
+    )
+    ax.set_xlim(0.0, float(max_possible_spikes))
+    ax.grid(True)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200)
+    plt.close(fig)
