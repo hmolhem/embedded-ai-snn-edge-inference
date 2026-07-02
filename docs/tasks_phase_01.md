@@ -13,15 +13,15 @@
 - [x] Extract compact beamspace or covariance-derived features.
 - [x] Implement stratified train/test split by SNR and class.
 - [x] Normalize features using training-set statistics.
-- [ ] Implement rate-based spike encoding.
+- [x] Implement rate-based spike encoding.
 - [ ] Implement lightweight LIF-inspired DOA-sector classifier.
 - [x] Implement nearest-centroid baseline.
 - [x] Evaluate accuracy versus SNR.
 - [x] Generate confusion matrix.
-- [ ] Generate spike-count distribution.
+- [x] Generate spike-count distribution.
 - [x] Save first dataset summary.
 - [x] Save baseline metrics and figures.
-- [ ] Write handoff after first DOA Run 001.
+- [ ] Write Phase 1 run notes.
 
 ## Deliverables
 
@@ -34,4 +34,4 @@
 - figures
 - results summary
 - short report section
-- handoff document
+- project notes
