@@ -37,6 +37,78 @@ The completed prototype connects three technical layers:
     \item sparse temporal inference through rate-based spike encoding and LIF-inspired evidence accumulation.
 \end{enumerate}
 
+\section{Theoretical Background}
+
+This section summarizes the theoretical foundation used in Phase 1. The purpose is to keep the main report self-contained while avoiding unnecessary derivation detail in the main body. Additional mathematical details are provided in the Appendix.
+
+\subsection{Uniform Linear Array Signal Model}
+
+A uniform linear array consists of $N$ equally spaced sensor elements. For a narrowband plane wave arriving from angle $\theta$, the relative phase progression across the array is determined by the element spacing $d$, the wavelength $\lambda$, and the wavenumber $k=2\pi/\lambda$. With a broadside angle convention, a typical ULA steering vector can be written as
+\begin{equation}
+    a(\theta)
+    =
+    \begin{bmatrix}
+    1 & e^{-jkd\sin\theta} & e^{-j2kd\sin\theta} & \cdots & e^{-j(N-1)kd\sin\theta}
+    \end{bmatrix}^{T}.
+\end{equation}
+For the Phase 1 prototype, the exact objective is not continuous-angle estimation. Instead, the steering-vector model is used to generate physically meaningful array snapshots for a four-sector DOA classification task.
+
+\subsection{Sample Covariance Matrix}
+
+For each simulated source angle and SNR value, the received snapshot matrix is modeled as
+\begin{equation}
+    X = a(\theta)s + N,
+\end{equation}
+where $a(\theta)$ is the steering vector, $s$ is the source waveform, and $N$ is additive complex noise. The sample covariance matrix is
+\begin{equation}
+    R_{xx}=\frac{1}{M}XX^{H},
+\end{equation}
+where $M$ is the number of snapshots. In expectation, the covariance structure contains spatial information through the rank-one signal component associated with $a(\theta)a^{H}(\theta)$ and a noise contribution determined by the SNR.
+
+\subsection{Beamspace Feature Extraction}
+
+Beamspace processing maps array-domain information into a set of angular responses. For a steering vector $b(\phi)$ evaluated at grid angle $\phi$, a simple beamspace energy feature can be represented as
+\begin{equation}
+    p(\phi)=b^{H}(\phi)R_{xx}b(\phi).
+\end{equation}
+Evaluating $p(\phi)$ on a fixed angular grid produces a compact real-valued feature vector. In Phase 1, this feature vector is used for coarse sector classification rather than fine DOA estimation.
+
+\subsection{Nearest-Centroid Classification}
+
+The non-spiking baseline uses a nearest-centroid decision rule. If $x$ is a normalized feature vector and $\mu_c$ is the training-set centroid for class $c$, the baseline decision is
+\begin{equation}
+    \hat{c}=\arg\min_{c}\|x-\mu_c\|_2^2.
+\end{equation}
+This classifier is intentionally simple and interpretable. It provides a useful reference for measuring how much accuracy is lost when continuous-valued features are converted into sparse spike trains.
+
+\subsection{Rate-Based Spike Encoding}
+
+After normalization, each feature component is mapped to a spike probability. For feature component $z_i \in [0,1]$, the spike at time step $t$ can be modeled as
+\begin{equation}
+    s_i[t] \sim \mathrm{Bernoulli}(z_i).
+\end{equation}
+The time-average spike count approximates the original normalized feature value:
+\begin{equation}
+    \mathbb{E}\left[\frac{1}{T}\sum_{t=1}^{T}s_i[t]\right]=z_i.
+\end{equation}
+This representation introduces stochastic quantization error but creates a sparse temporal signal appropriate for hardware-facing inference experiments.
+
+\subsection{LIF-Inspired Temporal Inference}
+
+The LIF-inspired classifier accumulates spike-driven evidence over time. For class $c$, the membrane evidence follows
+\begin{equation}
+    v_c[t]=\alpha v_c[t-1]+i_c[t],
+\end{equation}
+where $\alpha$ is the leak factor and $i_c[t]$ is the spike-driven input current. A higher leak value preserves past evidence more strongly, while a shorter time window reduces latency but may reduce classification accuracy.
+
+\subsection{Stable-Decision Latency}
+
+The classifier produces a class decision at each time step by selecting the largest membrane value:
+\begin{equation}
+    d[t]=\arg\max_{c}v_c[t].
+\end{equation}
+The stable-decision latency is defined as the earliest time step after which the decision remains equal to the final decision. This metric provides a practical way to evaluate whether the temporal classifier can support early-exit or adaptive-latency edge inference.
+
 \section{Signal Model and Dataset}
 
 The Phase 1 dataset is generated using a narrowband single-source ULA model. For each source angle $\theta$ and SNR value, the received array snapshot matrix is modeled as
@@ -228,7 +300,69 @@ The LIF-inspired classifier demonstrates that the same normalized features can b
 
 The Phase 1 result is therefore a valid embedded-AI reference baseline. The natural next step is to convert the Python reference model into a more formal course report and then extend the project toward richer radar/DOA case studies or embedded implementation.
 
-\section{References}
+\appendix
+
+\section{Additional Theoretical Details}
+
+\subsection{ULA Steering Vector and Phase Progression}
+
+For a ULA with inter-element spacing $d$, the path-length difference between adjacent sensors is $d\sin\theta$ under the broadside convention. The corresponding phase shift is
+\begin{equation}
+    \psi(\theta)=kd\sin\theta=\frac{2\pi d}{\lambda}\sin\theta.
+\end{equation}
+For half-wavelength spacing, $d=\lambda/2$, this becomes
+\begin{equation}
+    \psi(\theta)=\pi\sin\theta.
+\end{equation}
+This phase progression is the physical basis for the steering vector used to generate DOA-dependent array snapshots.
+
+\subsection{Beamspace Energy Interpretation}
+
+The beamspace response
+\begin{equation}
+    p(\phi)=b^{H}(\phi)R_{xx}b(\phi)
+\end{equation}
+can be interpreted as the output power of a conventional beam steered toward grid angle $\phi$. If the grid steering vector is aligned with the true source direction, the response tends to be larger. Therefore, the vector of grid responses provides a compact angular signature for sector classification.
+
+\subsection{Nearest-Centroid Rule as a Linear Score}
+
+The nearest-centroid decision rule can be expanded as
+\begin{align}
+    \hat{c}
+    &=\arg\min_c \|x-\mu_c\|_2^2 \\
+    &=\arg\min_c \left(x^Tx -2\mu_c^Tx + \mu_c^T\mu_c\right).
+\end{align}
+Since $x^Tx$ does not depend on class, the equivalent decision is
+\begin{equation}
+    \hat{c}=\arg\max_c \left(2\mu_c^Tx-\|\mu_c\|_2^2\right).
+\end{equation}
+This form is useful for the LIF-inspired implementation because it can be interpreted as class evidence accumulation using class-dependent weights and biases.
+
+\subsection{Spike Encoding Statistics}
+
+For rate-based encoding, the spike count for feature $i$ over $T$ time steps is
+\begin{equation}
+    K_i=\sum_{t=1}^{T}s_i[t].
+\end{equation}
+If $s_i[t]\sim \mathrm{Bernoulli}(z_i)$, then
+\begin{equation}
+    \mathbb{E}[K_i]=Tz_i,
+\end{equation}
+\begin{equation}
+    \mathrm{Var}(K_i)=Tz_i(1-z_i).
+\end{equation}
+Therefore, a longer spike window reduces relative stochastic error but increases the temporal budget.
+
+\subsection{LIF Leak and Latency Interpretation}
+
+The LIF-inspired update
+\begin{equation}
+    v_c[t]=\alpha v_c[t-1]+i_c[t]
+\end{equation}
+acts as a leaky temporal integration of evidence. When $\alpha$ is close to one, previous evidence is retained for more time steps. When $\alpha$ is smaller, the classifier reacts more strongly to recent spikes but may lose accumulated evidence more quickly. This explains why the Phase 1 parameter sweep uses both $T$ and $\alpha$ as design variables.
+
+\section*{References}
+\addcontentsline{toc}{section}{References}
 
 \begin{thebibliography}{9}
 \bibitem{vanTrees}
