@@ -91,7 +91,13 @@ def plot_lif_parameter_sweep_tradeoff(
     output_path: Path,
     title: str = "LIF Parameter Sweep: Accuracy-Latency Trade-off",
 ) -> None:
-    """Save accuracy-latency trade-off plot for the LIF parameter sweep."""
+    """Save accuracy-latency trade-off plot for the LIF parameter sweep.
+
+    The plot intentionally avoids labeling every sweep point. Dense point labels make
+    the report figure difficult to read because the tested configurations cluster in a
+    narrow accuracy range. Instead, the plot highlights the two engineering anchor
+    points: the best-accuracy configuration and the lowest-latency configuration.
+    """
 
     if not sweep_rows:
         raise ValueError("sweep_rows must not be empty.")
@@ -104,17 +110,52 @@ def plot_lif_parameter_sweep_tradeoff(
         leak_rows = sorted(leak_rows, key=lambda row: int(row["num_time_steps"]))
         latency = [float(row["mean_latency_steps"]) for row in leak_rows]
         accuracy = [100.0 * float(row["overall_accuracy"]) for row in leak_rows]
-        labels = [int(row["num_time_steps"]) for row in leak_rows]
 
         ax.plot(latency, accuracy, marker="o", label=f"leak={leak:.2f}")
-        for x_value, y_value, num_steps in zip(latency, accuracy, labels):
-            ax.annotate(
-                f"T={num_steps}",
-                (x_value, y_value),
-                textcoords="offset points",
-                xytext=(4, 4),
-                fontsize=8,
-            )
+
+    best_accuracy_row = max(
+        sweep_rows,
+        key=lambda row: (
+            float(row["overall_accuracy"]),
+            -float(row["mean_latency_steps"]),
+        ),
+    )
+    lowest_latency_row = min(
+        sweep_rows,
+        key=lambda row: (
+            float(row["mean_latency_steps"]),
+            -float(row["overall_accuracy"]),
+        ),
+    )
+
+    annotation_specs = [
+        (
+            best_accuracy_row,
+            "Best accuracy\n"
+            f"T={int(best_accuracy_row['num_time_steps'])}, "
+            f"leak={float(best_accuracy_row['leak']):.2f}",
+            (18, 14),
+        ),
+        (
+            lowest_latency_row,
+            "Lowest latency\n"
+            f"T={int(lowest_latency_row['num_time_steps'])}, "
+            f"leak={float(lowest_latency_row['leak']):.2f}",
+            (22, -30),
+        ),
+    ]
+
+    for row, label, offset in annotation_specs:
+        x_value = float(row["mean_latency_steps"])
+        y_value = 100.0 * float(row["overall_accuracy"])
+        ax.annotate(
+            label,
+            xy=(x_value, y_value),
+            xytext=offset,
+            textcoords="offset points",
+            arrowprops={"arrowstyle": "->"},
+            fontsize=8,
+        )
 
     ax.set_xlabel("Mean stable-decision latency (time steps)")
     ax.set_ylabel("Overall accuracy (%)")
