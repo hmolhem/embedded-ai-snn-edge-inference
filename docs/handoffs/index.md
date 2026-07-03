@@ -6,3 +6,4 @@
 - Handoff 005: Accuracy and latency comparison plots.
 - Handoff 006: Run 004 completion message fix.
 - Handoff 007: Run 005 LIF parameter sweep.
+- Handoff 008: Phase 1 report section draft.
