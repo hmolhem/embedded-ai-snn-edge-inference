@@ -31,7 +31,10 @@ embedded-ai-snn-edge-inference/
 │   ├── src/
 │   ├── notebooks/
 │   ├── figures/
-│   └── results/
+│   ├── results/
+│   ├── INDEX.md
+│   ├── EXPERIMENTS.md
+│   └── REPORT_SECTION.md
 ├── phase_02_radar_sensing_case_study/
 │   ├── src/
 │   ├── data/
@@ -53,13 +56,34 @@ embedded-ai-snn-edge-inference/
 
 ## Phase Roadmap
 
-### Phase 1 — Minimal Python Prototype
+### Phase 1 — Python DOA/SNN Reference Prototype
 
-Build a small Python-based spike-inference demonstration using simulated sensing data. The minimum deliverables are a dataset generator, feature normalization, spike encoding, a lightweight LIF-inspired classifier, accuracy metrics, a confusion matrix, spike-count statistics, and latency in time steps.
+Status: completed as a reproducible Python reference prototype.
+
+Phase 1 implements a physics-based DOA-sector inference workflow using a uniform linear array signal model, beamspace features, a nearest-centroid baseline, rate-based spike encoding, and a LIF-inspired temporal classifier.
+
+Primary Phase 1 navigation files:
+
+```text
+phase_01_python_prototype/INDEX.md
+phase_01_python_prototype/README.md
+phase_01_python_prototype/EXPERIMENTS.md
+phase_01_python_prototype/REPORT_SECTION.md
+```
+
+Key Phase 1 results:
+
+```text
+nearest-centroid baseline accuracy: 0.869048
+fixed Run 003 LIF accuracy:         0.825000
+best Run 005 LIF accuracy:          0.841667
+best Run 005 configuration:         T=40, leak=0.99
+lowest-latency Run 005 configuration: T=10, leak=0.99
+```
 
 ### Phase 2 — Radar / DOA Sensing Case Study
 
-Extend the prototype to radar/array-processing features such as covariance-derived features, beamspace energies, or direction-sector labels. This phase is the technical bridge to prior DSP, MIMO radar, DOA estimation, and FPGA-related work.
+Extend the prototype toward a richer radar/array-processing case study. Candidate extensions include multi-source DOA scenes, MUSIC or ESPRIT-style reference estimators, covariance-domain features, and more explicit comparison against classical signal-processing baselines.
 
 ### Phase 3 — PYNQ Edge Demo
 
@@ -77,8 +101,10 @@ After the course deliverable is stable, the project can be expanded into a resea
 
 - Repository initialized.
 - Handoff protocol established.
-- Phase 1 project scope defined.
-- Next target: implement the minimal Python prototype.
+- Phase 1 Python DOA/SNN prototype completed.
+- Run 001 through Run 005 results generated and documented.
+- Phase 1 report-ready narrative drafted.
+- Next target: decide whether to extend Phase 1 into a final course report package or start a new Phase 2 branch.
 
 ## Handoff Protocol
 

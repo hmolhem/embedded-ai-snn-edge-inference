@@ -6,6 +6,17 @@ Build a Python reference prototype for spike-based DOA-sector inference using a 
 
 This phase keeps the original project structure intact. Phase 1 remains the Python prototype phase, but the prototype is now based on an engineering DOA model rather than an arbitrary synthetic sensing dataset.
 
+## Navigation
+
+| File | Purpose |
+|---|---|
+| `INDEX.md` | Phase 1 documentation and artifact map. |
+| `EXPERIMENTS.md` | Chronological experiment log for Run 001 through Run 005. |
+| `REPORT_SECTION.md` | Report-ready Phase 1 narrative and interpretation. |
+| `results/` | Text and CSV outputs. |
+| `figures/` | Generated report figures. |
+| `src/` | Source code for the Phase 1 reference implementation. |
+
 ## Minimal Engineering Pipeline
 
 ```text
@@ -45,6 +56,7 @@ Metrics and figures
 13. Save all figures and results.
 14. Sweep LIF time-window and leak parameters.
 15. Convert Phase 1 results into a report-ready engineering section.
+16. Add a final Phase 1 documentation index.
 
 ## Initial Parameters
 

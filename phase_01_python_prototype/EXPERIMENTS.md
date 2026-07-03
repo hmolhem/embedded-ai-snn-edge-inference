@@ -132,13 +132,13 @@ Interpretation:
 
 The first complete Phase 1 run is successful. The nearest-centroid baseline confirms that compact beamspace features are informative for coarse DOA-sector inference. The LIF-inspired spike classifier achieves 82.5% accuracy using sparse rate-coded spike trains, far above the 25% random baseline. The mean stable-decision latency decreases as SNR improves, supporting the edge-inference interpretation.
 
-Next tasks:
+Follow-up work completed after Run 001:
 
-1. Inspect local figures.
-2. Commit generated local result files and figures.
-3. Add comparison and latency plots.
-4. Sweep number of spike time steps and leakage factor.
-5. Convert the run into a formal course-report section.
+1. Generated report-ready accuracy and latency comparison plots.
+2. Swept LIF time-step and leak parameters.
+3. Recorded Run 005 CSV, summary, and trade-off figure.
+4. Drafted the Phase 1 report-ready narrative section.
+5. Added a Phase 1 documentation index.
 
 ## Run 004 — Accuracy and Latency Comparison Plots
 
