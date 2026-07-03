@@ -1,0 +1,147 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+\title{Phase 1 Proposal: Lightweight Spike-Based DOA Sector Inference for Embedded Edge AI}
+\author{Hossein Molhem\\Kennesaw State University\\EE 6900 Embedded AI}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This proposal defines Phase 1 of a staged embedded-AI research and engineering project. The objective is to build a compact, reproducible Python reference prototype for direction-of-arrival (DOA) sector classification using a physics-based uniform linear array (ULA) model, beamspace feature extraction, rate-based spike encoding, and a lightweight leaky-integrate-and-fire (LIF)-inspired inference mechanism. The goal is not to claim a novel DOA estimator in Phase 1. Instead, this phase establishes a defensible baseline that connects array signal processing, sparse temporal encoding, and future embedded deployment on PYNQ or FPGA-oriented platforms.
+\end{abstract}
+
+\section{Motivation}
+
+Embedded AI systems must often make decisions under limited compute, memory, energy, and latency budgets. Classical deep-learning models may provide high accuracy, but they are not always appropriate for edge sensing platforms where deterministic operation, reduced arithmetic complexity, and hardware-friendly inference are important. Spike-based or SNN-inspired inference provides a useful design direction because information can be represented temporally and sparsely.
+
+The selected sensing case for Phase 1 is DOA sector classification. This choice is technically meaningful because it is grounded in array signal processing while remaining small enough for a focused Python prototype. A ULA-based DOA model also connects naturally to future radar, MIMO sensing, beamspace processing, and FPGA acceleration work.
+
+\section{Problem Statement}
+
+The Phase 1 problem is to classify the angular sector of a single narrowband source impinging on a uniform linear array. The prototype must compare a conventional non-spiking baseline against a sparse spike-encoded LIF-inspired classifier. The main engineering question is:
+
+\begin{quote}
+Can compact beamspace features extracted from a physics-based ULA signal model be converted into sparse spike trains and classified with acceptable accuracy and controllable temporal latency?
+\end{quote}
+
+\section{Objectives}
+
+The Phase 1 objectives are:
+
+\begin{enumerate}[label=\arabic*.]
+    \item Implement a reproducible ULA signal model for single-source DOA-sector classification.
+    \item Extract compact beamspace features from sample covariance matrices.
+    \item Train and evaluate a deterministic nearest-centroid non-spiking baseline.
+    \item Encode normalized features into sparse spike trains using rate-based encoding.
+    \item Implement a lightweight LIF-inspired classifier as a temporal evidence accumulator.
+    \item Evaluate accuracy versus SNR and estimate stable-decision latency in time steps.
+    \item Sweep LIF time-window and leak parameters to study the accuracy--latency trade-off.
+    \item Produce report-ready figures, tables, and a clean project handoff.
+\end{enumerate}
+
+\section{Technical Approach}
+
+\subsection{Signal Model}
+
+The dataset will be generated from a narrowband single-source ULA model. For a source at angle $\theta$, the array snapshot matrix is modeled as
+\begin{equation}
+    X = a(\theta)s + N,
+\end{equation}
+where $a(\theta)$ is the ULA steering vector, $s$ is the narrowband source waveform, and $N$ is circular complex Gaussian noise. The sample covariance matrix is
+\begin{equation}
+    R_{xx} = \frac{1}{M}XX^{H},
+\end{equation}
+where $M$ is the number of snapshots.
+
+\subsection{Feature Extraction}
+
+Beamspace energy features will be computed over a fixed angular grid. These features provide a compact representation of spatial information without implementing a full high-resolution DOA estimator in Phase 1.
+
+\subsection{Baseline Classifier}
+
+A nearest-centroid classifier will be used as the deterministic non-spiking baseline. This baseline is simple, reproducible, and interpretable. Its role is to determine whether the compact beamspace features contain enough information for coarse DOA-sector classification before spike encoding.
+
+\subsection{Spike Encoding and LIF-Inspired Inference}
+
+Normalized beamspace features will be converted into binary spike trains using rate-based encoding. The LIF-inspired classifier will accumulate spike-driven evidence in a leaky membrane state for each class. The predicted class is determined by the final membrane value, while stable-decision latency is estimated by identifying the earliest time step after which the final decision remains unchanged.
+
+\section{Initial Dataset Configuration}
+
+\begin{table}[h]
+\centering
+\caption{Planned Phase 1 Dataset Configuration}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Array type & Uniform Linear Array \\
+Number of elements & $N=8$ \\
+Snapshots per sample & $M=128$ \\
+Element spacing & $d=\lambda/2$ \\
+Source count & 1 \\
+DOA range & $-60^{\circ}$ to $+60^{\circ}$ \\
+Number of sectors & 4 \\
+SNR values & $-10,-5,0,5,10,15,20$ dB \\
+Samples per sector per SNR & 100 \\
+Total samples & 2800 \\
+Train/test split & 70/30, stratified \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Evaluation Metrics}
+
+Phase 1 will use the following metrics:
+
+\begin{itemize}
+    \item overall test accuracy,
+    \item accuracy versus SNR,
+    \item confusion matrix at a representative SNR,
+    \item spike-count statistics,
+    \item mean stable-decision latency in time steps,
+    \item accuracy--latency trade-off under LIF parameter sweeps.
+\end{itemize}
+
+\section{Expected Deliverables}
+
+The expected deliverables are:
+
+\begin{enumerate}[label=\arabic*.]
+    \item Python source code for the end-to-end Phase 1 pipeline.
+    \item CSV and text result files for reproducibility.
+    \item Report-ready figures for accuracy, latency, and trade-off analysis.
+    \item A formal Phase 1 report.
+    \item A compact IEEE-style paper draft.
+    \item A presentation slide deck and transcript.
+\end{enumerate}
+
+\section{Expected Contribution}
+
+The expected contribution of Phase 1 is a clean engineering bridge between classical array processing and hardware-aware spike-based inference. The output should be suitable as a course deliverable and as a foundation for later phases involving richer radar/DOA case studies, PYNQ deployment, and Vitis HLS kernel exploration.
+
+\section{References}
+
+\begin{thebibliography}{9}
+\bibitem{haykin}
+S. Haykin, \emph{Adaptive Filter Theory}. Pearson, 2014.
+
+\bibitem{vanTrees}
+H. L. Van Trees, \emph{Optimum Array Processing}. Wiley, 2002.
+
+\bibitem{maass}
+W. Maass, ``Networks of spiking neurons: The third generation of neural network models,'' \emph{Neural Networks}, vol. 10, no. 9, pp. 1659--1671, 1997.
+
+\bibitem{roy}
+K. Roy, A. Jaiswal, and P. Panda, ``Towards spike-based machine intelligence with neuromorphic computing,'' \emph{Nature}, vol. 575, pp. 607--617, 2019.
+\end{thebibliography}
+
+\end{document}
