@@ -9,3 +9,4 @@
 - Handoff 008: Phase 1 report section draft.
 - Handoff 009: Phase 1 final cleanup and index.
 - Handoff 010: Phase 1 LaTeX deliverables.
+- Handoff 011: Phase 1 theory and appendix update.
