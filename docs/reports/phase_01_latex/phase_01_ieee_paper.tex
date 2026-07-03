@@ -28,7 +28,7 @@ Embedded AI, spiking neural networks, LIF neuron, DOA classification, uniform li
 
 \section{Introduction}
 
-Edge sensing systems often require inference under constrained compute, memory, and latency budgets. For such systems, lightweight and hardware-aware inference methods can be preferable to large black-box neural networks. Spike-based inference is attractive because information can be represented through sparse temporal events, potentially reducing arithmetic activity and supporting early decision logic.
+Edge sensing systems often require inference under constrained compute, memory, and latency budgets. For such systems, lightweight and hardware-aware inference methods can be preferable to large black-box neural networks. Spike-based inference is attractive because information can be represented through sparse temporal events, potentially reducing arithmetic activity and supporting early decision logic \cite{maass,roy}.
 
 This work uses DOA sector classification as a controlled sensing problem. The selected problem is technically relevant because it is grounded in array signal processing, yet compact enough to support an end-to-end Phase 1 prototype. The contribution is an engineering baseline that compares continuous-valued beamspace classification with a sparse LIF-inspired temporal inference path.
 
@@ -45,6 +45,33 @@ where $a(\theta)$ is the steering vector, $s$ is the source signal, and $N$ is c
 where $M=128$ snapshots.
 
 Beamspace energy features are extracted over a fixed angular grid. The classification target is not the exact continuous angle, but one of four coarse angular sectors spanning $-60^{\circ}$ to $+60^{\circ}$.
+
+\section{Theoretical Foundation}
+
+For a ULA with element spacing $d$ and wavelength $\lambda$, the steering vector under the broadside convention can be written as \cite{vantrees}
+\begin{equation}
+    a(\theta)=
+    [1,e^{-jkd\sin\theta},\ldots,e^{-j(N-1)kd\sin\theta}]^{T},
+\end{equation}
+where $k=2\pi/\lambda$. This phase progression is the physical mechanism that makes the covariance matrix angle-dependent.
+
+For a steering vector $b(\phi)$ evaluated at grid angle $\phi$, the beamspace energy feature is represented as
+\begin{equation}
+    p(\phi)=b^{H}(\phi)R_{xx}b(\phi).
+\end{equation}
+Evaluating $p(\phi)$ over a fixed angular grid converts the complex covariance matrix into a compact real-valued feature vector suitable for sector classification \cite{vantrees,haykin}.
+
+The non-spiking baseline uses the nearest-centroid decision rule
+\begin{equation}
+    \hat{c}=\arg\min_c \lVert x-\mu_c\rVert_2^2,
+\end{equation}
+where $x$ is the normalized beamspace feature vector and $\mu_c$ is the centroid of class $c$. This rule is intentionally simple and interpretable, making it useful as a reference classifier \cite{duda}.
+
+For rate-based spike encoding, each normalized feature value $z_i\in[0,1]$ is interpreted as the probability of spike emission at each time step. The LIF-inspired classifier then accumulates class-level evidence as
+\begin{equation}
+    v_c[t]=\alpha v_c[t-1]+i_c[t],
+\end{equation}
+where $\alpha$ is the leak factor and $i_c[t]$ is the spike-driven input current. This model is used as a hardware-facing abstraction of temporal evidence accumulation rather than as a biologically detailed neuron model \cite{gerstner,roy}.
 
 \section{Methodology}
 
@@ -147,8 +174,14 @@ H. L. Van Trees, \emph{Optimum Array Processing}. Wiley, 2002.
 \bibitem{haykin}
 S. Haykin, \emph{Adaptive Filter Theory}. Pearson, 2014.
 
+\bibitem{duda}
+R. O. Duda, P. E. Hart, and D. G. Stork, \emph{Pattern Classification}. Wiley, 2001.
+
 \bibitem{maass}
 W. Maass, ``Networks of spiking neurons: The third generation of neural network models,'' \emph{Neural Networks}, vol. 10, no. 9, pp. 1659--1671, 1997.
+
+\bibitem{gerstner}
+W. Gerstner and W. M. Kistler, \emph{Spiking Neuron Models: Single Neurons, Populations, Plasticity}. Cambridge University Press, 2002.
 
 \bibitem{roy}
 K. Roy, A. Jaiswal, and P. Panda, ``Towards spike-based machine intelligence with neuromorphic computing,'' \emph{Nature}, vol. 575, pp. 607--617, 2019.
