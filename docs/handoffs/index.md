@@ -14,3 +14,4 @@
 - Handoff 013: Run 005 tradeoff plot update.
 - Handoff 014: Phase 1 presentation and paper sync.
 - Handoff 015: Phase 1 proposal template sync.
+- Handoff 016: Clarified spike value in Phase 1 report.
