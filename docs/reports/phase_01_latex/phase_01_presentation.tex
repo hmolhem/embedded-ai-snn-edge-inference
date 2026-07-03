@@ -58,6 +58,23 @@ Nearest-centroid baseline and LIF-inspired classifier
 \end{tabular}
 \end{frame}
 
+\begin{frame}{Theoretical Foundation}
+\small
+\begin{align*}
+    a(\theta) &= [1,e^{-jkd\sin\theta},\ldots,e^{-j(N-1)kd\sin\theta}]^{T} \\
+    R_{xx} &= \frac{1}{M}XX^{H} \\
+    p(\phi) &= b^{H}(\phi)R_{xx}b(\phi) \\
+    \hat{c} &= \arg\min_c \lVert x-\mu_c\rVert_2^2 \\
+    v_c[t] &= \alpha v_c[t-1]+i_c[t]
+\end{align*}
+\vspace{-0.1cm}
+\begin{itemize}
+    \item ULA phase progression creates angle-dependent spatial structure.
+    \item Beamspace energy converts covariance information into compact features.
+    \item Spike encoding and LIF accumulation create the temporal edge-inference path.
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Signal Model}
 For each source angle $\theta$ and SNR value:
 \begin{equation*}
