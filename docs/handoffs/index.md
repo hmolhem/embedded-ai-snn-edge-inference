@@ -8,3 +8,4 @@
 - Handoff 007: Run 005 LIF parameter sweep.
 - Handoff 008: Phase 1 report section draft.
 - Handoff 009: Phase 1 final cleanup and index.
+- Handoff 010: Phase 1 LaTeX deliverables.
