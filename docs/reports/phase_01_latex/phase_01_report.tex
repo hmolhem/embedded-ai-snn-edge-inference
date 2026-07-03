@@ -5,6 +5,8 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{cite}
+\usepackage{url}
 \usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{xcolor}
@@ -27,7 +29,7 @@ This report documents Phase 1 of an embedded-AI project focused on lightweight s
 
 \section{Purpose and Scope}
 
-The purpose of Phase 1 is to establish a complete and reproducible Python reference model for DOA-sector inference using a physics-based sensing model and a hardware-aware spike-based inference path. This phase is not intended to introduce a new high-resolution DOA algorithm. Instead, it provides an engineering baseline that can later be refactored toward embedded execution, PYNQ deployment, or Vitis HLS acceleration.
+The purpose of Phase 1 is to establish a complete and reproducible Python reference model for DOA-sector inference using a physics-based sensing model and a hardware-aware spike-based inference path. This phase is not intended to introduce a new high-resolution DOA algorithm. Instead, it provides an engineering baseline that can later be refactored toward embedded execution, PYNQ deployment, or Vitis HLS acceleration. This report is prepared as part of the EE 6900 Embedded AI project deliverable sequence~\cite{ee6900_phase1_project}.
 
 The completed prototype connects three technical layers:
 
@@ -37,13 +39,15 @@ The completed prototype connects three technical layers:
     \item sparse temporal inference through rate-based spike encoding and LIF-inspired evidence accumulation.
 \end{enumerate}
 
+The complete Phase 1 source code, generated metrics, figures, and compiled deliverables are maintained in the project repository~\cite{molhem2026embeddedai}.
+
 \section{Theoretical Background}
 
-This section summarizes the theoretical foundation used in Phase 1. The purpose is to keep the main report self-contained while avoiding unnecessary derivation detail in the main body. Additional mathematical details are provided in the Appendix.
+This section summarizes the theoretical foundation used in Phase 1. The purpose is to keep the main report self-contained while avoiding unnecessary derivation detail in the main body. The array-processing formulation follows standard ULA and covariance-based signal-processing theory~\cite{vantrees2002optimum,haykin2014adaptive}. The classification baseline follows classical pattern-recognition methodology~\cite{duda2001pattern}, while the spike-based temporal inference path is motivated by spiking-neuron and neuromorphic-computing models~\cite{maass1997networks,gerstner2002spiking,roy2019towards}. Additional mathematical details are provided in the Appendix.
 
 \subsection{Uniform Linear Array Signal Model}
 
-A uniform linear array consists of $N$ equally spaced sensor elements. For a narrowband plane wave arriving from angle $\theta$, the relative phase progression across the array is determined by the element spacing $d$, the wavelength $\lambda$, and the wavenumber $k=2\pi/\lambda$. With a broadside angle convention, a typical ULA steering vector can be written as
+A uniform linear array consists of $N$ equally spaced sensor elements. For a narrowband plane wave arriving from angle $\theta$, the relative phase progression across the array is determined by the element spacing $d$, the wavelength $\lambda$, and the wavenumber $k=2\pi/\lambda$. With a broadside angle convention, a typical ULA steering vector can be written as~\cite{vantrees2002optimum}
 \begin{equation}
     a(\theta)
     =
@@ -63,7 +67,7 @@ where $a(\theta)$ is the steering vector, $s$ is the source waveform, and $N$ is
 \begin{equation}
     R_{xx}=\frac{1}{M}XX^{H},
 \end{equation}
-where $M$ is the number of snapshots. In expectation, the covariance structure contains spatial information through the rank-one signal component associated with $a(\theta)a^{H}(\theta)$ and a noise contribution determined by the SNR.
+where $M$ is the number of snapshots. In expectation, the covariance structure contains spatial information through the rank-one signal component associated with $a(\theta)a^{H}(\theta)$ and a noise contribution determined by the SNR~\cite{vantrees2002optimum,haykin2014adaptive}.
 
 \subsection{Beamspace Feature Extraction}
 
@@ -71,7 +75,7 @@ Beamspace processing maps array-domain information into a set of angular respons
 \begin{equation}
     p(\phi)=b^{H}(\phi)R_{xx}b(\phi).
 \end{equation}
-Evaluating $p(\phi)$ on a fixed angular grid produces a compact real-valued feature vector. In Phase 1, this feature vector is used for coarse sector classification rather than fine DOA estimation.
+Evaluating $p(\phi)$ on a fixed angular grid produces a compact real-valued feature vector. In Phase 1, this feature vector is used for coarse sector classification rather than fine DOA estimation~\cite{vantrees2002optimum}.
 
 \subsection{Nearest-Centroid Classification}
 
@@ -79,7 +83,7 @@ The non-spiking baseline uses a nearest-centroid decision rule. If $x$ is a norm
 \begin{equation}
     \hat{c}=\arg\min_{c}\|x-\mu_c\|_2^2.
 \end{equation}
-This classifier is intentionally simple and interpretable. It provides a useful reference for measuring how much accuracy is lost when continuous-valued features are converted into sparse spike trains.
+This classifier is intentionally simple and interpretable. It provides a useful reference for measuring how much accuracy is lost when continuous-valued features are converted into sparse spike trains~\cite{duda2001pattern}.
 
 \subsection{Rate-Based Spike Encoding}
 
@@ -91,7 +95,7 @@ The time-average spike count approximates the original normalized feature value:
 \begin{equation}
     \mathbb{E}\left[\frac{1}{T}\sum_{t=1}^{T}s_i[t]\right]=z_i.
 \end{equation}
-This representation introduces stochastic quantization error but creates a sparse temporal signal appropriate for hardware-facing inference experiments.
+This representation introduces stochastic quantization error but creates a sparse temporal signal appropriate for hardware-facing inference experiments~\cite{maass1997networks,roy2019towards}.
 
 \subsection{LIF-Inspired Temporal Inference}
 
@@ -99,7 +103,7 @@ The LIF-inspired classifier accumulates spike-driven evidence over time. For cla
 \begin{equation}
     v_c[t]=\alpha v_c[t-1]+i_c[t],
 \end{equation}
-where $\alpha$ is the leak factor and $i_c[t]$ is the spike-driven input current. A higher leak value preserves past evidence more strongly, while a shorter time window reduces latency but may reduce classification accuracy.
+where $\alpha$ is the leak factor and $i_c[t]$ is the spike-driven input current. A higher leak value preserves past evidence more strongly, while a shorter time window reduces latency but may reduce classification accuracy. This leaky temporal accumulation is a simplified hardware-facing abstraction of LIF-style dynamics~\cite{gerstner2002spiking,roy2019towards}.
 
 \subsection{Stable-Decision Latency}
 
@@ -107,7 +111,7 @@ The classifier produces a class decision at each time step by selecting the larg
 \begin{equation}
     d[t]=\arg\max_{c}v_c[t].
 \end{equation}
-The stable-decision latency is defined as the earliest time step after which the decision remains equal to the final decision. This metric provides a practical way to evaluate whether the temporal classifier can support early-exit or adaptive-latency edge inference.
+The stable-decision latency is defined as the earliest time step after which the decision remains equal to the final decision. This metric provides a practical way to evaluate whether the temporal classifier can support early-exit or adaptive-latency edge inference~\cite{roy2019towards}.
 
 \section{Signal Model and Dataset}
 
@@ -119,7 +123,7 @@ where $a(\theta)$ is the ULA steering vector, $s$ is a complex narrowband source
 \begin{equation}
     R_{xx} = \frac{1}{M}XX^{H},
 \end{equation}
-where $M=128$ snapshots.
+where $M=128$ snapshots. The generated dataset and resulting artifacts are part of the reproducible Phase 1 implementation~\cite{molhem2026embeddedai}.
 
 A compact beamspace feature vector is extracted from the covariance matrix by evaluating spatial energy over a fixed angular grid. The features are normalized using training-set statistics before classification or spike encoding.
 
@@ -148,7 +152,7 @@ Test samples & 840 \\
 
 \section{Beamspace Features}
 
-Beamspace features provide a compact representation of angular information. The objective is not to estimate the exact continuous DOA angle, but to classify the received signal into one of four angular sectors. A beamspace representation is appropriate for this task because it reduces the complex covariance structure into a small real-valued feature vector that captures spatial energy distribution.
+Beamspace features provide a compact representation of angular information. The objective is not to estimate the exact continuous DOA angle, but to classify the received signal into one of four angular sectors. A beamspace representation is appropriate for this task because it reduces the complex covariance structure into a small real-valued feature vector that captures spatial energy distribution~\cite{vantrees2002optimum}.
 
 Figure~\ref{fig:beamspace} shows an example beamspace response generated during the reference run.
 
@@ -161,7 +165,7 @@ Figure~\ref{fig:beamspace} shows an example beamspace response generated during 
 
 \section{Nearest-Centroid Baseline}
 
-The non-spiking reference classifier is a nearest-centroid classifier trained on the normalized beamspace features. This classifier is deterministic, interpretable, and lightweight. Its purpose is to establish the amount of DOA-sector information available in the compact feature vector before converting the features into spike trains.
+The non-spiking reference classifier is a nearest-centroid classifier trained on the normalized beamspace features. This classifier is deterministic, interpretable, and lightweight. Its purpose is to establish the amount of DOA-sector information available in the compact feature vector before converting the features into spike trains~\cite{duda2001pattern}.
 
 The nearest-centroid baseline achieved
 \begin{equation}
@@ -188,13 +192,13 @@ SNR (dB) & Accuracy \\
 
 \section{Spike Encoding and LIF-Inspired Inference}
 
-Normalized beamspace features are converted into binary spike trains using rate-based encoding. A larger normalized feature value corresponds to a higher probability of spike emission across the time window. This representation is sparse and temporal, making it a useful abstraction for later hardware-oriented experiments.
+Normalized beamspace features are converted into binary spike trains using rate-based encoding. A larger normalized feature value corresponds to a higher probability of spike emission across the time window. This representation is sparse and temporal, making it a useful abstraction for later hardware-oriented experiments~\cite{maass1997networks,roy2019towards}.
 
 The LIF-inspired classifier is implemented as a class-level leaky membrane accumulator. It is not a biologically detailed SNN. Instead, it is a hardware-facing approximation in which each class accumulates spike-driven evidence over time. The membrane state can be interpreted as
 \begin{equation}
     v_c[t] = \alpha v_c[t-1] + i_c[t],
 \end{equation}
-where $v_c[t]$ is the membrane value for class $c$, $\alpha$ is the leak factor, and $i_c[t]$ is the spike-driven input current at time step $t$.
+where $v_c[t]$ is the membrane value for class $c$, $\alpha$ is the leak factor, and $i_c[t]$ is the spike-driven input current at time step $t$~\cite{gerstner2002spiking}.
 
 The fixed Run 003 configuration used
 \begin{equation}
@@ -227,7 +231,7 @@ Run 004 generated report-ready figures comparing the nearest-centroid baseline a
 \label{fig:latency}
 \end{figure}
 
-The latency trend supports the edge-inference interpretation. When the signal quality is higher, the LIF decision generally stabilizes earlier. This suggests that temporal inference can support early-exit or adaptive-latency decision logic in later embedded implementations.
+The latency trend supports the edge-inference interpretation. When the signal quality is higher, the LIF decision generally stabilizes earlier. This suggests that temporal inference can support early-exit or adaptive-latency decision logic in later embedded implementations~\cite{roy2019towards}.
 
 \section{Run 005 Parameter Sweep}
 
@@ -290,7 +294,7 @@ $T$ & Leak & Accuracy & Mean latency \\
 
 The parameter sweep confirms a clear accuracy--latency design trade-off. Increasing the spike time window generally improves classification accuracy because the rate-coded representation has more time steps to approximate the original continuous feature vector. However, a longer time window can increase temporal budget and stable-decision latency.
 
-The leak factor controls evidence retention. Higher leak values preserve accumulated information better. In this prototype, the best LIF accuracy occurs at $T=40$ and leak $=0.99$. The best LIF result improves over the fixed Run 003 configuration but remains below the continuous nearest-centroid baseline. This result is expected and useful: spike-based inference trades some continuous-valued accuracy for sparse temporal processing and explicit latency control.
+The leak factor controls evidence retention. Higher leak values preserve accumulated information better. In this prototype, the best LIF accuracy occurs at $T=40$ and leak $=0.99$. The best LIF result improves over the fixed Run 003 configuration but remains below the continuous nearest-centroid baseline. This result is expected and useful: spike-based inference trades some continuous-valued accuracy for sparse temporal processing and explicit latency control~\cite{roy2019towards}.
 
 \section{Conclusion}
 
@@ -298,7 +302,7 @@ The Phase 1 Python prototype successfully establishes an end-to-end DOA-sector i
 
 The LIF-inspired classifier demonstrates that the same normalized features can be converted into sparse temporal spike trains and classified using a hardware-facing leaky evidence accumulator. The fixed LIF configuration achieves 82.5\% accuracy, while the Run 005 parameter sweep improves the best LIF result to 84.17\%.
 
-The Phase 1 result is therefore a valid embedded-AI reference baseline. The natural next step is to convert the Python reference model into a more formal course report and then extend the project toward richer radar/DOA case studies or embedded implementation.
+The Phase 1 result is therefore a valid embedded-AI reference baseline. The natural next step is to convert the Python reference model into a more formal course report and then extend the project toward richer radar/DOA case studies or embedded implementation. The source code and generated Phase 1 artifacts are preserved for reproducibility in the project repository~\cite{molhem2026embeddedai}.
 
 \appendix
 
@@ -314,7 +318,7 @@ For half-wavelength spacing, $d=\lambda/2$, this becomes
 \begin{equation}
     \psi(\theta)=\pi\sin\theta.
 \end{equation}
-This phase progression is the physical basis for the steering vector used to generate DOA-dependent array snapshots.
+This phase progression is the physical basis for the steering vector used to generate DOA-dependent array snapshots~\cite{vantrees2002optimum}.
 
 \subsection{Beamspace Energy Interpretation}
 
@@ -322,7 +326,7 @@ The beamspace response
 \begin{equation}
     p(\phi)=b^{H}(\phi)R_{xx}b(\phi)
 \end{equation}
-can be interpreted as the output power of a conventional beam steered toward grid angle $\phi$. If the grid steering vector is aligned with the true source direction, the response tends to be larger. Therefore, the vector of grid responses provides a compact angular signature for sector classification.
+can be interpreted as the output power of a conventional beam steered toward grid angle $\phi$. If the grid steering vector is aligned with the true source direction, the response tends to be larger. Therefore, the vector of grid responses provides a compact angular signature for sector classification~\cite{vantrees2002optimum}.
 
 \subsection{Nearest-Centroid Rule as a Linear Score}
 
@@ -336,7 +340,7 @@ Since $x^Tx$ does not depend on class, the equivalent decision is
 \begin{equation}
     \hat{c}=\arg\max_c \left(2\mu_c^Tx-\|\mu_c\|_2^2\right).
 \end{equation}
-This form is useful for the LIF-inspired implementation because it can be interpreted as class evidence accumulation using class-dependent weights and biases.
+This form is useful for the LIF-inspired implementation because it can be interpreted as class evidence accumulation using class-dependent weights and biases~\cite{duda2001pattern}.
 
 \subsection{Spike Encoding Statistics}
 
@@ -351,7 +355,7 @@ If $s_i[t]\sim \mathrm{Bernoulli}(z_i)$, then
 \begin{equation}
     \mathrm{Var}(K_i)=Tz_i(1-z_i).
 \end{equation}
-Therefore, a longer spike window reduces relative stochastic error but increases the temporal budget.
+Therefore, a longer spike window reduces relative stochastic error but increases the temporal budget~\cite{maass1997networks,gerstner2002spiking}.
 
 \subsection{LIF Leak and Latency Interpretation}
 
@@ -359,23 +363,12 @@ The LIF-inspired update
 \begin{equation}
     v_c[t]=\alpha v_c[t-1]+i_c[t]
 \end{equation}
-acts as a leaky temporal integration of evidence. When $\alpha$ is close to one, previous evidence is retained for more time steps. When $\alpha$ is smaller, the classifier reacts more strongly to recent spikes but may lose accumulated evidence more quickly. This explains why the Phase 1 parameter sweep uses both $T$ and $\alpha$ as design variables.
+acts as a leaky temporal integration of evidence. When $\alpha$ is close to one, previous evidence is retained for more time steps. When $\alpha$ is smaller, the classifier reacts more strongly to recent spikes but may lose accumulated evidence more quickly. This explains why the Phase 1 parameter sweep uses both $T$ and $\alpha$ as design variables~\cite{gerstner2002spiking,roy2019towards}.
 
-\section*{References}
+\clearpage
+\phantomsection
 \addcontentsline{toc}{section}{References}
-
-\begin{thebibliography}{9}
-\bibitem{vanTrees}
-H. L. Van Trees, \emph{Optimum Array Processing}. Wiley, 2002.
-
-\bibitem{haykin}
-S. Haykin, \emph{Adaptive Filter Theory}. Pearson, 2014.
-
-\bibitem{roy}
-K. Roy, A. Jaiswal, and P. Panda, ``Towards spike-based machine intelligence with neuromorphic computing,'' \emph{Nature}, vol. 575, pp. 607--617, 2019.
-
-\bibitem{maass}
-W. Maass, ``Networks of spiking neurons: The third generation of neural network models,'' \emph{Neural Networks}, vol. 10, no. 9, pp. 1659--1671, 1997.
-\end{thebibliography}
+\bibliographystyle{IEEEtran}
+\bibliography{reference}
 
 \end{document}
