@@ -70,10 +70,10 @@ The trade-off plot summarizes the behavior of the LIF parameter sweep. Longer sp
 
 \section*{Slide 15 --- Engineering Interpretation}
 
-The main engineering interpretation is that the beamspace features are informative, the spike encoding introduces a moderate but understandable accuracy loss, and the LIF parameters provide explicit control over the accuracy-latency trade-off. This makes Phase 1 a useful reference model rather than just a toy example. It is now stable enough to support later hardware-aware refactoring.
+The main engineering interpretation is that the beamspace features are informative, while the spike path should not be interpreted as an accuracy-improving replacement for the continuous baseline. The spike encoding introduces a moderate but understandable accuracy loss. Its value is architectural: it converts continuous beamspace inference into sparse temporal processing, exposes stable-decision latency as a measurable output, and allows the accuracy-latency behavior to be tuned through the spike time window and leak factor. This makes Phase 1 a useful hardware-aware reference model rather than just a toy example.
 
 \section*{Slide 16 --- Conclusion and Next Steps}
 
-In conclusion, Phase 1 successfully establishes an end-to-end DOA/SNN reference prototype with reproducible metrics, figures, and documentation. The immediate next step is to finalize the course report package. After that, the project can be extended toward richer radar and DOA case studies, and selected kernels can be refactored for PYNQ or Vitis HLS.
+In conclusion, Phase 1 successfully establishes an end-to-end DOA/SNN reference prototype with reproducible metrics, figures, and documentation. The continuous baseline achieved 86.90 percent accuracy, while the best LIF configuration achieved 84.17 percent. Therefore, the spike-based path trades some continuous-valued accuracy for sparse temporal processing and explicit latency control. The next step is to use this model as a hardware-aware embedded-AI reference path and extend it toward richer radar and DOA case studies, PYNQ deployment, or Vitis HLS refactoring.
 
 \end{document}

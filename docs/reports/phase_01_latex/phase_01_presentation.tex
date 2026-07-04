@@ -195,20 +195,21 @@ Baseline & -- & -- & 0.869048 & -- \\
 \begin{frame}{Engineering Interpretation}
 \begin{itemize}
     \item Beamspace features are informative for coarse DOA-sector inference.
-    \item Spike encoding introduces some accuracy loss but enables sparse temporal processing.
-    \item LIF parameters provide explicit control over the accuracy--latency trade-off.
+    \item The spike path does not improve raw accuracy over the continuous baseline.
+    \item Its value is architectural: sparse temporal inference, measurable latency, and tunable accuracy--latency behavior.
+    \item LIF parameters provide explicit control through time-window length and leak factor.
     \item Phase 1 is a stable reference model for embedded implementation and hardware-aware refactoring.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Conclusion and Next Steps}
 \begin{block}{Conclusion}
-Phase 1 successfully establishes an end-to-end DOA/SNN reference prototype with reproducible metrics, figures, and documentation.
+Phase 1 establishes a reproducible DOA-sector inference baseline. The spike-based path trades some continuous-valued accuracy for sparse temporal processing and explicit latency control.
 \end{block}
 \begin{itemize}
-    \item Finalize course report package.
-    \item Extend toward richer radar/DOA case studies.
-    \item Refactor selected kernels for PYNQ or Vitis HLS.
+    \item Baseline accuracy: $86.90\%$; best LIF accuracy: $84.17\%$.
+    \item Use the model as a hardware-aware embedded-AI reference path.
+    \item Extend toward richer radar/DOA case studies and PYNQ or Vitis HLS refactoring.
 \end{itemize}
 \end{frame}
 

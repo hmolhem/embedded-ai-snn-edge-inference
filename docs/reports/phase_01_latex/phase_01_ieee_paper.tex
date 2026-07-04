@@ -19,7 +19,7 @@ Email: hmolhem@students.kennesaw.edu}}
 \maketitle
 
 \begin{abstract}
-This paper presents a compact Python reference prototype for direction-of-arrival (DOA) sector classification using a physics-based uniform linear array (ULA) signal model and a leaky-integrate-and-fire (LIF)-inspired inference path. The objective is not to introduce a new DOA estimator, but to establish a reproducible embedded-AI baseline that connects array signal processing, sparse spike encoding, and latency-aware temporal inference. Beamspace energy features are extracted from sample covariance matrices and classified using both a nearest-centroid non-spiking baseline and a rate-coded LIF-inspired classifier. The nearest-centroid baseline achieves an overall accuracy of 86.90\%. A fixed LIF configuration achieves 82.50\% accuracy, while a time-window/leak parameter sweep improves the best LIF accuracy to 84.17\%. The results show a clear accuracy--latency trade-off suitable for later embedded implementation studies.
+This paper presents a compact Python reference prototype for direction-of-arrival (DOA) sector classification using a physics-based uniform linear array (ULA) signal model and a leaky-integrate-and-fire (LIF)-inspired inference path. The objective is not to introduce a new DOA estimator, but to establish a reproducible embedded-AI baseline that connects array signal processing, sparse spike encoding, and latency-aware temporal inference. Beamspace energy features are extracted from sample covariance matrices and classified using both a nearest-centroid non-spiking baseline and a rate-coded LIF-inspired classifier. The nearest-centroid baseline achieves an overall accuracy of 86.90\%. A fixed LIF configuration achieves 82.50\% accuracy, while a time-window/leak parameter sweep improves the best LIF accuracy to 84.17\%. The spike-based path is not presented as an accuracy-improving replacement for the continuous baseline. Its added value is architectural: it converts continuous beamspace inference into a sparse temporal decision process with measurable stable-decision latency and tunable accuracy--latency behavior, which is suitable for later embedded implementation studies.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -165,7 +165,9 @@ The parameter sweep confirms that longer time windows generally improve accuracy
 
 \section{Conclusion}
 
-A complete Phase 1 Python prototype was developed for spike-based DOA sector classification. The system uses a physics-based ULA model, beamspace features, nearest-centroid baseline classification, rate-coded spike trains, and LIF-inspired temporal inference. The best LIF configuration reached 84.17\% accuracy, compared with 86.90\% for the non-spiking baseline. The result establishes a reproducible embedded-AI reference path for later work involving richer radar/DOA cases, PYNQ deployment, and FPGA-oriented acceleration.
+A complete Phase 1 Python prototype was developed for DOA sector classification using a physics-based ULA model, beamspace features, nearest-centroid baseline classification, rate-coded spike trains, and LIF-inspired temporal inference. The spike-based path did not improve raw accuracy over the continuous nearest-centroid baseline: the baseline achieved 86.90\%, the fixed LIF configuration achieved 82.50\%, and the best LIF sweep configuration reached 84.17\%.
+
+The value of the spike-based formulation is therefore architectural rather than purely accuracy-based. It transforms continuous beamspace inference into a sparse temporal decision process, exposes stable-decision latency as a measurable output, and provides tunable accuracy--latency behavior through the spike time window and leak factor. The result establishes a reproducible hardware-aware embedded-AI reference path for later work involving richer radar/DOA cases, PYNQ deployment, and FPGA-oriented acceleration.
 
 \begin{thebibliography}{9}
 \bibitem{vantrees}

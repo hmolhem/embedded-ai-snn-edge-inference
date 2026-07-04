@@ -15,3 +15,4 @@
 - Handoff 014: Phase 1 presentation and paper sync.
 - Handoff 015: Phase 1 proposal template sync.
 - Handoff 016: Clarified spike value in Phase 1 report.
+- Handoff 017: Synced spike value across Phase 1 deliverables.
