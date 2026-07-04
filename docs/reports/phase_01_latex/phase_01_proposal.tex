@@ -94,6 +94,8 @@ Embedded AI systems must often make decisions under limited compute, memory, ene
 
 The selected sensing case for Phase 01 is DOA sector classification. This choice is technically meaningful because it is grounded in array signal processing while remaining small enough for a focused Python prototype. A ULA-based DOA model also connects naturally to future radar, MIMO sensing, beamspace processing, and FPGA acceleration work \cite{vantrees2002optimum,haykin2014adaptive}.
 
+This direction is also connected to the author's prior FPGA/HLS work on sample-covariance-matrix acceleration for DOA preprocessing, where the covariance kernel was implemented and verified in Vitis HLS as a hardware-oriented backend for array-processing workflows~\cite{molhem2026scmhls}.
+
 \section{Problem Statement}
 
 The Phase 01 problem is to classify the angular sector of a single narrowband source impinging on a uniform linear array. The prototype must compare a conventional non-spiking baseline against a sparse spike-encoded LIF-inspired classifier. The main engineering question is:
@@ -222,6 +224,8 @@ The expected Phase 01 deliverables are:
 This project is directly relevant to embedded AI because it focuses on lightweight inference rather than large general-purpose neural-network models. The feature representation is compact, the baseline classifier is interpretable, and the spike-based inference path creates an explicit temporal decision process. These properties are aligned with embedded platforms where memory, arithmetic complexity, latency, and energy consumption are design constraints.
 
 The project also creates a natural bridge between signal processing and hardware-aware AI. The ULA and beamspace stages represent the sensing and feature-extraction side, while the spike encoder and LIF-inspired accumulator represent a simplified neuromorphic inference stage. This separation makes the prototype suitable for later exploration of fixed-point arithmetic, PYNQ deployment, FPGA acceleration, or Vitis HLS implementation.
+
+This hardware-aware direction is supported by prior author work on a Vitis HLS sample-covariance-matrix accelerator for DOA preprocessing, which provides a concrete example of how the covariance stage of an array-processing pipeline can be mapped toward FPGA implementation~\cite{molhem2026scmhls}.
 
 \section{Timeline / Phase Plan}
 
