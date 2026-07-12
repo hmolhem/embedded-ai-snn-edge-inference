@@ -1,0 +1,124 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{url}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\title{Paper Review of Phase 1 Report:\\Lightweight Spike-Based DOA Sector Inference for Embedded Edge AI}
+\author{Hossein Molhem\\Kennesaw State University\\EE 6900 Special Topics: Embedded AI for Autonomous Robots}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This paper review summarizes and evaluates the Phase 1 report on lightweight spike-based direction-of-arrival (DOA) sector inference for embedded edge AI. The reviewed work presents a reproducible Python prototype that connects a physics-based uniform linear array (ULA) signal model, sample covariance matrix estimation, beamspace feature extraction, nearest-centroid baseline classification, rate-based spike encoding, and leaky-integrate-and-fire (LIF)-inspired temporal inference. The review assesses the technical motivation, methodology, experimental design, quantitative results, engineering interpretation, limitations, and recommended future work. The main conclusion is that Phase 1 provides a sound baseline framework for hardware-aware embedded-AI exploration. The spike-based path does not improve raw classification accuracy over the continuous nearest-centroid baseline; however, it introduces sparse temporal inference, measurable stable-decision latency, and tunable accuracy--latency behavior, which are directly relevant to embedded and neuromorphic edge-inference studies.
+\end{abstract}
+
+\section{Review Scope}
+
+This review is based on the Phase 1 project report titled \emph{DOA-Sector Inference with LIF-Inspired Edge Processing}. The report documents a staged embedded-AI prototype for sector-level DOA classification. The work is not presented as a new high-resolution DOA estimator. Instead, it is positioned as an engineering baseline that links array signal processing to spike-based temporal inference and later hardware-aware deployment.
+
+The reviewed report is technically organized around three layers: array signal processing, classical machine-learning baseline classification, and sparse temporal inference. This structure is appropriate because it separates the sensing model, feature representation, and edge-inference mechanism. The result is a controlled framework that can be studied quantitatively before attempting FPGA, PYNQ, or Vitis HLS implementation.
+
+\section{Summary of the Reviewed Work}
+
+The Phase 1 prototype generates synthetic narrowband ULA data for a single source over a controlled angular and SNR grid. For each sample, the received snapshot matrix is modeled using a ULA steering vector, a complex narrowband source waveform, and additive complex Gaussian noise. The sample covariance matrix is computed as
+\begin{equation}
+    R_{xx}=\frac{1}{M}XX^{H},
+\end{equation}
+where $M=128$ snapshots are used per sample. Beamspace energy features are extracted from the covariance matrix over a fixed angular grid and then normalized using training-set statistics.
+
+The classification task is intentionally framed as sector-level inference rather than continuous-angle estimation. A nearest-centroid classifier is used as the deterministic non-spiking baseline. The normalized beamspace features are then converted into binary spike trains through rate-based encoding. Finally, a LIF-inspired classifier accumulates spike-driven evidence over time according to
+\begin{equation}
+    v_c[t]=\alpha v_c[t-1]+i_c[t],
+\end{equation}
+where $v_c[t]$ is the class membrane state, $\alpha$ is the leak factor, and $i_c[t]$ is the spike-driven input current. Stable-decision latency is measured as the earliest time step after which the final decision remains unchanged.
+
+\section{Technical Motivation}
+
+The motivation is strong and appropriate for an embedded-AI course. Edge systems are often constrained by compute resources, energy budget, memory footprint, and latency. A conventional high-capacity neural network may not be the best first choice for such platforms, especially when the sensing problem has an interpretable physics-based structure. The selected DOA-sector task is well chosen because it naturally links electromagnetic sensing, array signal processing, compact feature extraction, and hardware-aware inference.
+
+The report also benefits from a clear connection to prior author work on FPGA/HLS sample covariance matrix acceleration for DOA preprocessing~\cite{molhem2026scmhls}. This connection strengthens the engineering narrative: the current project is not an isolated Python experiment, but part of a broader path from covariance-based DOA preprocessing toward embedded and FPGA-aware inference systems.
+
+\section{Methodological Review}
+
+The methodology is defensible for a Phase 1 baseline. The use of a ULA model creates a physically meaningful data source. The sample covariance matrix captures spatial correlation information. Beamspace features reduce the covariance structure into a compact angular representation, which is a reasonable design choice for coarse sector classification. The nearest-centroid classifier provides a simple and interpretable baseline before introducing stochastic spike encoding.
+
+The LIF-inspired inference model is also appropriately scoped. The report does not overclaim biological realism. Instead, the LIF path is framed as a lightweight hardware-facing approximation: each class integrates spike-driven evidence over time with leakage. This is a useful abstraction because it creates a temporal decision process and allows latency to become an explicit design metric.
+
+A key methodological strength is the explicit comparison between a continuous-valued baseline and a spike-based path. Without this comparison, it would be difficult to know whether the spike encoding preserves useful information. The report correctly treats the nearest-centroid baseline as the accuracy reference point.
+
+\section{Experimental Design}
+
+The dataset configuration is compact but sufficient for Phase 1. It uses 8 array elements, 128 snapshots per sample, half-wavelength spacing, one source, four DOA sectors, seven SNR values from $-10$ dB to $20$ dB, 2800 total samples, and a stratified 70/30 train/test split. This provides enough variation to evaluate accuracy versus SNR while keeping the experiment reproducible and computationally lightweight.
+
+The evaluation metrics are appropriate for the stated objectives. The report includes overall accuracy, accuracy versus SNR, spike-count statistics, stable-decision latency, and an accuracy--latency trade-off study. This is important because embedded inference should not be judged only by classification accuracy. A lower-accuracy model may still be valuable if it exposes latency control, sparsity, and implementation-friendly temporal structure.
+
+\section{Results Review}
+
+The nearest-centroid baseline achieved an overall test accuracy of $0.869048$, or approximately $86.90\%$. This result demonstrates that the compact beamspace features contain meaningful information for coarse DOA-sector inference.
+
+The fixed LIF-inspired configuration used $T=20$ and leak $=0.97$. It achieved an accuracy of $0.825000$, or $82.50\%$, with a mean stable-decision latency of $6.423810$ time steps. This confirms that the spike-based path preserves much of the baseline information, but with a measurable reduction in raw accuracy.
+
+The Run 005 parameter sweep evaluated $T\in\{10,20,30,40\}$ and leak $\in\{0.90,0.95,0.97,0.99\}$, producing 16 configurations. The best LIF accuracy was $0.841667$ at $T=40$ and leak $=0.99$, with mean latency $8.396429$ time steps. The lowest-latency configuration occurred at $T=10$ and leak $=0.99$, with accuracy $0.776190$ and mean latency $3.782143$ time steps.
+
+\begin{table}[h]
+\centering
+\caption{Key Phase 1 Results}
+\begin{tabular}{lccc}
+\toprule
+Case & Time window & Leak & Accuracy \\
+\midrule
+Nearest-centroid baseline & -- & -- & 0.869048 \\
+Fixed LIF configuration & 20 & 0.97 & 0.825000 \\
+Best LIF sweep configuration & 40 & 0.99 & 0.841667 \\
+Lowest-latency LIF configuration & 10 & 0.99 & 0.776190 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Engineering Interpretation}
+
+The most important interpretation is that the spike-based path is not an accuracy-improving replacement for the continuous nearest-centroid baseline. The baseline remains the best raw-accuracy classifier. This is not a failure of the project; rather, it is the central engineering result. Rate-based spike encoding introduces stochastic quantization, and temporal accumulation creates a design space in which accuracy, latency, and sparsity must be balanced.
+
+The value of the spike-based formulation is architectural. It converts continuous beamspace features into sparse temporal events. It exposes stable-decision latency as a measurable output. It allows the designer to adjust the spike time window and leak factor to trade accuracy against temporal budget. These properties are directly aligned with embedded-AI and neuromorphic-inference motivations.
+
+\section{Limitations}
+
+The Phase 1 study is intentionally controlled, and several limitations should be noted. First, the dataset uses a single-source narrowband ULA model, which is simpler than many real radar or array-processing scenarios. Second, the task is sector classification rather than high-resolution DOA estimation. Third, the spike encoder is rate-based and stochastic, so performance depends on time-window length and random spike realization. Fourth, the LIF model is a simplified class-level accumulator rather than a detailed spiking neural network. Finally, the current implementation is a Python reference prototype, not yet a fixed-point or deployed hardware implementation.
+
+These limitations are acceptable for Phase 1 because the purpose is not to solve the full radar/DOA deployment problem. The purpose is to establish a clean baseline and identify a meaningful hardware-aware direction.
+
+\section{Recommended Future Work}
+
+The most important next step is hardware-aware refactoring. The covariance, beamspace, spike encoding, and temporal accumulation stages should be evaluated for fixed-point representation and implementation cost. The prior SCM HLS accelerator provides a natural starting point for the covariance stage. Later phases can integrate the Python DOA/SNN workflow with a fixed-point HLS or PYNQ-oriented backend.
+
+Additional recommended work includes multi-source DOA cases, randomized waveform and noise studies, richer SNR and angular distributions, confusion-matrix analysis by sector, energy or operation-count estimates, and systematic fixed-point quantization experiments. A smaller FPGA demonstrator could also be developed to show the complete path from signal-processing theory to hardware-aware edge inference.
+
+\section{Overall Assessment}
+
+Overall, the Phase 1 report is technically sound, well scoped, and defensible as an embedded-AI project. Its strongest feature is the integration of array signal processing, interpretable baseline classification, spike-based temporal inference, and latency-aware evaluation. The results are not overstated: the report clearly acknowledges that the spike-based path does not outperform the continuous baseline in raw accuracy. Instead, it correctly frames the contribution as an architectural bridge toward sparse, temporal, hardware-aware inference.
+
+For presentation to Dr. Feng, the central message should be concise: Phase 1 establishes a reproducible DOA-sector inference baseline; the continuous beamspace classifier provides strong accuracy; the spike-based path introduces a controlled accuracy--latency trade-off; and the project now has a clear path toward FPGA/HLS-aware embedded implementation.
+
+\clearpage
+\bibliographystyle{IEEEtran}
+\bibliography{reference}
+
+\end{document}
