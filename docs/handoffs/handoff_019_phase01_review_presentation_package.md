@@ -10,33 +10,48 @@ phase-01-review-presentation-package
 
 Prepare a submission-ready Phase 1 review and presentation package for Dr. Feng based on the finalized Phase 1 report.
 
-## Deliverables Added
+## Final Deliverable Interpretation
+
+After review, the appropriate paper-style deliverable for Dr. Feng is the existing IEEE-style paper rather than the separately added paper-review memo. The IEEE paper is the stronger deliverable because it uses IEEE conference format, includes the core Phase 1 results, and reports the generated figures.
+
+The paper/review component of the package should therefore be interpreted as:
+
+```text
+docs/reports/phase_01_latex/phase_01_ieee_paper.tex
+docs/reports/phase_01_latex/phase_01_ieee_paper.pdf
+```
+
+The separately added files below were later identified as redundant and scheduled for cleanup in Handoff 020:
 
 ```text
 docs/reports/phase_01_latex/phase_01_paper_review.tex
 docs/reports/phase_01_latex/phase_01_paper_review.pdf
+```
+
+## Presentation Deliverables Added
+
+```text
 docs/reports/phase_01_latex/phase_01_final_presentation.tex
 docs/reports/phase_01_latex/phase_01_final_presentation.pdf
 docs/reports/phase_01_latex/phase_01_final_presentation_transcript.tex
 docs/reports/phase_01_latex/phase_01_final_presentation_transcript.pdf
 ```
 
-## Paper Review
+## IEEE Paper Component
 
-The paper review summarizes and evaluates the finalized Phase 1 report. It includes:
+The IEEE-style paper summarizes the Phase 1 technical contribution in conference-paper format. It includes:
 
-- review scope,
-- summary of the reviewed work,
-- technical motivation,
-- methodological review,
-- experimental design,
-- results review,
-- engineering interpretation,
-- limitations,
-- recommended future work,
-- overall assessment.
+- embedded-AI motivation,
+- ULA signal model,
+- covariance and beamspace feature formulation,
+- nearest-centroid baseline,
+- rate-based spike encoding,
+- LIF-inspired temporal inference,
+- accuracy and latency results,
+- generated figures,
+- engineering interpretation of the spike-based path.
 
-The review emphasizes that Phase 1 is not a new high-resolution DOA estimator. It is a hardware-aware embedded-AI baseline that connects ULA modeling, sample covariance matrices, beamspace features, nearest-centroid classification, spike encoding, and LIF-inspired temporal inference.
+The central interpretation is that the spike-based path is not an accuracy-improving replacement for the continuous baseline. Its value is architectural: sparse temporal inference, measurable stable-decision latency, and tunable accuracy--latency behavior.
 
 ## Final Presentation
 
