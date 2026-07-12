@@ -1,0 +1,87 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\title{Transcript for Phase 1 Review Presentation:\\Lightweight Spike-Based DOA Sector Inference for Embedded Edge AI}
+\author{Hossein Molhem\\Kennesaw State University\\EE 6900 Special Topics: Embedded AI for Autonomous Robots}
+\date{Estimated duration: 15--17 minutes\\\today}
+
+\begin{document}
+\maketitle
+
+\section*{Slide 1 — Title}
+Good afternoon Dr. Feng. Today I will present my Phase 1 review for the project titled \emph{Lightweight Spike-Based DOA Sector Inference for Embedded Edge AI}. The purpose of this presentation is to summarize what was implemented, review the main technical results, and explain the engineering value of the spike-based path. The project combines a physics-based uniform linear array model, covariance-based beamspace features, a nearest-centroid baseline classifier, rate-based spike encoding, and LIF-inspired temporal inference.
+
+\section*{Slide 2 — Presentation Roadmap}
+I will organize the presentation in six parts. First, I will explain the motivation and problem definition. Second, I will describe the Phase 1 signal-processing and inference pipeline. Third, I will summarize the dataset and experimental design. Fourth, I will review the baseline and LIF-inspired results. Fifth, I will interpret the accuracy-latency trade-off. Finally, I will discuss limitations and future work. The presentation is designed for approximately fifteen to seventeen minutes.
+
+\section*{Slide 3 — Motivation}
+The motivation comes from embedded AI. In edge systems, inference is not only about accuracy. These systems often have limited computation, limited memory, limited energy, and strict latency constraints. For sensing problems, we also often have useful physics-based structure. Instead of applying a large black-box model immediately, Phase 1 explores whether compact signal-processing features can be converted into sparse temporal events. This makes spike-based inference attractive because it creates a pathway toward low-complexity and hardware-aware edge inference.
+
+\section*{Slide 4 — Problem Statement}
+The central Phase 1 question is whether compact beamspace features extracted from a physics-based ULA signal model can be converted into sparse spike trains and classified with acceptable accuracy and controllable temporal latency. The task is four-class DOA sector classification. This is intentionally simpler than high-resolution angle estimation. The goal is to create a controlled engineering baseline, not to claim a new DOA estimator. That controlled baseline lets us evaluate what is gained and what is lost when moving from continuous features to spike-based temporal inference.
+
+\section*{Slide 5 — Why DOA Sector Inference?}
+DOA sector inference is a useful sensing case because it connects several areas that are important for my research direction: electromagnetics, radar, MIMO sensing, array signal processing, and embedded implementation. Sector classification is also small enough for a focused Phase 1 prototype. Instead of estimating an exact continuous angle, the model classifies the source into one of four angular regions. This keeps the problem tractable while still preserving the physical meaning of the ULA and covariance-based processing.
+
+\section*{Slide 6 — End-to-End Phase 1 Pipeline}
+This slide shows the complete Phase 1 pipeline. The process starts with a ULA and DOA signal model. The model generates array snapshots under controlled SNR values. From those snapshots, the sample covariance matrix is computed. Then beamspace energy features are extracted from the covariance matrix. Those features are used in two paths. The first path is the continuous nearest-centroid baseline. The second path converts the normalized features into spike trains and uses LIF-inspired temporal accumulation for classification.
+
+\section*{Slide 7 — Theoretical Foundation}
+The theoretical foundation has five main components. The steering vector represents the angle-dependent phase progression across the uniform linear array. The sample covariance matrix captures spatial correlation in the received snapshots. Beamspace energy maps the covariance matrix into a compact angular feature vector. The nearest-centroid rule provides an interpretable non-spiking baseline. Finally, the LIF-inspired update accumulates class evidence over time with a leak factor. These equations define the signal-processing and temporal-inference backbone of the prototype.
+
+\section*{Slide 8 — Dataset Configuration}
+The Phase 1 dataset is controlled and reproducible. It uses an eight-element uniform linear array with half-wavelength spacing and 128 snapshots per sample. The source is a single narrowband emitter, and the DOA range is from negative sixty degrees to positive sixty degrees. The angle range is divided into four sectors. The SNR grid includes seven values, from negative ten dB to twenty dB. The total dataset has 2800 samples, with 840 samples used for testing after a stratified 70/30 train-test split.
+
+\section*{Slide 9 — Beamspace Feature Example}
+This figure shows an example beamspace response from the Phase 1 simulation. The purpose of the beamspace representation is to compress the covariance matrix into a small feature vector that still contains angular information. When the steering or beamforming grid aligns with the source direction, the response tends to be larger. For this project, the feature vector is not used for exact DOA estimation. It is used as a compact representation for coarse sector classification.
+
+\section*{Slide 10 — Baseline Classifier}
+The non-spiking baseline is a nearest-centroid classifier. It uses continuous normalized beamspace features and assigns each test sample to the closest class centroid. This classifier is simple, deterministic, and interpretable. Its role is important because it establishes the reference accuracy before spike encoding. The baseline achieved an overall test accuracy of 0.869048, or approximately 86.90 percent. This result confirms that the beamspace features carry strong information for sector-level DOA classification.
+
+\section*{Slide 11 — Spike Encoding and LIF-Inspired Inference}
+The spike-based path begins by converting normalized beamspace features into binary spike trains using rate-based encoding. A larger normalized feature value produces a higher probability of spike emission across the time window. The LIF-inspired classifier then accumulates spike-driven evidence for each class. This is not intended to be a biologically detailed spiking neural network. It is a simplified hardware-facing abstraction that creates sparse temporal inference and makes latency measurable.
+
+\section*{Slide 12 — Fixed LIF Configuration}
+For the fixed LIF configuration, the update equation is a leaky evidence accumulator. The class membrane value at each time step equals the previous membrane value multiplied by the leak factor plus the current spike-driven input. In Run 003, the time window was 20 steps and the leak was 0.97. This configuration achieved 0.825000 accuracy with a mean stable-decision latency of 6.423810 time steps. This shows that the spike path preserves useful information, but it loses some raw accuracy compared with the continuous baseline.
+
+\section*{Slide 13 — Accuracy Comparison Versus SNR}
+This figure compares the nearest-centroid baseline and the LIF-inspired classifier across the SNR grid. The continuous baseline remains stronger in raw classification accuracy. However, the LIF-inspired path is still meaningful because it remains well above a random four-class baseline and preserves sector information after spike encoding. The key point is that the spike path should not be interpreted as an accuracy-improving replacement. It should be interpreted as a different computational architecture with temporal and sparse-processing properties.
+
+\section*{Slide 14 — Stable-Decision Latency Versus SNR}
+This figure shows mean stable-decision latency versus SNR for the LIF-inspired classifier. The important observation is that decision latency becomes a measurable output of the inference process. In general, higher signal quality supports earlier stabilization, although the exact trend depends on the stochastic spike realization and class evidence. This is important for embedded AI because edge systems are often constrained by response time. The model gives us a way to study latency, not only accuracy.
+
+\section*{Slide 15 — Run 005 Parameter Sweep}
+Run 005 swept the spike time window and the membrane leak factor. The time window values were 10, 20, 30, and 40. The leak values were 0.90, 0.95, 0.97, and 0.99. The best LIF accuracy was 0.841667 at a time window of 40 and leak 0.99, with a mean latency of 8.396429 time steps. The lowest-latency configuration used a time window of 10 and leak 0.99, reaching 0.776190 accuracy with 3.782143 mean latency.
+
+\section*{Slide 16 — Accuracy--Latency Trade-Off}
+This trade-off plot summarizes the main design behavior. Longer spike windows give the rate-coded representation more time to approximate the original continuous features, which can improve accuracy. However, longer windows also increase the temporal budget. The leak factor controls how strongly past evidence is retained. A high leak preserves accumulated evidence, but it can also affect stabilization time. The important result is that Phase 1 exposes a tunable accuracy-latency design space.
+
+\section*{Slide 17 — Main Engineering Interpretation}
+The main engineering interpretation is clear: the spike-based path does not improve raw accuracy over the continuous nearest-centroid baseline. That is not a failure. It is the core engineering finding. Rate-based spike encoding introduces stochastic quantization, so some accuracy loss is expected. The value of the spike path is architectural. It converts continuous beamspace features into sparse temporal events, exposes stable-decision latency, and allows accuracy and latency to be tuned through the time window and leak factor.
+
+\section*{Slide 18 — Connection to Prior FPGA/HLS SCM Work}
+This project also connects naturally to my prior FPGA/HLS work on sample covariance matrix acceleration for DOA preprocessing. That earlier repository implemented the covariance stage in Vitis HLS. The current Embedded AI project uses the same covariance-based foundation, but extends the workflow toward spike-based temporal inference. Together, the two repositories form a coherent path: DOA preprocessing, covariance computation, beamspace features, embedded AI inference, and eventually hardware-aware or FPGA-oriented deployment.
+
+\section*{Slide 19 — Limitations}
+There are several limitations. The model uses a single-source narrowband ULA scenario, which is simpler than many real radar or wireless sensing environments. The task is sector classification, not high-resolution DOA estimation. The spike encoder is stochastic and rate-based, so performance depends on the time window and random realization. The LIF classifier is a simplified class-level accumulator. Finally, Phase 1 is still a Python reference prototype, not yet a fixed-point or deployed FPGA implementation.
+
+\section*{Slide 20 — Conclusion and Future Work}
+In conclusion, Phase 1 establishes a reproducible DOA-sector embedded-AI baseline. The continuous beamspace classifier achieves strong accuracy, while the spike-based path provides sparse temporal inference and explicit latency control. The baseline accuracy is 86.90 percent, and the best LIF accuracy is 84.17 percent. The next steps are richer DOA cases, fixed-point analysis, PYNQ or Vitis HLS refactoring, and hardware-aware deployment planning.
+
+\section*{Slide 21 — Closing Message}
+The closing message is that Phase 1 successfully converts a physics-based DOA feature pipeline into a latency-aware embedded-AI inference baseline. The main contribution is not higher raw accuracy. The contribution is the controlled bridge toward sparse temporal and hardware-aware edge inference. This makes the project a useful foundation for later work in neuromorphic inference, embedded implementation, and FPGA-aware acceleration.
+
+\end{document}
