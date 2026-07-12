@@ -17,3 +17,4 @@
 - Handoff 016: Clarified spike value in Phase 1 report.
 - Handoff 017: Synced spike value across Phase 1 deliverables.
 - Handoff 018: Cited prior SCM HLS work in Phase 1 proposal.
+- Handoff 019: Phase 1 review and presentation package.
