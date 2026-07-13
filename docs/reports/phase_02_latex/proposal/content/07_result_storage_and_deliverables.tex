@@ -1,0 +1,46 @@
+\section{Result Storage and Deliverables}
+
+The implementation results for Phase 2 should be stored outside the LaTeX proposal folder, under the official Phase 2 working directory:
+
+\begin{verbatim}
+phase_02_radar_sensing_case_study/
+    src/
+    data/
+    figures/
+    results/
+\end{verbatim}
+
+The LaTeX proposal and report should be stored under:
+
+\begin{verbatim}
+docs/reports/phase_02_latex/
+\end{verbatim}
+
+The report-template structure must remain unchanged. All section text belongs in \texttt{content/}; code listings belong in \texttt{codes/}; figures belong in \texttt{figures/}; and console outputs belong in \texttt{appendices/console_outputs/}.
+
+\subsection{Run Output Naming Rule}
+
+Every run should follow a strict naming convention:
+
+\begin{verbatim}
+results/run_001_phase2_config.json
+results/run_001_phase2_dataset_summary.txt
+results/run_001_phase2_metrics.txt
+results/run_001_phase2_accuracy_vs_snr.csv
+figures/run_001_phase2_accuracy_vs_snr.png
+figures/run_001_phase2_confusion_matrix.png
+\end{verbatim}
+
+This convention ensures that the final report can cite exact numerical outputs and exact figure files.
+
+\subsection{Expected Deliverables}
+
+The expected Phase 2 deliverables are:
+
+\begin{itemize}
+    \item Phase 2 proposal in LaTeX/PDF format.
+    \item Reproducible Python experiment framework.
+    \item Numbered result files and figures for each run.
+    \item Phase 2 technical report using the established LaTeX template.
+    \item Optional IEEE-style short paper or presentation if required by the course workflow.
+\end{itemize}
