@@ -1,38 +1,89 @@
-% =========================================================
-% 01_packages.tex
-% Core package set for the Phase 2 proposal template
-% =========================================================
+% ==========================================
+% setup/01_packages.tex
+% ==========================================
 
+% --- Core Packages ---
 \usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{microtype}
-
-\usepackage[a4paper, margin=1in]{geometry}
-\usepackage{setspace}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{tocloft}
-
-\usepackage{amsmath, amssymb, amsfonts, mathtools, bm}
-\usepackage{siunitx}
-\usepackage{physics}
-
+\usepackage[english]{babel}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{upquote}
+
+% --- Math & Typography (IEEE Times Look) ---
+% \usepackage{amsmath, amsfonts, amssymb, amsthm}
+% \usepackage{mathtools}
+% \usepackage{newtxtext, newtxmath} % Times font
+% \usepackage{bm}
+
+% --- Math & Typography (Palatino Look) ---
+% \usepackage{amsmath, amsfonts, amssymb, amsthm}
+% \usepackage{mathtools}
+% \usepackage{newpxtext, newpxmath} % Palatino font
+% \usepackage{bm}
+
+% --- Math & Typography (Classic LaTeX Look) ---
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{lmodern} % Classic LaTeX font
+\usepackage[T1]{fontenc}
+\usepackage{bm}
+
+
+% --- Layout & Tables ---
 \usepackage{booktabs}
-\usepackage{array}
-\usepackage{longtable}
-\usepackage{multirow}
+\usepackage{tabularx, multirow, array}
 \usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{longtable}
 
-\usepackage[table]{xcolor}
-\usepackage[most]{tcolorbox}
-\usepackage{listings}
-
+% --- Bibliography & Citations Setup ---
 \usepackage{csquotes}
-\usepackage[backend=biber, style=ieee, sorting=none]{biblatex}
 
-\usepackage{hyperref}
-\usepackage[nameinlink, capitalise]{cleveref}
+\usepackage[
+    backend=biber,      
+    style=ieee,         
+    sorting=none,       
+    doi=true,           
+    isbn=false          
+]{biblatex}
+% \addbibresource{references.bib} % این خط باید در main.tex باشد، نه اینجا، اما اگر ساختار شما اینطور است بگذارید بماند.
+
+% --- Hyperref Setup ---
+\usepackage[
+    colorlinks=true, 
+    linkcolor=blue,    
+    citecolor=red,     
+    urlcolor=cyan,     
+    breaklinks=true
+]{hyperref}
+
+% --- Graphics & Code ---
+\usepackage{tcolorbox}
+% FIX: 'listings' library added here to support \newtcblisting for PowerShell
+\tcbuselibrary{theorems, breakable, skins, listings}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
+
+% --- Table of Contents Additions ---
+\usepackage[nottoc]{tocbibind} 
+
+% --- Styling Packages ---
+\usepackage{titlesec}
+
+\usepackage{pdfpages}
+
+
+% Unit
+
+\usepackage{siunitx}
+
+\sisetup{
+    detect-all,
+    per-mode=symbol
+}
