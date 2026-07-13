@@ -1,0 +1,23 @@
+\chapter{Phase 2 Reproducibility Plan}
+
+This appendix defines the minimum reproducibility requirements for Phase 2.
+
+\section{Required Run Artifacts}
+
+Each numbered run must include:
+
+\begin{itemize}
+    \item a configuration file containing all key parameters,
+    \item a human-readable summary file,
+    \item at least one machine-readable CSV metrics file,
+    \item generated figures saved under the Phase 2 figures directory,
+    \item console output if the run is used in the final report appendix.
+\end{itemize}
+
+\section{Required Parameters}
+
+The saved configuration should include array size, snapshots, spacing, SNR values, DOA range, sector boundaries, random seed, feature type, spike time steps, LIF leak values, and classifier settings.
+
+\section{Documentation Rule}
+
+Every major run must be described in \texttt{EXPERIMENTS.md} and summarized in a handoff file if it changes the scientific direction, produces reportable results, or modifies the Phase 2 scope.
