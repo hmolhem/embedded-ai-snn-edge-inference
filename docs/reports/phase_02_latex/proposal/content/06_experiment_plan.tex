@@ -1,0 +1,39 @@
+\section{Experiment Plan}
+
+The Phase 2 experiments will be organized as numbered runs so that every result is reproducible and traceable.
+
+\begin{table}[H]
+\centering
+\caption{Proposed Phase 2 Experimental Runs}
+\begin{tabular}{p{0.16\textwidth}p{0.30\textwidth}p{0.42\textwidth}}
+\toprule
+\textbf{Run} & \textbf{Purpose} & \textbf{Expected Output} \\
+\midrule
+Run 001 & Phase 1 reproduction check & Confirms that the Phase 1 baseline and LIF reference behavior can be regenerated under the Phase 2 folder structure. \\
+Run 002 & Harder SNR and angular boundary cases & Measures robustness loss near sector boundaries and under degraded SNR. \\
+Run 003 & Covariance-derived feature comparison & Compares beamspace features with an alternative compact covariance representation. \\
+Run 004 & LIF parameter sweep under harder data & Repeats the accuracy--latency sweep to determine whether the Phase 1 trade-off still holds. \\
+Run 005 & Optional MUSIC/reference estimator study & Adds a classical DOA reference to interpret ambiguity and feature quality, if schedule permits. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The first run is deliberately conservative. It prevents the project from drifting away from the completed Phase 1 result. After that, each run adds one controlled difficulty factor so that any performance change can be interpreted scientifically.
+
+\subsection{Metrics}
+
+The following metrics will be reported for each major run:
+
+\begin{itemize}
+    \item overall classification accuracy,
+    \item accuracy versus SNR,
+    \item confusion matrix,
+    \item mean spike count per sample,
+    \item mean stable-decision latency,
+    \item accuracy loss relative to the Phase 1 baseline,
+    \item accuracy--latency trade-off across LIF parameters.
+\end{itemize}
+
+\subsection{Reproducibility}
+
+Each run will store a configuration file, numerical output files, and generated figures. Random seeds, dataset parameters, SNR values, angle ranges, feature settings, and LIF parameters must be saved with the results.
