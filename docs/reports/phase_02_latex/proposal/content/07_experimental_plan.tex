@@ -1,0 +1,23 @@
+\section{Experimental Plan}
+
+The Phase 2 experiment will be organized as a sequence of numbered runs. Each run will have a clearly defined configuration, saved result files, and generated figures.
+
+\subsection{Run 001: Phase 2 Baseline Reproduction}
+
+The first run will reproduce the Phase 1-style pipeline inside the Phase 2 directory structure. This run will verify that the migrated or extended code produces results consistent with the Phase 1 reference behavior. The purpose is to establish a clean starting point before introducing new sensing conditions.
+
+\subsection{Run 002: Extended SNR Evaluation}
+
+The second run will evaluate the pipeline over a more demanding SNR configuration. This may include additional low-SNR cases or a denser SNR sweep. The goal is to determine how the continuous baseline and LIF-inspired inference path degrade as the sensing problem becomes more difficult.
+
+\subsection{Run 003: Sector-Boundary Evaluation}
+
+The third run will focus on DOA angles near sector boundaries. These cases are important because coarse sector classification is most likely to fail when the source angle lies near the decision boundary between two sectors. The expected output is a confusion-matrix-based analysis of boundary sensitivity.
+
+\subsection{Run 004: Accuracy--Latency Tradeoff Study}
+
+The fourth run will repeat a controlled spike-inference parameter sweep. The spike time window and leak parameter will be varied to study the tradeoff between accuracy and stable-decision latency. This run will connect directly to the Phase 1 Run 005 analysis.
+
+\subsection{Run 005: Final Integrated Phase 2 Case Study}
+
+The final run will combine the most important Phase 2 settings into a single integrated case study. This run will provide the numerical results and figures used in the Phase 2 final report.

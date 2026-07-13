@@ -1,0 +1,30 @@
+% =============================================================================
+% setup/08_theme.tex
+% Global styling for chapters, sections, and subsections
+% =============================================================================
+
+% --- 1. Color Definitions ---
+% Deep colors are preferred for professional engineering reports
+\definecolor{ChapterColor}{RGB}{128, 0, 0}      % Dark Maroon for Chapter titles
+\definecolor{SectionColor}{RGB}{0, 51, 102}      % Deep Blue for Sections
+\definecolor{SubSectionColor}{RGB}{80, 80, 80}  % Charcoal Gray for Subsections
+
+% --- 2. Chapter Format ---
+% Large, bold, and colored chapter headings
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{ChapterColor}} % Format
+  {\chaptertitlename\ \thechapter}               % Label (e.g., Chapter 1)
+  {20pt}                                         % Separation
+  {\Huge}                                        % Title size
+
+% --- 3. Section Format ---
+% Includes a horizontal rule for visual separation in long technical reports
+% \titleformat{\section}
+%   {\normalfont\Large\bfseries\color{SectionColor}}
+%   {\thesection}{1em}{}
+%   [\titlerule] % Horizontal line below the section title
+
+% --- 4. Subsection Format ---
+% \titleformat{\subsection}
+%   {\normalfont\large\bfseries\color{SubSectionColor}}
+%   {\thesubsection}{1em}{}

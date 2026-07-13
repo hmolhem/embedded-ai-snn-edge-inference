@@ -1,0 +1,19 @@
+\section{Technical Objectives}
+
+The main technical objectives of Phase 2 are listed below.
+
+\subsection{Objective 1: Extend the Sensing Scenario}
+
+The first objective is to extend the Phase 1 synthetic DOA dataset into a more robust radar/array sensing case study. This includes generating additional test cases that are more difficult than the original controlled single-source setting. The extension may include lower SNR values, denser angular sampling, sector-boundary cases, or interference-like perturbations.
+
+\subsection{Objective 2: Preserve the Phase 1 Reference Pipeline}
+
+The second objective is to preserve the core Phase 1 pipeline so that Phase 2 remains a direct continuation of the previous work. The existing stages are ULA signal generation, sample covariance matrix estimation, beamspace feature extraction, feature normalization, baseline classification, spike encoding, and LIF-inspired temporal inference.
+
+\subsection{Objective 3: Evaluate Robustness}
+
+The third objective is to evaluate robustness using metrics beyond overall accuracy. The Phase 2 evaluation should include accuracy versus SNR, confusion matrices, sector-specific behavior, stable-decision latency, and spike activity.
+
+\subsection{Objective 4: Prepare for Later Hardware-Aware Phases}
+
+The fourth objective is to organize Phase 2 in a way that supports later PYNQ, FPGA, or Vitis HLS work. The implementation should remain modular, reproducible, and suitable for future fixed-point or hardware-aware refactoring.

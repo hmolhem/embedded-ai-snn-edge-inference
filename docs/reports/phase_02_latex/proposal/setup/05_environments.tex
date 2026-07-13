@@ -1,0 +1,69 @@
+% --- tcolorbox configurations ---
+\tcbuselibrary{theorems, breakable, skins}
+
+% --- 1. Theorem Box ---
+\newtcbtheorem[number within=section]{theorem}{Theorem}%
+{
+    enhanced, breakable,
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    boxrule=1pt,
+    arc=3pt,
+    title=Theorem~\thetcbcounter
+}{th}
+
+% --- 2. Definition Box ---
+\newtcbtheorem[number within=section]{definition}{Definition}%
+{
+    enhanced, breakable,
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    boxrule=1pt,
+    arc=3pt,
+    title=Definition~\thetcbcounter
+}{def}
+
+% --- 3. Example Box ---
+\newtcbtheorem[number within=section]{example}{Example}%
+{
+    enhanced, breakable,
+    colback=gray!5!white,
+    colframe=gray!60!black,
+    fonttitle=\bfseries,
+    boxrule=1pt,
+    arc=0pt, % Sharp corners for examples
+    title=Example~\thetcbcounter
+}{ex}
+
+% --- 4. Problem Box (Hardware/Coding constraints etc.) ---
+\newtcbtheorem[number within=section]{problem}{Problem}%
+{
+    enhanced, breakable,
+    colback=red!5!white,
+    colframe=red!75!black,
+    fonttitle=\bfseries\sffamily,
+    boxrule=1pt,
+    arc=3pt,
+    title=Problem~\thetcbcounter
+}{prob}
+
+% --- 5. Lemma Box ---
+\newtcbtheorem[number within=section]{lemma}{Lemma}%
+{
+    enhanced, breakable,
+    colback=cyan!5!white,
+    colframe=cyan!75!black,
+    fonttitle=\bfseries,
+    boxrule=1pt,
+    arc=3pt,
+    title=Lemma~\thetcbcounter
+}{lem}
+
+
+% objective environment
+% Define the custom environment
+\newenvironment{objective}
+  {\small\begin{quote}\textbf{Objective:}\newline}
+  {\end{quote}}

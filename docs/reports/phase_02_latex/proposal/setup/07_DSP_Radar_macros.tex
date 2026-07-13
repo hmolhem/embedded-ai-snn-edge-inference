@@ -1,0 +1,45 @@
+% ==========================================
+% Radar, MIMO, and FPGA Specific Macros
+% ==========================================
+
+% --- 1. Array Processing & DOA (MUSIC/ESPRIT) ---
+\newcommand{\steer}[1]{\mathbf{a}(#1)}           % Steering vector a(theta)
+\newcommand{\Rxx}{\mathbf{R}_{xx}}               % Signal Covariance Matrix
+\newcommand{\Rnn}{\mathbf{R}_{nn}}               % Noise Covariance Matrix
+\newcommand{\Eop}[1]{\mathbb{E}\left[ #1 \right]} % Expectation with auto-scaling brackets
+\newcommand{\proj}{\mathbf{P}}                   % Projection Matrix
+\newcommand{\porth}{\mathbf{P}^{\perp}}          % Orthogonal Projection Matrix
+
+% --- 2. Optimization & Signal Norms ---
+\DeclareMathOperator*{\argmax}{arg\,max}         % Argmax without spacing issues
+\DeclareMathOperator*{\argmin}{arg\,min}         % Argmin without spacing issues
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}   % Norm operator ||x||
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}    % Absolute value |x|
+
+% --- 3. FPGA & Hardware Representation ---
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}   % Ceiling (for bit-width calculations)
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}% Floor (for truncation)
+\newcommand{\quant}[1]{\mathcal{Q}\left( #1 \right)} % Quantization Operator
+\newcommand{\qformat}[2]{\text{Q}#1.#2}          % Q-format fixed-point (e.g., \qformat{1}{15})
+\newcommand{\delay}[1]{z^{-#1}}                  % Discrete delay operator (Z-domain)
+
+
+% --- َ related to chapter 2 Antenna design
+
+\newcommand{\ph}{\mathrm{ph}}
+\newcommand{\jv}{j}
+\newcommand{\dd}{\,d}
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\uv}[1]{\hat{#1}}
+\newcommand{\boxedans}[1]{\boxed{#1}}
+\newcommand{\antproblem}[2]{%
+\begin{problem}{#1}{prob:#1}
+\textbf{Paraphrased statement.} #2
+\end{problem}
+\noindent\textbf{Solution.}\par
+}
+\newcommand{\interp}[1]{\par\smallskip\noindent\textbf{Physical meaning.} #1\par\medskip}
+
+% ---- Homework chapter 2
+\newcommand{\ohm}{\Omega}
+\newcommand{\degree}{^\circ}

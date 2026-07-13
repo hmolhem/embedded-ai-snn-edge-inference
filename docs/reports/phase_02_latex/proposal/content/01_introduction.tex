@@ -1,0 +1,7 @@
+\section{Introduction}
+
+The objective of Phase 2 is to extend the completed Phase 1 embedded-AI prototype into a more robust radar and direction-of-arrival (DOA) sensing case study. Phase 1 established a controlled Python reference workflow that connected uniform linear array (ULA) signal modeling, sample covariance matrix estimation, beamspace feature extraction, nearest-centroid baseline classification, rate-based spike encoding, and leaky-integrate-and-fire (LIF)-inspired temporal inference.
+
+The Phase 1 result demonstrated that a lightweight spike-based inference path can preserve a significant portion of the information contained in beamspace DOA features while introducing additional engineering metrics such as spike activity, stable-decision latency, and accuracy--latency tradeoff behavior. However, Phase 1 was intentionally controlled. It used a single-source ULA scenario, a compact sector-level classification problem, and a limited range of experimental conditions.
+
+Phase 2 will build directly on this foundation. The purpose is not to replace classical DOA estimation with a black-box neural model. Instead, the purpose is to evaluate whether the Phase 1 spike-inference pipeline remains technically meaningful when the sensing scenario becomes more realistic and more demanding. The project will therefore emphasize robustness, baseline comparison, reproducibility, and engineering interpretation.

@@ -1,0 +1,16 @@
+\section{Proposed Phase 2 Scope}
+
+Phase 2 will extend the existing Phase 1 workflow rather than starting a separate project. The existing ULA simulator, covariance feature extraction, baseline classifier, spike encoder, and LIF-inspired inference logic will remain the technical foundation. The new work will focus on extending the sensing case study and improving the experimental evaluation.
+
+The proposed Phase 2 scope includes the following elements:
+
+\begin{enumerate}
+    \item Extend the Phase 1 DOA-sector dataset generation process to include more challenging sensing conditions.
+    \item Evaluate performance over a wider or more carefully structured SNR range.
+    \item Add boundary-focused DOA cases where the source angle lies near sector decision boundaries.
+    \item Compare the spike-inference pipeline against the existing continuous-valued baseline.
+    \item Add robustness metrics such as confusion matrices, per-SNR accuracy, and latency versus SNR.
+    \item Store all results using a reproducible run-based naming convention.
+\end{enumerate}
+
+The Phase 2 scope will remain appropriate for an embedded-AI course project. It will not attempt to solve a full production radar-processing system. Instead, it will produce a defensible research prototype that connects radar/array signal processing with hardware-aware temporal inference.

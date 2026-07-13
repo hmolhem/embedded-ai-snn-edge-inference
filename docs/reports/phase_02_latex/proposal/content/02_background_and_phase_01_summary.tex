@@ -1,0 +1,9 @@
+\section{Background and Phase 1 Summary}
+
+The broader motivation for this project is the development of hardware-aware embedded-AI inference methods for sensing systems. Radar, array processing, and robotic perception applications often operate under constraints on latency, memory, power, and computation. These constraints make lightweight and interpretable inference pipelines attractive, especially when the front-end sensing model is already governed by physical structure.
+
+In Phase 1, a narrowband ULA model was used to generate synthetic DOA data over multiple signal-to-noise ratio (SNR) values. For each sample, the received array snapshot matrix was used to estimate the sample covariance matrix. Beamspace features were then extracted over a fixed angular grid and normalized using training-set statistics. A nearest-centroid classifier provided the continuous-valued baseline, while a rate-based spike encoder and LIF-inspired class accumulator provided the spike-based temporal inference path.
+
+The Phase 1 nearest-centroid baseline achieved strong sector-classification accuracy, while the LIF-inspired path achieved slightly lower raw accuracy but introduced sparse temporal inference and measurable stable-decision latency. This distinction is important. The spike-based path was not shown to improve accuracy relative to the continuous baseline. Its value was architectural: it transformed continuous-valued features into event-based temporal evidence and exposed a controllable accuracy--latency tradeoff.
+
+Phase 2 uses this interpretation as the starting point. The goal is to determine whether the same design philosophy remains useful when the sensing case study is expanded beyond the original controlled setting.

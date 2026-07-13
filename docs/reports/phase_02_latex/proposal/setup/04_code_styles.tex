@@ -1,0 +1,281 @@
+% ==========================================
+% setup/04_code_styles.tex
+% ==========================================
+% Centralized code-listing styles for MATLAB, Python,
+% console output, Vitis HLS C/C++, Vitis output, and PowerShell.
+%
+% Required packages in setup/01_packages.tex:
+%   \usepackage{xcolor}
+%   \usepackage{listings}
+%   \usepackage{textcomp}
+%   \usepackage{upquote}   % optional; remove if unavailable
+%
+% Notes:
+%   1. Each style name is defined only once.
+%   2. Python colors are inspired by VS Code Light+ with a light-blue box.
+%   3. Avoid redefining \lstdefinestyle{Python} elsewhere in the project.
+
+% ---------------------------------------------------------
+% MATLAB Listing Colors
+% ---------------------------------------------------------
+\definecolor{mGreen}{RGB}{34,139,34}
+\definecolor{mGray}{RGB}{128,128,128}
+\definecolor{mPurple}{RGB}{160,32,240}
+\definecolor{mBackground}{RGB}{245,245,245}
+\definecolor{mFrame}{RGB}{180,180,180}
+\definecolor{mKeyword}{RGB}{0,0,180}
+
+% ---------------------------------------------------------
+% MATLAB Listing Style
+% ---------------------------------------------------------
+\lstdefinestyle{Matlab}{
+    language=Matlab,
+    backgroundcolor=\color{mBackground},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{mKeyword}\bfseries,
+    commentstyle=\color{mGreen}\itshape,
+    stringstyle=\color{mPurple},
+    numbers=left,
+    numberstyle=\tiny\color{mGray},
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{mFrame},
+    framerule=0.4pt,
+    framesep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces=true,
+    columns=fullflexible,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=true,
+    captionpos=b,
+    literate={≈}{$\approx$}{1}
+}
+
+% ---------------------------------------------------------
+% Python Listing Colors: VS Code Light+ Inspired
+% ---------------------------------------------------------
+\definecolor{pyBackground}{RGB}{240,247,255}  % very light blue background
+\definecolor{pyFrame}{RGB}{90,140,190}        % soft blue frame
+\definecolor{pyKeyword}{RGB}{0,0,255}         % VS Code-like keyword blue
+\definecolor{pyBuiltin}{RGB}{121,94,38}       % VS Code-like function/builtin brown
+\definecolor{pyString}{RGB}{163,21,21}        % VS Code-like string red
+\definecolor{pyComment}{RGB}{0,128,0}         % VS Code-like comment green
+\definecolor{pyNumber}{RGB}{9,134,88}         % VS Code-like numeric green
+\definecolor{pyLineNumber}{RGB}{120,120,120}  % gray line numbers
+
+% ---------------------------------------------------------
+% Python Listing Style
+% ---------------------------------------------------------
+\lstdefinestyle{Python}{
+    language=Python,
+    backgroundcolor=\color{pyBackground},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{pyKeyword}\bfseries,
+    commentstyle=\color{pyComment}\itshape,
+    stringstyle=\color{pyString},
+    numbers=left,
+    numberstyle=\tiny\color{pyLineNumber},
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{pyFrame},
+    framerule=0.5pt,
+    framesep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces=true,
+    columns=fullflexible,
+    upquote=true,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=true,
+    captionpos=b,
+    morekeywords={
+        as,assert,async,await,break,class,continue,def,del,elif,else,
+        except,False,finally,for,from,global,if,import,in,is,lambda,
+        None,nonlocal,not,or,pass,raise,return,True,try,while,with,yield
+    },
+    emph={
+        print,range,len,float,int,str,list,dict,tuple,set,
+        sum,min,max,abs,round,pow,enumerate,zip,sorted,
+        input,type,isinstance,open,format,append,extend,
+        math,sqrt,sin,cos,tan,log,log10,pi
+    },
+    emphstyle=\color{pyBuiltin}
+}
+
+% ---------------------------------------------------------
+% Console Output Style
+% ---------------------------------------------------------
+\lstdefinestyle{ConsoleOutput}{
+    backgroundcolor=\color{pyBackground},
+    basicstyle=\ttfamily\footnotesize\color{black},
+    numbers=none,
+    frame=single,
+    rulecolor=\color{pyFrame},
+    framerule=0.5pt,
+    framesep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces=true,
+    columns=fullflexible,
+    upquote=true,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=true,
+    captionpos=b
+}
+
+% ---------------------------------------------------------
+% General Code Output Style
+% ---------------------------------------------------------
+\definecolor{outputBackground}{RGB}{245,245,245}
+\definecolor{outputFrame}{RGB}{180,180,180}
+\definecolor{outputText}{RGB}{30,30,30}
+
+\lstdefinestyle{CodeOutput}{
+    backgroundcolor=\color{outputBackground},
+    basicstyle=\ttfamily\footnotesize\color{outputText},
+    numbers=none,
+    frame=single,
+    rulecolor=\color{outputFrame},
+    framerule=0.6pt,
+    framesep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces=true,
+    columns=fullflexible,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=true,
+    captionpos=b,
+    xleftmargin=1em,
+    xrightmargin=1em,
+    aboveskip=1em,
+    belowskip=1em
+}
+
+% ---------------------------------------------------------
+% Vitis HLS C/C++ Listing Colors
+% ---------------------------------------------------------
+\definecolor{vKeyword}{RGB}{0,51,153}
+\definecolor{vPragma}{RGB}{153,0,0}
+\definecolor{vComment}{RGB}{0,128,0}
+\definecolor{vString}{RGB}{163,21,21}
+\definecolor{vBackground}{RGB}{245,245,250}
+\definecolor{vNumber}{RGB}{128,128,128}
+\definecolor{vFrame}{RGB}{180,180,190}
+
+% ---------------------------------------------------------
+% Vitis HLS C/C++ Listing Style
+% ---------------------------------------------------------
+\lstdefinestyle{vitisHLS}{
+    language=C++,
+    backgroundcolor=\color{vBackground},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{vKeyword}\bfseries,
+    stringstyle=\color{vString},
+    commentstyle=\color{vComment}\itshape,
+    numbers=left,
+    numberstyle=\tiny\color{vNumber},
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{vFrame},
+    framerule=0.4pt,
+    framesep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces=true,
+    columns=fullflexible,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=true,
+    captionpos=b,
+    alsoletter={:},
+    morekeywords={ap_uint,ap_int,hls::stream},
+    emph={
+        HLS,PIPELINE,UNROLL,ARRAY_PARTITION,DATAFLOW,
+        INTERFACE,ALLOCATION,DEPENDENCE
+    },
+    emphstyle=\color{vPragma}\bfseries
+}
+
+% ---------------------------------------------------------
+% Vitis C-Simulation Output Style
+% ---------------------------------------------------------
+\lstdefinestyle{VitisOutput}{
+    backgroundcolor=\color{gray!12},
+    basicstyle=\ttfamily\small\color{black},
+    numbers=none,
+    frame=none,
+    showstringspaces=false,
+    keepspaces=true,
+    columns=fullflexible,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=true,
+    xleftmargin=10pt,
+    captionpos=b
+}
+
+% ---------------------------------------------------------
+% PowerShell Listing Colors
+% ---------------------------------------------------------
+\definecolor{psKeyword}{RGB}{0,180,180}      % cyan for cmdlets
+\definecolor{psString}{RGB}{200,200,0}       % yellow for strings
+\definecolor{psComment}{RGB}{180,180,180}    % light gray for comments
+\definecolor{psBackground}{RGB}{1,36,86}     % classic PowerShell blue
+\definecolor{psFrame}{RGB}{0,0,0}
+\definecolor{psNumber}{RGB}{180,180,180}
+
+% ---------------------------------------------------------
+% PowerShell Listing Style
+% ---------------------------------------------------------
+\lstdefinestyle{PowerShell}{
+    language=bash,
+    backgroundcolor=\color{psBackground},
+    basicstyle=\ttfamily\footnotesize\color{white},
+    keywordstyle=\color{psKeyword}\bfseries,
+    stringstyle=\color{psString},
+    commentstyle=\color{psComment}\itshape,
+    numbers=left,
+    numberstyle=\tiny\color{psNumber},
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{psFrame},
+    framerule=0.4pt,
+    framesep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces=true,
+    columns=fullflexible,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=true,
+    captionpos=b,
+    alsoletter={-},
+    morekeywords={
+        Write-Host,Get-Command,Get-Process,Set-ExecutionPolicy,
+        Invoke-WebRequest,New-Item,Remove-Item,Test-Path,
+        Set-Location,Get-ChildItem,Copy-Item,Move-Item,
+        Import-Csv,Export-Csv,ConvertTo-Json,ConvertFrom-Json
+    },
+    morecomment=[l]{\#},
+    morestring=[b]",
+    morestring=[b]'
+}
+
+% ==========================================
+% End of setup/04_code_styles.tex
+% ==========================================

@@ -1,0 +1,100 @@
+% =========================================================
+% main.tex
+% Phase 2 Proposal -- EE 6900 Embedded AI
+% =========================================================
+
+\documentclass[12pt, a4paper, oneside, openany]{report}
+
+% =========================================================
+% 1. Metadata Variables
+% =========================================================
+
+\newcommand{\coursenumber}{EE 6900}
+\newcommand{\coursetitle}{Special Topics: Embedded AI for Autonomous Robots}
+\newcommand{\coursename}{\coursenumber\ \coursetitle}
+\newcommand{\courseshorttitle}{\coursenumber\ Embedded AI}
+
+\newcommand{\assignmenttype}{Phase 2 Proposal}
+\newcommand{\projecttitle}{Robust Radar/DOA Sensing Case Study Based on the Phase 1 Spike-Inference Pipeline}
+\newcommand{\projectshorttitle}{Phase 2 DOA/SNN Proposal}
+
+\newcommand{\reporttitle}{%
+\assignmenttype:\\[0.35cm]
+Robust Radar/DOA Sensing Case Study
+Based on the Phase 1 Spike-Inference Pipeline%
+}
+\newcommand{\reporttitleplain}{\assignmenttype: \projecttitle}
+\newcommand{\reportshorttitle}{\projectshorttitle}
+
+\newcommand{\headerleft}{\courseshorttitle}
+\newcommand{\headerright}{\reportshorttitle}
+
+\newcommand{\departmentname}{Department of Electrical and Computer Engineering}
+\newcommand{\universityname}{Kennesaw State University}
+
+\newcommand{\studentname}{Hossein Molhem}
+\newcommand{\studentid}{001201181}
+\newcommand{\studentidlabel}{KSUID\#}
+\newcommand{\netid}{hmolhem}
+\newcommand{\professorname}{Dr. Lei Feng}
+
+\newcommand{\semestername}{Summer Semester 2026}
+\newcommand{\submissiondate}{\today}
+
+% =========================================================
+% 2. Modular Setup Files
+% =========================================================
+\input{setup/01_packages}
+\input{setup/02_layout}
+\input{setup/03_math_macros}
+\input{setup/04_code_styles}
+\input{setup/05_environments}
+\input{setup/06_advanced_math}
+\input{setup/07_DSP_Radar_macros}
+\input{setup/08_theme}
+
+\hypersetup{
+    pdftitle={\reporttitleplain},
+    pdfauthor={\studentname},
+    pdfsubject={\coursename},
+    pdfkeywords={Embedded AI, spiking neural networks, DOA estimation, radar sensing, LIF, edge inference}
+}
+
+\addbibresource{references.bib}
+
+\begin{document}
+
+\input{frontmatter/titlepage}
+
+\clearpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\input{frontmatter/objective}
+\clearpage
+\input{frontmatter/abstract}
+
+\clearpage
+\tableofcontents
+
+\clearpage
+\listoffigures
+
+\clearpage
+\listoftables
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\include{content/00_report_body}
+
+\appendix
+\include{appendices/appendix_phase2_reproducibility_plan}
+
+\clearpage
+\printbibliography[heading=bibintoc, title={References}]
+
+\end{document}

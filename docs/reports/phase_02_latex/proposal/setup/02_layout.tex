@@ -1,0 +1,82 @@
+% ==========================================
+% setup/02_layout.tex
+% ==========================================
+
+% --- Page Geometry Configuration ---
+\geometry{
+    a4paper,
+    top=2.5cm,
+    bottom=2.5cm,
+    left=3.0cm,
+    right=2.5cm,
+    headheight=16pt,
+    includeheadfoot
+}
+
+% --------------------------------------------------
+% Header fallback definitions
+% --------------------------------------------------
+% These commands are normally defined in main.tex.
+% The fallback definitions prevent compilation errors
+% if the layout file is reused in a future report.
+
+\providecommand{\courseshorttitle}{EE 6530 Antenna Engineering}
+\providecommand{\reportshorttitle}{5G Patch Array Beamforming}
+\providecommand{\headerleft}{\courseshorttitle}
+\providecommand{\headerright}{\reportshorttitle}
+
+% --------------------------------------------------
+% Headers and Footers
+% --------------------------------------------------
+% The report class uses the "plain" page style on
+% chapter-opening pages. Therefore, both the regular
+% fancy style and the plain style are defined.
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{\small\slshape\nouppercase{\headerleft}}
+\fancyhead[R]{\small\slshape\nouppercase{\headerright}}
+\fancyfoot[C]{\thepage}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{16pt}
+
+\fancypagestyle{plain}{%
+    \fancyhf{}%
+    \fancyhead[L]{\small\slshape\nouppercase{\headerleft}}%
+    \fancyhead[R]{\small\slshape\nouppercase{\headerright}}%
+    \fancyfoot[C]{\thepage}%
+    \renewcommand{\headrulewidth}{0.4pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+}
+
+% --------------------------------------------------
+% Title page style
+% --------------------------------------------------
+% This style removes headers and footers from the cover page.
+
+\fancypagestyle{titlepage}{%
+    \fancyhf{}%
+    \renewcommand{\headrulewidth}{0pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+}
+
+% --- Captions, Paragraphs, and Spacing ---
+\captionsetup{margin=10pt, font=small, labelfont=bf}
+
+% Paragraph formatting
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.65em}
+
+% Allow long equations to break across pages automatically
+\allowdisplaybreaks
+
+% --- List of Figures and Tables Customization ---
+\renewcommand{\listfigurename}{List of Figures}
+\renewcommand{\listtablename}{List of Tables}
+
+% --- Table of Contents and Section Numbering Depth ---
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}

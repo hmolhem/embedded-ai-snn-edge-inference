@@ -1,0 +1,11 @@
+\section{Problem Statement}
+
+Phase 1 established a clean and reproducible reference pipeline for DOA-sector inference, but the experiment was intentionally limited in scope. The main limitation is that the sensing scenario was relatively simple compared with practical radar or array-processing environments. A robust embedded-AI sensing pipeline should be evaluated under richer conditions, including lower SNR, boundary cases between sectors, possible interference-like effects, and stronger comparisons with classical signal-processing baselines.
+
+The central problem addressed in Phase 2 is therefore the following:
+
+\begin{quote}
+Can the Phase 1 spike-inference pipeline remain useful and interpretable when the DOA sensing task is expanded into a more realistic and robustness-oriented radar/array-processing case study?
+\end{quote}
+
+This problem requires more than reporting classification accuracy. It requires evaluating accuracy versus SNR, confusion behavior between sectors, latency behavior, spike activity, and sensitivity to sensing conditions. It also requires maintaining a clear connection between the physical signal model and the inference pipeline.

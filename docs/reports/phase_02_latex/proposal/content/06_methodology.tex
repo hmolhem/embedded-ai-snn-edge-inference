@@ -1,0 +1,27 @@
+\section{Methodology}
+
+The Phase 2 methodology follows the same general structure as Phase 1, but with a more robustness-oriented experiment design.
+
+\subsection{Signal Model}
+
+The starting point is the narrowband ULA signal model used in Phase 1. The array response is represented using steering vectors parameterized by the source angle. The received data matrix is generated from the source waveform, array steering response, and additive noise. The number of array elements, snapshot count, and element spacing will initially remain consistent with the Phase 1 configuration to preserve continuity.
+
+\subsection{Covariance and Beamspace Features}
+
+For each generated sample, the sample covariance matrix is estimated from the received snapshot matrix. Beamspace features are then computed by evaluating spatial response energy over a fixed angular grid. These features provide a compact representation of the spatial information contained in the array data.
+
+\subsection{Continuous Baseline Classifier}
+
+The continuous-valued nearest-centroid classifier will remain the main baseline. This baseline is important because it provides an interpretable reference point for evaluating the effect of spike encoding and temporal accumulation. The spike-based path should not be evaluated in isolation.
+
+\subsection{Spike Encoding}
+
+The normalized beamspace features will be converted into spike trains using rate-based encoding. This step introduces a sparse temporal representation of the continuous features. The spike window length and random seed will be controlled so that each experimental run is reproducible.
+
+\subsection{LIF-Inspired Temporal Inference}
+
+The LIF-inspired classifier will accumulate spike-driven evidence over time for each class. The final decision will be based on the accumulated class evidence. Stable-decision latency will be measured as the earliest time step after which the final predicted class remains unchanged.
+
+\subsection{Evaluation Metrics}
+
+The primary metrics will include overall accuracy, accuracy versus SNR, confusion matrix behavior, mean stable-decision latency, latency versus SNR, and spike activity. These metrics are selected because they reflect both classification performance and embedded-inference relevance.
