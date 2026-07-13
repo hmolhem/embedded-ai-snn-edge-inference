@@ -1,0 +1,13 @@
+\section{Problem Statement}
+
+The Phase 1 experiment used a deliberately controlled single-source ULA scenario. This was appropriate for establishing a reproducible reference model, but it does not yet show whether the same spike-inference pathway remains useful under more difficult radar/DOA sensing conditions. A practical embedded sensing system must operate with noisy measurements, ambiguous sector boundaries, finite snapshots, and potentially richer covariance structures.
+
+The Phase 2 problem is therefore stated as follows:
+
+\begin{proposalbox}{Phase 2 Problem Statement}
+Given the completed Phase 1 DOA/SNN reference pipeline, determine whether the spike-based temporal inference path remains accurate, sparse, and latency-controllable when the radar/DOA sensing scenario becomes more challenging.
+\end{proposalbox}
+
+The scientific issue is not simply whether the LIF-inspired model can match the continuous baseline. The deeper issue is whether the spike-based representation provides a stable engineering trade-off under degraded sensing conditions. Phase 2 will evaluate this by comparing continuous and spike-based inference across harder SNR regimes, angular boundary cases, and alternative feature representations.
+
+The proposed work is intentionally bounded. It does not claim to solve full high-resolution multi-target radar tracking. It is a robustness study for a compact embedded-AI inference pipeline.
