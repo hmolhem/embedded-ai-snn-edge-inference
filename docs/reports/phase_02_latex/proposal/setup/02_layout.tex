@@ -1,0 +1,37 @@
+% =========================================================
+% 02_layout.tex
+% Page layout and heading style
+% =========================================================
+
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.65em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small \headerleft}
+\rhead{\small \headerright}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\Huge}
+  {\chaptername\ \thechapter}
+  {0.5em}
+  {\Huge}
+
+\titleformat{\section}
+  {\normalfont\bfseries\Large}
+  {\thesection}
+  {0.75em}
+  {}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\large}
+  {\thesubsection}
+  {0.75em}
+  {}
+
+\setlist[itemize]{leftmargin=2em}
+\setlist[enumerate]{leftmargin=2em}
