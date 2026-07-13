@@ -1,0 +1,30 @@
+% =========================================================
+% 04_code_styles.tex
+% Code listing styles
+% =========================================================
+
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codeframe}{RGB}{210,210,210}
+\definecolor{codekeyword}{RGB}{0,70,140}
+\definecolor{codecomment}{RGB}{80,120,80}
+\definecolor{codestring}{RGB}{150,60,60}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    backgroundcolor=\color{codebg},
+    frame=single,
+    rulecolor=\color{codeframe},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{codekeyword}\bfseries,
+    commentstyle=\color{codecomment},
+    stringstyle=\color{codestring},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    tabsize=4
+}
+
+\lstset{style=pythonstyle}
