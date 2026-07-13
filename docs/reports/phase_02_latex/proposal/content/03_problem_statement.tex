@@ -1,13 +1,11 @@
 \section{Problem Statement}
 
-The Phase 1 experiment used a deliberately controlled single-source ULA scenario. This was appropriate for establishing a reproducible reference model, but it does not yet show whether the same spike-inference pathway remains useful under more difficult radar/DOA sensing conditions. A practical embedded sensing system must operate with noisy measurements, ambiguous sector boundaries, finite snapshots, and potentially richer covariance structures.
+Phase 1 established a clean and reproducible reference pipeline for DOA-sector inference, but the experiment was intentionally limited in scope. The main limitation is that the sensing scenario was relatively simple compared with practical radar or array-processing environments. A robust embedded-AI sensing pipeline should be evaluated under richer conditions, including lower SNR, boundary cases between sectors, possible interference-like effects, and stronger comparisons with classical signal-processing baselines.
 
-The Phase 2 problem is therefore stated as follows:
+The central problem addressed in Phase 2 is therefore the following:
 
-\begin{proposalbox}{Phase 2 Problem Statement}
-Given the completed Phase 1 DOA/SNN reference pipeline, determine whether the spike-based temporal inference path remains accurate, sparse, and latency-controllable when the radar/DOA sensing scenario becomes more challenging.
-\end{proposalbox}
+\begin{quote}
+Can the Phase 1 spike-inference pipeline remain useful and interpretable when the DOA sensing task is expanded into a more realistic and robustness-oriented radar/array-processing case study?
+\end{quote}
 
-The scientific issue is not simply whether the LIF-inspired model can match the continuous baseline. The deeper issue is whether the spike-based representation provides a stable engineering trade-off under degraded sensing conditions. Phase 2 will evaluate this by comparing continuous and spike-based inference across harder SNR regimes, angular boundary cases, and alternative feature representations.
-
-The proposed work is intentionally bounded. It does not claim to solve full high-resolution multi-target radar tracking. It is a robustness study for a compact embedded-AI inference pipeline.
+This problem requires more than reporting classification accuracy. It requires evaluating accuracy versus SNR, confusion behavior between sectors, latency behavior, spike activity, and sensitivity to sensing conditions. It also requires maintaining a clear connection between the physical signal model and the inference pipeline.

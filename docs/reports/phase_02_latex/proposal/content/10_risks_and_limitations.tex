@@ -1,0 +1,9 @@
+\section{Risks and Limitations}
+
+Several risks and limitations should be acknowledged at the proposal stage.
+
+First, the dataset will remain synthetic. This is appropriate for a controlled course project, but it does not capture all impairments present in measured radar or antenna-array data. Second, the task will remain sector-level DOA inference rather than high-resolution continuous DOA estimation. This limitation keeps the project focused on embedded inference and robustness evaluation rather than full radar-system design.
+
+Third, the spike encoder introduces stochastic behavior. To make the results reproducible, random seeds and run configurations must be saved for every experiment. Fourth, the LIF-inspired classifier is a simplified engineering abstraction rather than a biologically detailed spiking neural network. Its role is to support sparse temporal inference and latency analysis, not to model biological neural dynamics.
+
+Finally, Phase 2 is not yet a hardware implementation. However, the project will be organized so that later phases can move selected kernels, such as spike encoding or LIF state updates, toward PYNQ or Vitis HLS implementation.
