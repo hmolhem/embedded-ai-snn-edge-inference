@@ -1,0 +1,21 @@
+\section{Phase 2 Objectives}
+
+The technical objectives of Phase 2 are organized around continuity, robustness, and reportable engineering interpretation.
+
+\subsection{Primary Objectives}
+
+\begin{enumerate}
+    \item \textbf{Reproduce the Phase 1 reference behavior.} The first Phase 2 run should verify that the Phase 1 baseline and LIF-inspired results can be reproduced before any extension is introduced.
+    \item \textbf{Stress-test the sensing scenario.} The dataset generator should introduce harder SNR conditions, angular boundary cases, and more ambiguous sector samples.
+    \item \textbf{Evaluate feature robustness.} Beamspace features should be compared with at least one additional covariance-derived representation.
+    \item \textbf{Preserve the spike-inference path.} Rate-based spike encoding and LIF-inspired temporal accumulation should remain central parts of the experiment.
+    \item \textbf{Measure accuracy--latency--sparsity trade-offs.} Phase 2 should report not only accuracy, but also stable-decision latency, spike count, and sparsity behavior.
+\end{enumerate}
+
+\subsection{Secondary Objectives}
+
+If time permits, Phase 2 may include a classical DOA reference estimator such as MUSIC. The purpose would not be to replace the sector classifier, but to provide a radar signal-processing reference for interpreting feature quality and angular ambiguity.
+
+\subsection{Non-Objectives}
+
+Phase 2 will not attempt full FPGA deployment, full PYNQ integration, complete Vitis HLS synthesis, or a full end-to-end MUSIC hardware accelerator. Those directions remain more appropriate for Phase 3 and Phase 4.
