@@ -1,0 +1,19 @@
+\section{Risks and Limitations}
+
+The main technical risk is scope expansion. Phase 2 can easily become too large if it attempts multi-source radar, full MUSIC implementation, fixed-point quantization, and hardware deployment at the same time. To control this risk, Phase 2 will prioritize reproducible robustness experiments before optional extensions.
+
+\begin{riskbox}{Scope Control Rule}
+Phase 2 must first prove that the Phase 1 pipeline can be reproduced and stress-tested. FPGA, PYNQ, and Vitis HLS implementation should remain future phases unless the core Phase 2 results are already stable.
+\end{riskbox}
+
+Additional limitations include:
+
+\begin{itemize}
+    \item Synthetic data may not fully represent real radar measurements.
+    \item Sector classification is less ambitious than continuous high-resolution DOA estimation.
+    \item Rate-based spike encoding may introduce stochastic variability.
+    \item LIF-inspired accumulation is a simplified temporal inference model, not a full biologically realistic SNN.
+    \item MUSIC or multi-source extensions may require careful interpretation and should not be overclaimed.
+\end{itemize}
+
+These limitations are acceptable because the objective of Phase 2 is not to claim a final radar product. The objective is to build a stronger scientific bridge from Phase 1 toward later embedded and hardware-aware implementation.
