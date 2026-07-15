@@ -1,26 +1,59 @@
 \section{Expected Results and Deliverables}
 
-The expected result of Phase 2 is not necessarily an accuracy improvement over the Phase 1 continuous-valued baseline. Instead, the expected result is a more complete engineering evaluation of the spike-inference pipeline under more realistic sensing conditions.
+The expected outcome of Phase 2 is not a claim that spike-based temporal inference must outperform the continuous nearest-centroid classifier or the classical Bartlett reference in raw accuracy. The expected contribution is a controlled and reproducible characterization of when the Phase 1 spike-based path remains useful, how its accuracy degrades under sensing stress, and what temporal and sparsity behavior accompanies that degradation.
 
-The expected technical results include:
+\subsection{Expected Technical Results}
+
+The study is expected to produce the following evidence:
+
+\begin{enumerate}
+    \item A verified reproduction of the documented Phase 1 reference results within the stated acceptance tolerances.
+    \item A three-path comparison among Bartlett sector estimation, continuous nearest-centroid classification, and rate-coded LIF-inspired inference on identical test samples.
+    \item Quantitative accuracy, confusion, and degradation curves across the extended SNR range.
+    \item Boundary-focused results showing how performance and stable-decision latency vary with angular distance from the nearest sector boundary.
+    \item Array-mismatch results showing the sensitivity of the nominal processing pipeline to controlled element-gain and element-phase perturbations.
+    \item Accuracy-retention measurements that distinguish general sensing difficulty from the additional loss introduced by spike encoding and temporal accumulation.
+    \item A renewed LIF parameter sweep that identifies Pareto-relevant operating points rather than selecting a configuration solely by maximum accuracy.
+    \item An integrated joint-stress case study that determines whether the selected operating point remains defensible outside nominal conditions.
+\end{enumerate}
+
+The anticipated trend is that lower SNR, smaller boundary distance, and larger array mismatch will reduce sector-classification accuracy. The LIF-inspired path is also expected to require more time steps to stabilize as the input evidence becomes less separable. These are hypotheses to be tested rather than results assumed in advance.
+
+\subsection{Evaluation Artifacts}
+
+Each numbered run will generate a complete artifact set that includes, as applicable:
 
 \begin{itemize}
-    \item A reproducible Phase 2 Python experiment framework.
-    \item Accuracy versus SNR results for both the continuous baseline and the LIF-inspired inference path.
-    \item Confusion matrices showing sector-level classification behavior.
-    \item Stable-decision latency measurements for the spike-based inference path.
-    \item Spike activity statistics that describe the sparsity of the temporal representation.
-    \item A final technical interpretation of the accuracy, latency, and robustness tradeoffs.
+    \item a machine-readable configuration or explicit configuration summary;
+    \item fixed random-seed records;
+    \item overall and condition-specific metric files;
+    \item CSV tables for accuracy, latency, spike count, firing rate, and accuracy retention;
+    \item confusion matrices and report-ready figures;
+    \item a concise console or text summary suitable for independent verification; and
+    \item a run-specific interpretation identifying assumptions, anomalies, and limitations.
 \end{itemize}
 
-The expected project deliverables are:
+Representative file names will follow the run-based convention already established in Phase 1, for example
 
-\begin{itemize}
-    \item A Phase 2 proposal prepared using the established LaTeX report template.
-    \item A reproducible Python implementation under the Phase 2 working directory.
-    \item Numbered result files and generated figures for each experimental run.
-    \item A Phase 2 final technical report.
-    \item Optional presentation or IEEE-style summary paper if required later in the course workflow.
-\end{itemize}
+\begin{quote}
+\path{run_002_accuracy_vs_snr.csv},
+\path{run_003_accuracy_vs_boundary_distance.csv},
+\path{run_004_mismatch_degradation.csv}, and
+\path{run_005_lif_operating_points.csv}.
+\end{quote}
 
-The implementation artifacts should be stored outside the LaTeX proposal folder, while the proposal and report should remain under the LaTeX report directory. File paths should be handled using a reproducible naming convention such as \path{run_001_phase2_metrics.txt}, \path{run_001_phase2_accuracy_vs_snr.csv}, and \path{run_001_phase2_confusion_matrix.png}.
+\subsection{Project Deliverables}
+
+The Phase 2 deliverables will include:
+
+\begin{enumerate}
+    \item the revised and technically complete Phase 2 proposal;
+    \item modular Python source code that extends, rather than duplicates, the Phase 1 reference pipeline;
+    \item the complete numbered-run result set and generated figures;
+    \item a Phase 2 final technical report based on the same LaTeX template;
+    \item a concise architecture and operating-point recommendation for the next embedded implementation phase;
+    \item a Phase 2 handoff document recording the completed work, decisions, file locations, known limitations, and next steps; and
+    \item an indexed entry for that handoff in the repository handoff index.
+\end{enumerate}
+
+Implementation code and numerical results will remain outside the LaTeX proposal directory. The proposal and final report will reference those artifacts by stable repository paths so that the reported conclusions can be traced to the underlying experiment outputs.
