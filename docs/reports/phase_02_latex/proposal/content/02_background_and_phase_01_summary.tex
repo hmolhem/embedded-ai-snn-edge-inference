@@ -1,9 +1,112 @@
-\section{Background and Phase 1 Summary}
+\section{Phase 1 Foundation and Established Baseline}
 
-The broader motivation for this project is the development of hardware-aware embedded-AI inference methods for sensing systems. Radar, array processing, and robotic perception applications often operate under constraints on latency, memory, power, and computation. These constraints make lightweight and interpretable inference pipelines attractive, especially when the front-end sensing model is already governed by physical structure.
+Phase 2 is anchored to the completed Phase 1 implementation and measured results. This continuity is essential: the purpose of the new phase is to test the limits of an established pipeline, not to introduce a separate dataset or unrelated classifier. The Phase 1 configuration, data-generation logic, preprocessing sequence, class definitions, and inference models therefore define the nominal reference against which every Phase 2 stress experiment will be compared~\cite{molhem2026phase1}.
 
-In Phase 1, a narrowband ULA model was used to generate synthetic DOA data over multiple signal-to-noise ratio (SNR) values. For each sample, the received array snapshot matrix was used to estimate the sample covariance matrix. Beamspace features were then extracted over a fixed angular grid and normalized using training-set statistics. A nearest-centroid classifier provided the continuous-valued baseline, while a rate-based spike encoder and LIF-inspired class accumulator provided the spike-based temporal inference path.
+\subsection{Reference Sensing and Feature Pipeline}
 
-The Phase 1 nearest-centroid baseline achieved strong sector-classification accuracy, while the LIF-inspired path achieved slightly lower raw accuracy but introduced sparse temporal inference and measurable stable-decision latency. This distinction is important. The spike-based path was not shown to improve accuracy relative to the continuous baseline. Its value was architectural: it transformed continuous-valued features into event-based temporal evidence and exposed a controllable accuracy--latency tradeoff.
+Phase 1 modeled a single narrowband source impinging on an $N$-element uniform linear array. For source angle $\theta$, the received snapshot matrix was represented as
 
-Phase 2 uses this interpretation as the starting point. The goal is to determine whether the same design philosophy remains useful when the sensing case study is expanded beyond the original controlled setting.
+\[
+    \mathbf{X}=\mathbf{a}(\theta)\mathbf{s}^{\mathsf{T}}+\mathbf{N},
+\]
+
+where $\mathbf{a}(\theta)$ is the ULA steering vector, $\mathbf{s}$ contains the complex source samples, and $\mathbf{N}$ is circular complex additive white Gaussian noise. The spatial information was summarized by the sample covariance matrix
+
+\[
+    \mathbf{R}_{xx}=\frac{1}{M}\mathbf{X}\mathbf{X}^{\mathsf{H}},
+\]
+
+with $M=128$ snapshots per sample. Compact beamspace features were then computed over a nine-angle beam grid using
+
+\[
+    p(\phi_g)
+    =
+    \frac{\left|\mathbf{a}^{\mathsf{H}}(\phi_g)
+    \mathbf{R}_{xx}
+    \mathbf{a}(\phi_g)\right|}{N^2},
+\]
+
+where $\phi_g$ denotes a candidate beam direction. This representation retained the direction-dependent covariance structure while reducing each complex covariance matrix to a short real-valued feature vector.
+
+The nominal Phase 1 dataset used the configuration summarized in Table~\ref{tab:phase1_reference_configuration}. The train/test split was stratified jointly by SNR and sector so that each operating condition was represented consistently. Feature normalization used training-set statistics only, preventing information leakage into the test set.
+
+\begin{table}[H]
+\centering
+\caption{Phase 1 reference configuration retained as the Phase 2 nominal case.}
+\label{tab:phase1_reference_configuration}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Phase 1 value} \\
+\midrule
+Array geometry & 8-element ULA \\
+Element spacing & $d=\lambda/2$ \\
+Snapshots per sample & $M=128$ \\
+Source count & 1 \\
+DOA interval & $-60^{\circ}$ to $+60^{\circ}$ \\
+Sector boundaries & $-60^{\circ},-30^{\circ},0^{\circ},30^{\circ},60^{\circ}$ \\
+Beamspace grid & 9 angular samples \\
+SNR values & $-10,-5,0,5,10,15,20$ dB \\
+Samples per sector per SNR & 100 \\
+Total samples & 2800 \\
+Train/test split & 70/30, stratified by SNR and sector \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Continuous and Spike-Based Inference Paths}
+
+The continuous reference was a nearest-centroid classifier applied to the normalized beamspace feature vectors. For feature vector $\mathbf{x}$ and class centroid $\boldsymbol{\mu}_c$, the predicted sector was
+
+\[
+    \hat{c}
+    =
+    \arg\min_c
+    \left\|\mathbf{x}-\boldsymbol{\mu}_c\right\|_2^2.
+\]
+
+This classifier was deliberately simple, deterministic, and interpretable. It established how much sector information was available before spike conversion and therefore provided the correct baseline for measuring information loss introduced by temporal encoding.
+
+For the spike-based path, each normalized feature was converted into a Bernoulli spike process whose event probability was proportional to the corresponding feature magnitude. Class-level evidence was then accumulated through a leaky temporal state,
+
+\[
+    v_c[t]=\alpha v_c[t-1]+i_c[t],
+\]
+
+where $v_c[t]$ is the membrane-like state for class $c$, $\alpha$ is the leak factor, and $i_c[t]$ is the spike-driven class evidence at time step $t$. The predicted sector was determined from the largest class state. Stable-decision latency was defined as the earliest time step after which the predicted class remained equal to the final decision for the remainder of the inference window.
+
+This model was intentionally described as LIF-inspired rather than as a biologically complete spiking neural network. Its purpose was to expose the temporal and hardware-facing characteristics of sparse evidence accumulation while keeping the reference implementation transparent and reproducible.
+
+\subsection{Measured Phase 1 Results}
+
+Table~\ref{tab:phase1_measured_results} records the principal Phase 1 operating points. The nearest-centroid classifier achieved an overall test accuracy of 0.869048. The fixed LIF configuration used in the first temporal experiment achieved 0.825000 accuracy with a mean stable-decision latency of 6.423810 time steps. A subsequent sweep over time-window length and leak factor produced a best LIF accuracy of 0.841667 at $T=40$ and $\alpha=0.99$~\cite{molhem2026phase1}.
+
+\begin{table}[H]
+\centering
+\caption{Established Phase 1 baseline and LIF operating points.}
+\label{tab:phase1_measured_results}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Inference path} & \textbf{Configuration} & \textbf{Accuracy} & \textbf{Mean latency} \\
+\midrule
+Nearest-centroid baseline & Continuous features & 0.869048 & N/A \\
+Fixed LIF reference & $T=20$, $\alpha=0.97$ & 0.825000 & 6.423810 \\
+Best Phase 1 LIF accuracy & $T=40$, $\alpha=0.99$ & 0.841667 & 8.396429 \\
+Lowest-latency swept case & $T=10$, $\alpha=0.99$ & 0.776190 & 3.782143 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The best Phase 1 LIF result retained
+
+\[
+    \frac{0.841667}{0.869048}\times 100\%
+    \approx 96.8\%
+\]
+
+of the continuous baseline accuracy. This is the correct interpretation of the Phase 1 result. The spike-based path did not outperform the continuous classifier. Instead, it traded a modest amount of raw accuracy for sparse temporal representation, an explicit decision-time metric, and tunable behavior controlled by $T$ and $\alpha$. Longer windows generally improved the approximation of the continuous feature vector but increased temporal cost, while stronger evidence retention supported higher accuracy in the tested configuration.
+
+\subsection{Unresolved Questions Carried into Phase 2}
+
+Phase 1 established feasibility but did not establish robustness. Four limitations define the technical starting point for Phase 2. First, the original SNR sweep ended at $-10$~dB and therefore did not identify the lower-SNR failure region. Second, angles were sampled throughout each sector without explicitly controlling their distance from the decision boundaries at $-30^{\circ}$, $0^{\circ}$, and $30^{\circ}$. Third, the data-generation array and the steering model used for feature extraction were perfectly matched, so calibration error and manifold mismatch were absent. Fourth, the study compared the continuous and spike-based classifiers but did not include a classical array-processing reference mapped to the same sector decision.
+
+Phase 2 will address these limitations one at a time before combining them. This staged design preserves the Phase 1 baseline as the nominal case, isolates the cause of each degradation, and makes it possible to determine whether a selected LIF operating point remains defensible under progressively more realistic sensing conditions.
