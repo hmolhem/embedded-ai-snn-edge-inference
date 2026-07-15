@@ -1,39 +1,39 @@
 \section{Technical Objectives and Success Criteria}
 
-The technical objectives of Phase 2 are defined so that each objective produces a measurable output and preserves continuity with the completed Phase 1 implementation.
+The technical objectives of Phase 2 are defined so that each objective produces a measurable output, preserves continuity with the completed Phase 1 implementation, and contributes directly to the robustness questions defined in the preceding section.
 
 \subsection{Objective 1: Reproduce the Phase 1 Reference Point}
 
-The first objective is to reproduce the Phase 1 continuous and LIF-inspired reference results from the existing code base before introducing any new stress condition. This establishes a controlled starting point for Phase 2 and verifies that changes to the experiment framework do not invalidate the previous baseline.
+The first objective is to reproduce the Phase 1 continuous and LIF-inspired reference results from the existing code base before introducing any new stress condition. This establishes a controlled starting point for Phase 2 and verifies that later modifications to the experiment framework do not invalidate the documented baseline.
 
-\textbf{Success criterion.} The reproduced nearest-centroid and LIF-inspired accuracies shall remain within one percentage point of the documented Phase 1 values, and the reference stable-decision latency shall remain consistent with the original run configuration.
+\textbf{Success criterion.} The reproduced nearest-centroid and LIF-inspired accuracies shall remain within one percentage point of the documented Phase 1 values of $86.90\%$ and $84.17\%$, respectively. The reproduced mean stable-decision latency shall also remain within $10\%$ of the documented value for the corresponding Phase 1 LIF configuration, unless a justified implementation correction is identified and recorded.
 
 \subsection{Objective 2: Quantify Low-SNR and Boundary Sensitivity}
 
-The second objective is to extend the dataset generator with an expanded low-SNR condition and a boundary-focused angular sampling mode. The experiment shall report performance as a function of SNR and angular distance from the nearest sector boundary.
+The second objective is to extend the dataset generator with an expanded low-SNR condition and a boundary-focused angular sampling mode. The experiment shall report performance as a function of SNR and angular distance from the nearest sector boundary while preserving the Phase 1 array geometry, sector definitions, covariance calculation, and beamspace feature representation.
 
-\textbf{Success criterion.} The implementation shall produce reproducible accuracy, confusion, latency, and spike-activity results for every configured SNR and boundary-distance condition.
+\textbf{Success criterion.} The implementation shall produce reproducible sector accuracy, confusion matrices, accuracy-retention ratios, stable-decision latency, and spike-activity statistics for every configured SNR and boundary-distance condition. Boundary-near and sector-center cases shall be reported separately.
 
 \subsection{Objective 3: Evaluate Modest Array-Model Mismatch}
 
 The third objective is to introduce controlled element-level gain and phase perturbations into the test snapshots while retaining the nominal array model in the feature-extraction and inference stages. This experiment will quantify sensitivity to calibration mismatch without expanding the project into a full array-calibration study.
 
-\textbf{Success criterion.} The experiment shall report relative degradation from the nominal case for at least three nonzero mismatch levels and shall preserve the same train/test and reporting conventions used by the nominal pipeline.
+\textbf{Success criterion.} The experiment shall report relative degradation from the nominal case for at least three nonzero mismatch levels. The same trained models, test-sample identities, random-seed policy, and reporting conventions shall be preserved so that mismatch level is the controlled experimental variable.
 
 \subsection{Objective 4: Establish Three Comparable Inference Paths}
 
-The fourth objective is to evaluate three explicitly defined paths: a classical array-processing reference whose angular estimate is mapped to a sector, the Phase 1 continuous nearest-centroid classifier, and the Phase 1 rate-coded LIF-inspired temporal classifier. The comparison is intended to clarify the role of each architecture rather than to claim that the spike-based path must achieve the highest raw accuracy.
+The fourth objective is to evaluate three explicitly defined sector-inference paths: a Bartlett conventional beamformer whose peak direction is mapped to a sector, the Phase 1 continuous nearest-centroid classifier operating on normalized beamspace features, and the Phase 1 rate-coded LIF-inspired temporal classifier. The comparison is intended to clarify the role of each architecture rather than to claim that the spike-based path must achieve the highest raw accuracy.
 
-\textbf{Success criterion.} All three paths shall be evaluated on identical test samples and reported using common sector-level metrics.
+\textbf{Success criterion.} All three paths shall be evaluated on identical test samples and reported using common sector-level metrics. Any path-specific quantity, such as stable-decision latency or spike count, shall be identified explicitly rather than forced into an inappropriate cross-architecture comparison.
 
 \subsection{Objective 5: Select a Hardware-Relevant Operating Point}
 
 The fifth objective is to repeat the LIF time-window and leak-factor sweep under representative nominal and stressed conditions. The selected operating point shall balance accuracy retention, stable-decision latency, and spike activity rather than optimize accuracy alone.
 
-\textbf{Success criterion.} Phase 2 shall identify at least one Pareto-relevant LIF configuration suitable for later fixed-point analysis, PYNQ deployment, or Vitis HLS implementation.
+\textbf{Success criterion.} Phase 2 shall identify at least one Pareto-relevant LIF configuration for nominal operation and one defensible configuration for a representative stressed condition. The selected configuration shall be documented with its time-window length, leak factor, accuracy, retention ratio, mean latency, and spike-activity statistics so that it can support later fixed-point analysis, PYNQ deployment, or Vitis HLS implementation.
 
 \subsection{Objective 6: Preserve Reproducibility and Traceability}
 
-The final objective is to maintain a run-based experiment structure with fixed random seeds, explicit configuration files, saved numerical outputs, report-ready figures, console summaries, and handoff documentation.
+The final objective is to maintain a run-based experiment structure with fixed random seeds, explicit configuration records, saved numerical outputs, report-ready figures, console summaries, source-code revision identifiers, and handoff documentation.
 
-\textbf{Success criterion.} Every reported result shall be traceable to a named run, configuration, source-code revision, and stored output artifact.
+\textbf{Success criterion.} Every reported result shall be traceable to a named run, configuration, source-code revision, and stored output artifact. The completed Phase 2 work shall include a dedicated handoff document and a corresponding entry in the project handoff index before the proposal or implementation branch is merged.
