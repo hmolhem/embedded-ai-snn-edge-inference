@@ -1,3 +1,131 @@
 \section{Methodology}
 
-Phase 2 uses a controlled comparative methodology rather than introducing an unrelated model or replacing the completed Phase 1 architecture. The same physics-based ULA front end, sample-covariance representation, beamspace feature extractor, nearest-centroid
+Phase 2 uses a controlled comparative methodology rather than introducing an unrelated model or replacing the completed Phase 1 architecture. The same physics-based ULA front end, sample-covariance representation, beamspace feature extractor, nearest-centroid classifier, rate encoder, and LIF-inspired temporal accumulator will remain the reference pipeline. New experiments will vary only the defined sensing-stress factors and inference parameters required by the research questions.
+
+\subsection{Nominal Signal Model}
+
+The nominal received snapshot matrix for a single narrowband source at angle $\theta$ is
+
+\[
+X = a(\theta)s + N,
+\]
+
+where $a(\theta)$ is the steering vector of the eight-element half-wavelength ULA, $s$ is the complex source sequence, and $N$ is circular complex additive white Gaussian noise. The nominal array configuration and the snapshot count $M=128$ will be retained from Phase 1 so that Phase 2 results remain directly comparable with the completed reference runs.
+
+The sample covariance matrix is computed as
+
+\[
+R_{xx}=\frac{1}{M}XX^{H}.
+\]
+
+Beamspace energy features are then evaluated on the established nine-angle grid using
+
+\[
+p(\phi_g)=\frac{\left|a^{H}(\phi_g)R_{xx}a(\phi_g)\right|}{N_a^2},
+\]
+
+where $N_a=8$ is the number of array elements. Feature normalization will use statistics obtained from the training set only. Test-set information will not be used to fit normalization parameters, centroids, or class templates.
+
+\subsection{Controlled Stress Models}
+
+Three sensing stresses will be introduced independently before they are combined in the final integrated run.
+
+\subsubsection{Extended Low-SNR Operation}
+
+The Phase 1 SNR grid will be preserved and extended with a $-15$~dB condition. For each SNR value, the same source-power and noise-power convention used in Phase 1 will be retained. Training and test samples will remain stratified by SNR and sector so that per-condition metrics are not distorted by class imbalance.
+
+\subsubsection{Sector-Boundary Sampling}
+
+Boundary-focused samples will be generated at controlled angular offsets from the internal boundaries at $-30^{\circ}$, $0^{\circ}$, and $30^{\circ}$. The distance variable $\Delta_b$ will be stored for every sample, allowing accuracy, confusion behavior, and latency to be reported as functions of the distance from the nearest boundary.
+
+\subsubsection{Array Gain and Phase Mismatch}
+
+For test-time mismatch studies, the nominal steering vector will be perturbed element by element according to
+
+\[
+\widetilde{a}_n(\theta)
+=
+10^{g_n/20}
+\exp\!\left(j\phi_n\right)
+a_n(\theta),
+\]
+
+where $g_n$ is a zero-mean gain perturbation in decibels and $\phi_n$ is a zero-mean phase perturbation. Their standard deviations are controlled by $\sigma_g$ and $\sigma_{\phi}$. The classifier, Bartlett reference, and beamspace feature grid will remain nominal. This creates a deliberate train--test model mismatch and measures sensitivity without introducing calibration compensation.
+
+\subsection{Classical Bartlett Sector Reference}
+
+The classical reference will use the Bartlett spatial response
+
+\[
+P_{\mathrm{B}}(\phi)
+=
+a^{H}(\phi)R_{xx}a(\phi).
+\]
+
+The angle corresponding to the largest sampled response will be mapped to one of the four Phase 1 sectors. Bartlett is selected because it is deterministic, interpretable, and directly related to the beamspace features already used by the project. It is not included as a claim of high-resolution DOA estimation.
+
+\subsection{Continuous Nearest-Centroid Baseline}
+
+The continuous baseline will retain the Phase 1 nearest-centroid rule. For a normalized feature vector $x$ and class centroid $\mu_c$,
+
+\[
+\widehat{c}_{\mathrm{continuous}}
+=
+\arg\min_c \lVert x-\mu_c\rVert_2^2.
+\]
+
+The centroids will be fitted using only the training partition. The same fitted centroids will be used to construct the LIF class templates, preserving the architectural relationship established in Phase 1.
+
+\subsection{Rate-Based Spike Encoding}
+
+For each normalized feature component $x_f\in[0,1]$, the binary spike at time $t$ is sampled as
+
+\[
+z_f[t]\sim\operatorname{Bernoulli}(x_f).
+\]
+
+The spike tensor therefore has dimensions equal to the number of samples, the temporal-window length $T$, and the number of beamspace features. Every run will record the random seed, $T$, mean spike count, and mean firing rate. Representative stress experiments will be repeated across multiple seeds when needed to distinguish systematic behavior from a favorable stochastic realization.
+
+\subsection{LIF-Inspired Temporal Inference}
+
+The Phase 1 prototype converts each normalized centroid into a class weight and bias:
+
+\[
+w_c=2\mu_c,
+\qquad
+b_c=-\lVert\mu_c\rVert_2^2.
+\]
+
+At each time step, the class membrane state is updated by
+
+\[
+v_c[t]
+=
+\alpha v_c[t-1]
++
+w_c^{T}z[t]
++
+b_c,
+\]
+
+where $\alpha$ is the membrane-retention factor. The final predicted class is
+
+\[
+\widehat{c}_{\mathrm{LIF}}
+=
+\arg\max_c v_c[T].
+\]
+
+Stable-decision latency is defined as the earliest one-indexed time step after which the winning class remains equal to the final predicted class for all remaining time steps. This is an algorithmic latency proxy, not a direct hardware execution-time measurement.
+
+\subsection{Common Evaluation Protocol}
+
+Bartlett, nearest-centroid, and LIF-inspired inference will be evaluated on identical test samples. The primary metrics are overall and condition-specific accuracy, balanced accuracy, confusion matrices, mean and distributional stable-decision latency, mean spike count, mean firing rate, relative degradation from nominal performance, and the accuracy-retention ratio
+
+\[
+\rho_A
+=
+\frac{A_{\mathrm{LIF}}}{A_{\mathrm{continuous}}}.
+\]
+
+All configuration values, seeds, source-code revisions, numerical outputs, and figures will be saved under named experiment runs. This protocol ensures that Phase 2 conclusions remain reproducible, comparable with Phase 1, and suitable for later fixed-point or hardware-oriented analysis.
