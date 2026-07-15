@@ -1,29 +1,37 @@
 \section{Research Questions and Hypotheses}
 
-Phase 2 is organized around four research questions that extend the completed Phase 1 reference pipeline without changing its fundamental architecture.
+Phase 2 is organized around four research questions that extend the completed Phase 1 reference pipeline without changing its fundamental architecture. Each question isolates one engineering uncertainty introduced by the transition from nominal feasibility testing to controlled robustness evaluation. The associated hypotheses are directional and testable; they define expected trends that will be evaluated using common test samples and the metrics introduced in the preceding problem formulation.
 
 \subsection{Research Question 1: Low-SNR Robustness}
 
-How does decreasing signal-to-noise ratio affect the accuracy, stable-decision latency, and spike activity of the continuous and spike-based DOA-sector inference paths?
+\textbf{Research question.} How does decreasing signal-to-noise ratio affect the sector-classification accuracy, stable-decision latency, and spike activity of the classical, continuous, and spike-based inference paths?
 
-\textbf{Hypothesis H1.} Lower SNR will reduce classification accuracy for all inference paths, while the LIF-inspired path will also require more time steps to reach a stable decision.
+This question examines whether the LIF-inspired temporal path degrades only in accuracy or also requires a longer evidence-accumulation interval as the received data become noisier. The same SNR grid and test samples will be used across all inference paths so that observed differences can be attributed to the inference architecture rather than to dataset variation.
+
+\textbf{Hypothesis H1.} Lower SNR will reduce classification accuracy for all inference paths. The LIF-inspired path is additionally expected to require more time steps to reach a stable decision and to exhibit greater variability in latency at the lowest SNR values.
 
 \subsection{Research Question 2: Sector-Boundary Ambiguity}
 
-How does angular distance from the nearest sector boundary affect class confusion and temporal decision stability?
+\textbf{Research question.} How does angular distance from the nearest sector boundary affect class confusion, accuracy retention, and temporal decision stability?
 
-\textbf{Hypothesis H2.} Samples close to the boundaries at $-30^{\circ}$, $0^{\circ}$, and $30^{\circ}$ will produce more classification errors and longer stable-decision latency than samples located near sector centers.
+The Phase 1 aggregate results combined samples from the full interior of each sector. Phase 2 will separate boundary-near samples from sector-center samples so that geometric ambiguity is not hidden by an overall average. The principal boundaries are located at $-30^{\circ}$, $0^{\circ}$, and $30^{\circ}$.
+
+\textbf{Hypothesis H2.} Samples close to a sector boundary will produce more classification errors, lower LIF-to-continuous accuracy retention, and longer stable-decision latency than samples located near sector centers. The strongest confusion is expected between the two classes that share the nearest boundary.
 
 \subsection{Research Question 3: Array-Model Mismatch}
 
-How sensitive is the Phase 1 pipeline to modest gain and phase perturbations across the ULA elements when the inference model remains nominal?
+\textbf{Research question.} How sensitive is the Phase 1 pipeline to controlled element-level gain and phase perturbations when feature extraction and classification continue to use the nominal ULA model?
 
-\textbf{Hypothesis H3.} Mild array mismatch will cause measurable but limited degradation, while larger perturbations will reduce both classical and learned-sector performance because the beamspace feature geometry no longer matches the nominal array model.
+This question represents a limited calibration-mismatch study rather than a complete array-calibration problem. The objective is to determine whether the beamspace representation and subsequent classifiers fail gracefully or abruptly as the received spatial signature departs from the nominal steering model.
+
+\textbf{Hypothesis H3.} Mild array mismatch will cause measurable but limited degradation, while larger perturbations will reduce the performance of all three inference paths because the observed spatial covariance no longer matches the nominal array geometry. The classical reference and continuous classifier are expected to provide useful comparison points for interpreting any additional loss introduced by spike encoding.
 
 \subsection{Research Question 4: Accuracy--Latency Retention}
 
-Can the optimized spike-based path preserve most of the continuous baseline accuracy while maintaining sparse temporal activity and explicit latency control under stressed sensing conditions?
+\textbf{Research question.} Can an optimized spike-based operating point preserve most of the continuous-baseline accuracy while maintaining sparse temporal activity and explicit latency control under both nominal and stressed sensing conditions?
 
-\textbf{Hypothesis H4.} Under nominal conditions, the optimized LIF-inspired path will retain at least $95\%$ of the continuous-baseline accuracy. Under stressed conditions, accuracy retention will decrease, but longer temporal windows and stronger evidence retention will partially recover performance at the cost of increased latency.
+The Phase 1 parameter sweep showed that time-window length and leak factor create a measurable accuracy--latency tradeoff. Phase 2 will repeat this analysis under selected stress conditions and will evaluate the accuracy-retention ratio $\rho_A$ together with stable-decision latency and spike count rather than optimizing raw accuracy alone.
 
-The Phase 2 experiments will therefore test not only whether the spike-based classifier remains accurate, but also whether its architectural benefits remain meaningful as the sensing task becomes more difficult.
+\textbf{Hypothesis H4.} Under nominal conditions, the optimized LIF-inspired path will retain at least $95\%$ of the continuous-baseline accuracy. Under stressed conditions, accuracy retention will decrease; however, longer temporal windows and stronger evidence retention are expected to recover part of the lost performance at the cost of increased latency and temporal activity.
+
+Together, these questions convert Phase 2 from a general extension exercise into a controlled comparative study. The experiments will determine not only whether the spike-based path remains accurate, but also whether its temporal and hardware-oriented characteristics remain meaningful as the sensing problem becomes more difficult.
