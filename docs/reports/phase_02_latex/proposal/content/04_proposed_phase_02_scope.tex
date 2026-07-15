@@ -1,16 +1,29 @@
-\section{Proposed Phase 2 Scope}
+\section{Research Questions and Hypotheses}
 
-Phase 2 will extend the existing Phase 1 workflow rather than starting a separate project. The existing ULA simulator, covariance feature extraction, baseline classifier, spike encoder, and LIF-inspired inference logic will remain the technical foundation. The new work will focus on extending the sensing case study and improving the experimental evaluation.
+Phase 2 is organized around four research questions that extend the completed Phase 1 reference pipeline without changing its fundamental architecture.
 
-The proposed Phase 2 scope includes the following elements:
+\subsection{Research Question 1: Low-SNR Robustness}
 
-\begin{enumerate}
-    \item Extend the Phase 1 DOA-sector dataset generation process to include more challenging sensing conditions.
-    \item Evaluate performance over a wider or more carefully structured SNR range.
-    \item Add boundary-focused DOA cases where the source angle lies near sector decision boundaries.
-    \item Compare the spike-inference pipeline against the existing continuous-valued baseline.
-    \item Add robustness metrics such as confusion matrices, per-SNR accuracy, and latency versus SNR.
-    \item Store all results using a reproducible run-based naming convention.
-\end{enumerate}
+How does decreasing signal-to-noise ratio affect the accuracy, stable-decision latency, and spike activity of the continuous and spike-based DOA-sector inference paths?
 
-The Phase 2 scope will remain appropriate for an embedded-AI course project. It will not attempt to solve a full production radar-processing system. Instead, it will produce a defensible research prototype that connects radar/array signal processing with hardware-aware temporal inference.
+\textbf{Hypothesis H1.} Lower SNR will reduce classification accuracy for all inference paths, while the LIF-inspired path will also require more time steps to reach a stable decision.
+
+\subsection{Research Question 2: Sector-Boundary Ambiguity}
+
+How does angular distance from the nearest sector boundary affect class confusion and temporal decision stability?
+
+\textbf{Hypothesis H2.} Samples close to the boundaries at $-30^{\circ}$, $0^{\circ}$, and $30^{\circ}$ will produce more classification errors and longer stable-decision latency than samples located near sector centers.
+
+\subsection{Research Question 3: Array-Model Mismatch}
+
+How sensitive is the Phase 1 pipeline to modest gain and phase perturbations across the ULA elements when the inference model remains nominal?
+
+\textbf{Hypothesis H3.} Mild array mismatch will cause measurable but limited degradation, while larger perturbations will reduce both classical and learned-sector performance because the beamspace feature geometry no longer matches the nominal array model.
+
+\subsection{Research Question 4: Accuracy--Latency Retention}
+
+Can the optimized spike-based path preserve most of the continuous baseline accuracy while maintaining sparse temporal activity and explicit latency control under stressed sensing conditions?
+
+\textbf{Hypothesis H4.} Under nominal conditions, the optimized LIF-inspired path will retain at least $95\%$ of the continuous-baseline accuracy. Under stressed conditions, accuracy retention will decrease, but longer temporal windows and stronger evidence retention will partially recover performance at the cost of increased latency.
+
+The Phase 2 experiments will therefore test not only whether the spike-based classifier remains accurate, but also whether its architectural benefits remain meaningful as the sensing task becomes more difficult.
