@@ -1,23 +1,67 @@
 \section{Experimental Plan}
 
-The Phase 2 experiment will be organized as a sequence of numbered runs. Each run will have a clearly defined configuration, saved result files, and generated figures.
+The Phase 2 study will be executed as a sequence of numbered and reproducible runs. Each run will use a fixed configuration, deterministic random seeds, a documented code revision, saved numerical outputs, and report-ready figures. All comparison paths will be evaluated on identical test samples so that performance differences can be attributed to the inference method rather than to dataset variation.
 
-\subsection{Run 001: Phase 2 Baseline Reproduction}
+\subsection{Run 001: Phase 1 Reference Reproduction}
 
-The first run will reproduce the Phase 1-style pipeline inside the Phase 2 directory structure. This run will verify that the migrated or extended code produces results consistent with the Phase 1 reference behavior. The purpose is to establish a clean starting point before introducing new sensing conditions.
+Run 001 will reproduce the documented Phase 1 reference point inside the Phase 2 experiment framework. The nominal eight-element half-wavelength ULA, $128$ snapshots, four sector labels, original SNR grid, nearest-centroid baseline, rate encoder, and fixed LIF configuration will be preserved.
 
-\subsection{Run 002: Extended SNR Evaluation}
+The acceptance criterion is that the reproduced nearest-centroid and LIF-inspired accuracies remain within one percentage point of the Phase 1 values of $86.90\%$ and $84.17\%$, respectively. The fixed-configuration stable-decision latency shall also remain within $10\%$ of the documented reference. Failure to meet these criteria will be treated as an implementation or configuration discrepancy that must be resolved before subsequent runs.
 
-The second run will evaluate the pipeline over a more demanding SNR configuration. This may include additional low-SNR cases or a denser SNR sweep. The goal is to determine how the continuous baseline and LIF-inspired inference path degrade as the sensing problem becomes more difficult.
+\subsection{Run 002: Extended Low-SNR Evaluation}
 
-\subsection{Run 003: Sector-Boundary Evaluation}
+Run 002 will extend the nominal SNR grid by adding a lower-SNR operating point at $-15$~dB while preserving the existing values from $-10$ to $20$~dB. Bartlett sector estimation, continuous nearest-centroid classification, and LIF-inspired inference will be evaluated on the same stratified test samples.
 
-The third run will focus on DOA angles near sector boundaries. These cases are important because coarse sector classification is most likely to fail when the source angle lies near the decision boundary between two sectors. The expected output is a confusion-matrix-based analysis of boundary sensitivity.
+The required outputs are overall and per-SNR accuracy, confusion matrices at representative low- and moderate-SNR points, mean stable-decision latency versus SNR, mean spike count versus SNR, and accuracy-retention ratio versus SNR. This run will identify the SNR range in which the spike-based path remains practically useful and the range in which the sensing front end becomes the dominant limitation.
 
-\subsection{Run 004: Accuracy--Latency Tradeoff Study}
+\subsection{Run 003: Sector-Boundary Stress Test}
 
-The fourth run will repeat a controlled spike-inference parameter sweep. The spike time window and leak parameter will be varied to study the tradeoff between accuracy and stable-decision latency. This run will connect directly to the Phase 1 Run 005 analysis.
+Run 003 will replace unrestricted within-sector angular sampling with controlled offsets from the three internal sector boundaries at $-30^{\circ}$, $0^{\circ}$, and $30^{\circ}$. The planned offsets are
 
-\subsection{Run 005: Final Integrated Phase 2 Case Study}
+\[
+\Delta_b \in \{\pm 0.5^{\circ},\pm 1^{\circ},\pm 2^{\circ},\pm 5^{\circ},\pm 10^{\circ}\}.
+\]
 
-The final run will combine the most important Phase 2 settings into a single integrated case study. This run will provide the numerical results and figures used in the Phase 2 final report.
+Samples will be balanced across boundaries, offset magnitudes, classes, and selected SNR values. The required outputs are accuracy versus absolute boundary distance, boundary-focused confusion matrices, stable-decision latency versus boundary distance, and error rates for each neighboring sector pair. The purpose is to separate intrinsic label ambiguity from general low-SNR degradation.
+
+\subsection{Run 004: Array-Model Mismatch Evaluation}
+
+Run 004 will introduce element-level gain and phase perturbations into the test snapshots while retaining the nominal array model in Bartlett processing, beamspace feature extraction, and classifier training. At least three nonzero mismatch levels will be evaluated in addition to the nominal case. A representative initial grid is
+
+\begin{table}[H]
+\centering
+\caption{Planned Array-Mismatch Stress Levels}
+\label{tab:array_mismatch_levels}
+\begin{tabular}{lcc}
+\toprule
+Condition & Gain-error standard deviation & Phase-error standard deviation \\
+\midrule
+Nominal & $0$ dB & $0^{\circ}$ \\
+Mild & $0.25$ dB & $2^{\circ}$ \\
+Moderate & $0.50$ dB & $5^{\circ}$ \\
+Severe & $1.00$ dB & $10^{\circ}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The required outputs are absolute accuracy, relative degradation from nominal performance, stable-decision latency, spike activity, and comparison among the three inference paths. This run is a robustness study, not a complete array-calibration investigation.
+
+\subsection{Run 005: LIF Operating-Point Sweep Under Stress}
+
+Run 005 will repeat the Phase 1 sweep over temporal-window length and membrane-retention factor under selected nominal and stressed conditions. The planned grid is
+
+\[
+T \in \{10,20,30,40\},
+\qquad
+\alpha \in \{0.90,0.95,0.97,0.99\}.
+\]
+
+Each configuration will be evaluated using accuracy, accuracy-retention ratio, mean and distributional latency, mean spike count, and mean firing rate. The objective is not to select the highest-accuracy configuration automatically. Instead, the run will identify Pareto-relevant operating points that balance accuracy retention, temporal cost, and sparse activity.
+
+\subsection{Run 006: Integrated Phase 2 Case Study}
+
+Run 006 will evaluate the selected LIF operating point under a representative joint-stress condition that combines low SNR, sector-boundary proximity, and moderate array mismatch. The same samples will be processed by Bartlett, nearest-centroid, and LIF-inspired paths. This run will provide the principal figures and tables for the Phase 2 final report and will determine whether the selected spike-based operating point remains defensible outside nominal conditions.
+
+\subsection{Run Artifacts and Traceability}
+
+Every run will save its configuration, random seeds, numerical summaries, tabular outputs, and figures using a consistent naming convention. Each reported table or figure shall identify its originating run and stored artifact. This structure will support the final report, the Phase 2 handoff, and later migration toward fixed-point, PYNQ, or Vitis HLS experiments.

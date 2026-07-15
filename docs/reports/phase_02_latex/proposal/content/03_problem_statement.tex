@@ -1,11 +1,60 @@
-\section{Problem Statement}
+\section{Research Gap and Problem Formulation}
 
-Phase 1 established a clean and reproducible reference pipeline for DOA-sector inference, but the experiment was intentionally limited in scope. The main limitation is that the sensing scenario was relatively simple compared with practical radar or array-processing environments. A robust embedded-AI sensing pipeline should be evaluated under richer conditions, including lower SNR, boundary cases between sectors, possible interference-like effects, and stronger comparisons with classical signal-processing baselines.
+Phase 1 established the feasibility of a lightweight DOA-sector inference pipeline in which physics-derived beamspace features were evaluated by both a continuous nearest-centroid classifier and a rate-coded LIF-inspired temporal classifier. The completed results showed that the continuous baseline reached an overall accuracy of $86.90\%$, while the best Phase 1 LIF configuration reached $84.17\%$ and exposed measurable stable-decision latency and spike-activity behavior. These results provide a credible reference point, but they do not yet establish whether the same architecture is robust enough to remain useful when the sensing conditions become more difficult.
 
-The central problem addressed in Phase 2 is therefore the following:
+\subsection{Engineering Research Gap}
+
+The Phase 1 data were generated and evaluated under a controlled single-source ULA model. The training and test samples used the same nominal array geometry, and the reported aggregate accuracy combined samples located throughout each $30^{\circ}$ sector. This design was appropriate for establishing feasibility, but it can conceal two practically important failure mechanisms. First, samples close to a sector boundary are intrinsically more ambiguous than samples near a sector center. Second, a classifier trained with a nominal steering model may degrade when the received snapshots contain element-level gain or phase errors.
+
+A second gap concerns the interpretation of the spike-based path. Phase 1 demonstrated that rate encoding and leaky temporal accumulation can preserve most of the continuous-baseline accuracy, but the result was evaluated primarily under nominal conditions. For an embedded sensing system, accuracy alone is not sufficient. A temporal inference path must also be characterized by the time required to reach a stable decision, the number of generated spike events, and the degree to which those quantities change as signal quality and model fidelity deteriorate.
+
+The Phase 2 research gap is therefore not the absence of another high-resolution DOA estimator. It is the absence of a controlled robustness study that preserves the completed Phase 1 pipeline while comparing classical sector estimation, continuous feature classification, and spike-based temporal inference on identical stressed test conditions. This comparison is needed before the Python reference model can support a defensible transition toward fixed-point analysis, PYNQ deployment, or Vitis HLS implementation.
+
+\subsection{Problem Formulation}
+
+Phase 2 retains the Phase 1 eight-element half-wavelength ULA, sample-covariance calculation, beamspace feature vector, sector definitions, nearest-centroid baseline, rate encoder, and LIF-inspired class accumulator. The nominal four-sector label set remains
+
+\[
+\mathcal{C}=\{[-60^{\circ},-30^{\circ}),[-30^{\circ},0^{\circ}),[0^{\circ},30^{\circ}),[30^{\circ},60^{\circ}]\}.
+\]
+
+Each Phase 2 test condition is described by a controlled stress vector
+
+\[
+\boldsymbol{\eta}
+=
+\left[
+\gamma,
+\Delta_{b},
+\sigma_{g},
+\sigma_{\phi}
+\right],
+\]
+
+where $\gamma$ is the signal-to-noise ratio, $\Delta_{b}$ is the angular distance from the nearest sector boundary, $\sigma_{g}$ characterizes element-gain variation, and $\sigma_{\phi}$ characterizes element-phase variation. The nominal Phase 1 case corresponds to no array mismatch and unrestricted within-sector angular sampling. Phase 2 will vary these factors systematically rather than replacing the original signal and inference architecture.
+
+For every common test sample, three inference paths will be evaluated:
+
+\begin{enumerate}
+    \item a classical array-processing reference whose angular estimate is mapped to one of the four sectors;
+    \item the continuous nearest-centroid classifier operating on normalized beamspace features; and
+    \item the rate-coded LIF-inspired classifier operating on temporal spike evidence.
+\end{enumerate}
+
+The principal outputs will be sector-classification accuracy, confusion behavior, stable-decision latency, and spike activity. To compare the spike-based and continuous paths directly, Phase 2 will also report the accuracy-retention ratio
+
+\[
+\rho_{A}
+=
+\frac{A_{\mathrm{LIF}}}{A_{\mathrm{continuous}}},
+\]
+
+where $A_{\mathrm{LIF}}$ and $A_{\mathrm{continuous}}$ are measured on the same test condition. This ratio distinguishes absolute performance loss caused by a difficult sensing condition from the additional loss introduced by temporal spike encoding.
+
+The central research problem is therefore:
 
 \begin{quote}
-Can the Phase 1 spike-inference pipeline remain useful and interpretable when the DOA sensing task is expanded into a more realistic and robustness-oriented radar/array-processing case study?
+How robust is the completed Phase 1 spike-based DOA-sector inference pipeline to low SNR, sector-boundary ambiguity, and modest array-model mismatch, and how does its accuracy--latency behavior compare with classical and continuous-valued inference references evaluated on the same data?
 \end{quote}
 
-This problem requires more than reporting classification accuracy. It requires evaluating accuracy versus SNR, confusion behavior between sectors, latency behavior, spike activity, and sensitivity to sensing conditions. It also requires maintaining a clear connection between the physical signal model and the inference pipeline.
+The scope remains sector-level directional inference for autonomous edge sensing. Phase 2 does not claim a new high-resolution DOA algorithm, a complete radar signal chain, or a hardware implementation. Its purpose is to establish the controlled comparative evidence required to justify those later engineering phases.

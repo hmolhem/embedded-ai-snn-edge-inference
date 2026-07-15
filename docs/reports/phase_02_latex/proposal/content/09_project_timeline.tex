@@ -1,23 +1,24 @@
 \section{Project Timeline}
 
-The Phase 2 work will be completed in a staged sequence. The proposed timeline is shown in Table~\ref{tab:phase2_timeline}.
+The Phase 2 work will proceed through gated stages so that each new stress condition is introduced only after the previous stage has been verified. The sequence is organized around technical evidence rather than calendar dates because the experiment runs are logically dependent on one another. Table~\ref{tab:phase2_timeline} summarizes the planned progression.
 
 \begin{table}[H]
 \centering
-\caption{Proposed Phase 2 Timeline}
+\caption{Proposed Phase 2 Work Sequence}
 \label{tab:phase2_timeline}
-\begin{tabular}{p{0.22\textwidth} p{0.68\textwidth}}
+\begin{tabular}{p{0.14\textwidth} p{0.52\textwidth} p{0.25\textwidth}}
 \toprule
-Stage & Planned Work \\
+Stage & Planned Work & Exit Evidence \\
 \midrule
-Stage 1 & Finalize the Phase 2 proposal and confirm the LaTeX template structure. \\
-Stage 2 & Reproduce the Phase 1-style baseline inside the Phase 2 working directory. \\
-Stage 3 & Extend the sensing dataset and add robustness-oriented test cases. \\
-Stage 4 & Run continuous-baseline and LIF-inspired inference experiments. \\
-Stage 5 & Generate figures, tables, and result summaries for the final report. \\
-Stage 6 & Write and polish the Phase 2 final technical report. \\
+Stage 1 & Finalize and review the Phase 2 proposal, verify the LaTeX structure in Overleaf, and confirm consistency with Phase 1 results. & Approved proposal structure and clean compiled PDF. \\
+Stage 2 & Implement Run 001 and reproduce the documented Phase 1 nearest-centroid, LIF, and latency reference values. & Reference results within the defined tolerances. \\
+Stage 3 & Implement Bartlett sector mapping and Run 002 extended low-SNR evaluation. & Three-path per-SNR metrics and figures. \\
+Stage 4 & Implement Run 003 boundary-focused sampling and Run 004 array-mismatch stress models. & Boundary and mismatch robustness datasets and analyses. \\
+Stage 5 & Execute Run 005 LIF parameter sweep under nominal and stressed conditions and select Pareto-relevant operating points. & Accuracy--latency--activity comparison and operating-point decision. \\
+Stage 6 & Execute Run 006 integrated joint-stress case study and consolidate the final result set. & Final report figures, tables, and interpretation. \\
+Stage 7 & Complete the Phase 2 technical report, repository documentation, handoff document, and handoff-index entry. & Traceable final package ready for review and merge. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-This staged schedule is intended to reduce technical risk. The project first confirms that the existing pipeline still works, then adds difficulty gradually, and finally reports the results in a controlled and reproducible manner.
+This gated sequence reduces the risk of attributing a result to the wrong cause. For example, array-mismatch behavior will not be interpreted until the nominal reproduction and common-baseline comparisons are verified. Similarly, no hardware-facing operating point will be recommended until its accuracy retention, latency, and spike activity have been evaluated under both nominal and stressed conditions.

@@ -1,9 +1,37 @@
 \section{Risks and Limitations}
 
-Several risks and limitations should be acknowledged at the proposal stage.
+Phase 2 is designed as a controlled robustness study, and its conclusions must remain within the limits of the synthetic signal model, the sector-classification task, and the simplified temporal inference architecture.
 
-First, the dataset will remain synthetic. This is appropriate for a controlled course project, but it does not capture all impairments present in measured radar or antenna-array data. Second, the task will remain sector-level DOA inference rather than high-resolution continuous DOA estimation. This limitation keeps the project focused on embedded inference and robustness evaluation rather than full radar-system design.
+\subsection{Synthetic-Data Limitation}
 
-Third, the spike encoder introduces stochastic behavior. To make the results reproducible, random seeds and run configurations must be saved for every experiment. Fourth, the LIF-inspired classifier is a simplified engineering abstraction rather than a biologically detailed spiking neural network. Its role is to support sparse temporal inference and latency analysis, not to model biological neural dynamics.
+All primary experiments will use simulated narrowband ULA snapshots. This provides precise control over SNR, source angle, and array mismatch, but it does not reproduce the full set of impairments present in measured radar or antenna-array data. Mutual coupling, correlated noise, multipath, wideband effects, synchronization error, and nonstationary interference are outside the primary scope. The results will therefore support algorithmic and architectural conclusions under controlled conditions, not claims of field-ready radar performance.
 
-Finally, Phase 2 is not yet a hardware implementation. However, the project will be organized so that later phases can move selected kernels, such as spike encoding or LIF state updates, toward PYNQ or Vitis HLS implementation.
+\subsection{Sector Labels and Boundary Ambiguity}
+
+The task remains four-class sector inference rather than continuous high-resolution DOA estimation. Near an internal sector boundary, small changes in true angle can change the assigned class even when the underlying spatial responses are very similar. Boundary-focused errors must therefore be interpreted partly as label ambiguity rather than solely as classifier failure. Phase 2 addresses this risk by reporting performance versus angular distance from the boundary instead of relying only on aggregate accuracy.
+
+\subsection{Model-Mismatch Scope}
+
+The array-mismatch experiment will apply controlled independent gain and phase perturbations. This is a deliberately limited calibration-error model. It will not estimate or compensate for the perturbations, model mutual coupling, or establish a complete array-calibration method. Its purpose is to quantify sensitivity of the existing nominal pipeline and identify whether later calibration-aware work is justified.
+
+\subsection{Stochastic Spike Encoding}
+
+The rate encoder uses Bernoulli sampling, so a single spike realization can influence the predicted label and latency. Fixed random seeds are necessary for reproducibility but are not sufficient to characterize stochastic variability. Representative experiments should therefore be repeated across multiple documented seeds when computationally practical, and conclusions should be based on aggregate behavior rather than on an isolated favorable realization.
+
+\subsection{Interpretation of Stable-Decision Latency}
+
+Stable-decision latency is a discrete algorithmic proxy: it is the earliest time step after which the winning class remains equal to the final predicted class. It is not yet wall-clock latency, end-to-end sensor latency, or hardware execution time. The metric is useful for comparing temporal configurations, but conversion to physical latency will require a defined sample clock, implementation architecture, and platform-specific measurement in a later phase.
+
+\subsection{Simplified LIF-Inspired Architecture}
+
+The classifier is a class-level leaky evidence accumulator derived from nearest-centroid prototypes. It is not a trained multilayer spiking neural network and does not claim biological fidelity. This simplification is intentional because it preserves interpretability and exposes a direct path toward fixed-point arithmetic and hardware mapping. Conclusions must therefore be framed around sparse temporal inference and architecture tradeoffs, not around general SNN superiority.
+
+\subsection{No Direct Energy Claim}
+
+Spike count and firing rate are activity proxies, not direct measurements of energy consumption. Reduced event activity may support a lower-activity implementation, but energy benefit depends on memory traffic, arithmetic precision, clocking, control overhead, and the target platform. Phase 2 will not claim energy savings without hardware or platform-level measurements.
+
+\subsection{Project-Scope Control}
+
+Phase 2 will not expand into a full radar signal chain, multi-source resolution study, MUSIC or ESPRIT research project, adaptive calibration system, or FPGA implementation. Bartlett processing is included only as an interpretable classical sector reference. PYNQ, fixed-point, and Vitis HLS work remain later phases that will use the Phase 2 operating-point evidence as input.
+
+These limitations do not invalidate the proposed study. They define the boundary within which the Phase 2 results can be interpreted rigorously and prevent the proposal from making claims that exceed the available evidence.
