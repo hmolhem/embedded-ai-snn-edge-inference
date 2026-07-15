@@ -20,3 +20,4 @@
 - Handoff 019: Phase 1 review and presentation package.
 - Handoff 020: Cleanup Phase 1 review package.
 - Handoff 021: Phase 2 proposal LaTeX template.
+- Handoff 022: Phase 2 proposal technical rewrite and robustness-study plan.
