@@ -1,0 +1,133 @@
+\chapter{Embedded Constraints and System-Level Metrics}
+\label{chap:embedded-constraints}
+
+\section{Why Edge Deployment Changes the Problem}
+
+A cloud model can use large batches, abundant memory, high cooling capacity, and elastic compute. An autonomous edge device may operate from a battery, share memory with control software, require deterministic response, and remain functional without connectivity. These conditions change which algorithms are acceptable.
+
+The principal constraints are not independent. Increasing parallelism may reduce latency but increase power and area. Compressing a model can reduce memory but decrease accuracy. Sending raw data to a server can reduce local compute but increase communication energy and network uncertainty.
+
+\section{Latency and Throughput}
+
+\begin{definition}{Latency}{def:latency}
+Latency is the elapsed time between the arrival or occurrence of an input event and the completion of the required response.
+\end{definition}
+
+\begin{definition}{Throughput}{def:throughput}
+Throughput is the number of samples, events, frames, or decisions processed per unit time.
+\end{definition}
+
+A pipeline can have high throughput while individual samples experience long latency. Batch processing is a common example. Conversely, a system can provide low latency for one request but insufficient throughput for a high-rate sensor.
+
+Real-time systems require more than a low mean. They require a bounded response time. A \(10\,\mathrm{ms}\) average with occasional \(100\,\mathrm{ms}\) stalls may be unacceptable for control. Reporting percentiles, worst-case behavior, scheduling policy, and hardware load is therefore important.
+
+\section{Power and Energy}
+
+Power is the rate of energy consumption. Energy is the accumulated cost of an operation or mission:
+
+\[
+    E = \int_{t_0}^{t_1} P(t)\,\d t.
+\]
+
+A faster design does not automatically consume less energy. It may use more parallel units and higher instantaneous power. Useful metrics include energy per inference, energy per event, energy per meter traveled, and mission duration.
+
+System energy includes more than the neural accelerator:
+
+\[
+E_{\text{system}}
+= E_{\text{sensing}}
++ E_{\text{compute}}
++ E_{\text{memory}}
++ E_{\text{communication}}
++ E_{\text{control}}
++ E_{\text{thermal}}.
+\]
+
+CARMA is important because it evaluates sensor, model, and platform energy rather than optimizing only the neural network~\cite{zhang2023carma}.
+
+\section{Memory Capacity and Memory Movement}
+
+Many modern models are limited by data movement rather than arithmetic. Moving an activation from off-chip memory can cost more energy than a multiply--accumulate performed locally. Feature maps can dominate storage even when parameter count is modest.
+
+Relevant quantities include:
+
+\begin{itemize}
+    \item model-parameter memory;
+    \item peak activation memory;
+    \item on-chip buffer capacity;
+    \item off-chip bandwidth;
+    \item data reuse and locality;
+    \item irregular-access overhead;
+    \item precision and compression format.
+\end{itemize}
+
+This explains why FLOP reduction does not always create speedup. If memory traffic remains unchanged, the accelerator can still be bandwidth-bound.
+
+\section{Communication Cost}
+
+Multimodal sensors generate large data volumes. A camera, LiDAR, and radar can overwhelm a wireless or shared-bus link. Communication also introduces queueing, packet loss, latency variation, security exposure, and dependence on infrastructure.
+
+Near-sensor intelligence filters, compresses, or summarizes data before transmission. FusionSense goes further by learning whether a modality is necessary for the fused task on a particular sample~\cite{yun2026fusionsense}. The goal is to avoid sensing, transmitting, and processing information that does not change the decision.
+
+\section{Thermal and Mechanical Constraints}
+
+Power becomes heat. A compact enclosure may have no fan, limited airflow, vibration, dust, moisture, and a restricted operating-temperature range. Thermal throttling can change latency after deployment. Mechanical placement can limit sensor baseline, field of view, aperture, and calibration stability.
+
+A deployable design must therefore consider:
+
+\begin{itemize}
+    \item heat dissipation and temperature-dependent performance;
+    \item enclosure size and mass;
+    \item power-supply transients;
+    \item vibration and connector reliability;
+    \item electromagnetic compatibility;
+    \item maintenance and recalibration access.
+\end{itemize}
+
+\section{Determinism and Scheduling}
+
+Autonomous platforms often run perception, networking, logging, planning, and control on shared resources. A fast kernel can still miss deadlines because of operating-system scheduling, memory contention, interrupts, or bus arbitration. FPGAs and dedicated accelerators are attractive when deterministic streaming latency is more important than general-purpose flexibility.
+
+\section{Accuracy--Resource Trade-Offs}
+
+There is rarely one optimal design. Instead, the system has a Pareto frontier. A design is Pareto-optimal if no objective can be improved without worsening another. Common trade-offs include:
+
+\begin{itemize}
+    \item accuracy versus latency;
+    \item accuracy versus energy;
+    \item robustness versus model complexity;
+    \item sensor coverage versus communication bandwidth;
+    \item precision versus memory capacity;
+    \item adaptivity versus runtime-control overhead.
+\end{itemize}
+
+A paper should state the operating point and system priority. ``Best'' has no meaning without the objective and constraints.
+
+\section{A System Accounting Table}
+
+\begin{table}[H]
+\centering
+\caption{Questions for system-level resource accounting.}
+\label{tab:resource-accounting}
+\begin{tabularx}{\textwidth}{@{}p{3.2cm}X@{}}
+\toprule
+\textbf{Dimension} & \textbf{Required questions} \\
+\midrule
+Latency & From which timestamp to which output? Average, percentile, or worst case? At what sensor rate and load? \\
+Energy & Does the boundary include sensors, memory, radio, and host processor? \\
+Memory & Are parameter memory and peak activation memory both reported? \\
+Bandwidth & On-chip, off-chip, and communication bandwidth? Is compression included? \\
+Hardware & Exact device, clock, precision, batch size, compiler, and utilization? \\
+Thermal & Sustained or burst performance? Was throttling measured? \\
+Reliability & Behavior under dropped data, sensor failure, and timing jitter? \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{engineeringcheck}
+Do not compare energy or latency numbers unless the measurement boundaries are equivalent. A neural-core energy figure cannot be compared directly with a system-wide figure that includes sensing and communication.
+\end{engineeringcheck}
+
+\section{Chapter Summary}
+
+Embedded constraints include latency, throughput, power, energy, memory, bandwidth, thermal limits, determinism, and reliability. These quantities interact and create a Pareto design space. System-level accounting is essential because optimizing one neural kernel may not improve the complete autonomous platform.
