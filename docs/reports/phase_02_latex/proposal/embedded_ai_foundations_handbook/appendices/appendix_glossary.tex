@@ -1,0 +1,60 @@
+\chapter{Glossary of Core Terms}
+\label{app:glossary}
+
+\begin{longtable}{@{}p{3.6cm}p{10.1cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+Actuation & Physical execution of a command through a motor, brake, steering mechanism, valve, relay, or other actuator. \\
+Asynchronous processing & Processing triggered or localized by events rather than repeated full-batch or full-frame execution. \\
+Attention & Learned input-dependent weighting of tokens, features, channels, locations, time steps, or modalities. \\
+Calibration & Estimation of sensor-internal parameters and spatial transformations among sensors. \\
+Closed loop & A system in which actions change the physical world and new measurements feed back into future decisions. \\
+Compute-in-memory & Computing near or within memory to reduce data movement, commonly for matrix operations. \\
+Context & Environmental or system condition that changes which sensing or model configuration is appropriate. \\
+Data association & Determining which measurements correspond to the same physical object or landmark. \\
+Decision-level fusion & Combination of independent decisions, scores, hypotheses, or tracks. \\
+Event camera & Sensor that reports pixel-level brightness changes as asynchronous events. \\
+Event-driven & A data or execution model in which activity occurs when events are present. \\
+Extrinsic calibration & Rotation and translation relating one sensor coordinate frame to another. \\
+Feature & Engineered or learned representation that preserves task-relevant information while reducing raw-data complexity. \\
+Feature-level fusion & Combination of intermediate features produced by modality-specific encoders. \\
+Fusion & Combination of multiple information sources to improve an estimate or decision. \\
+GNN & Graph neural network; a model that updates nodes through relationships and message passing. \\
+Graceful degradation & Controlled reduction of capability when sensors or computational resources are lost. \\
+IMU & Inertial measurement unit containing accelerometers and gyroscopes, and sometimes magnetometers. \\
+Intrinsic calibration & Internal sensor parameters such as camera focal length and lens distortion. \\
+Latency & Time from an input event or measurement to the required output. \\
+LiDAR & Light Detection and Ranging; optical range sensing commonly producing a 3-D point cloud. \\
+Loose coupling & Fusion of subsystem-level state estimates rather than direct joint use of their measurements. \\
+Measurement & A sensor observation with a time, coordinate frame, unit, and uncertainty. \\
+Modality & A distinct type of information defined by sensing physics and data structure, such as RGB, depth, event, radar, or inertial data. \\
+Multimodal system & A system that uses more than one information modality. \\
+Near-sensor computing & Computation placed at or close to the sensor to filter, compress, or interpret data before transfer. \\
+Neuromorphic computing & Brain-inspired computing with neuron/synapse structures, local state, and often event-driven communication. \\
+NPU/DPU & Specialized processor for neural-network operations. \\
+Observability & The extent to which hidden state variables can be inferred from available measurements. \\
+Odometry & Estimation of incremental platform motion over time. \\
+Open loop & Evaluation or operation without feedback from the output to future system input. \\
+Perception & Interpretation of sensor data into objects, free space, scene structure, or semantic information. \\
+Point cloud & Collection of three-dimensional points with optional intensity, time, and channel attributes. \\
+Representation & Structured form in which data are presented to an algorithm. \\
+Robustness & Ability to maintain acceptable behavior under noise, environmental change, and system degradation. \\
+Runtime reconfiguration & Changing active sensors, model branches, precision, or hardware configuration during operation. \\
+Sensor & Physical device that converts a physical phenomenon into a measurable signal. \\
+Sensor fusion & Combination of multisensor information with alignment, uncertainty, and consistency management. \\
+SLAM & Simultaneous Localization and Mapping. \\
+SNN & Spiking neural network using spike events and time-dependent neuron states. \\
+State & Set of hidden physical variables sufficient to describe and predict system behavior. \\
+State estimation & Inference of system state from dynamics, controls, measurements, and uncertainty. \\
+Synchronization & Alignment of measurement timestamps to a common time reference. \\
+Tight coupling & Joint use of measurements or residuals from multiple sensors in a shared estimator. \\
+Throughput & Number of samples or decisions processed per unit time. \\
+Uncertainty & Quantified lack of certainty caused by measurement variation, ambiguity, or model knowledge. \\
+\bottomrule
+\end{longtable}
