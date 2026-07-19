@@ -1,0 +1,31 @@
+\begin{tikzpicture}[
+    node distance=0.48cm and 0.6cm,
+    block/.style={draw, rounded corners=2pt, align=center, minimum height=0.72cm, text width=2.35cm, fill=blue!5, font=\small},
+    residual/.style={draw, rounded corners=2pt, align=center, minimum height=0.72cm, text width=1.85cm, fill=blue!5, font=\scriptsize},
+    estimator/.style={draw, rounded corners=2pt, align=center, minimum height=0.85cm, text width=3.1cm, fill=green!7, font=\small},
+    arrow/.style={-{Latex[length=2.2mm]}, thick}
+]
+\node[font=\bfseries] at (0,3.0) {Loosely coupled};
+\node[block] (l1) at (-1.7,2.0) {Camera\\subsystem};
+\node[block] (l2) at (1.7,2.0) {LiDAR\\subsystem};
+\node[block] (l3) at (-1.7,0.85) {Visual pose\\estimate};
+\node[block] (l4) at (1.7,0.85) {LiDAR pose\\estimate};
+\node[estimator] (lf) at (0,-0.45) {State-level fusion\\of estimates};
+\draw[arrow] (l1) -- (l3);
+\draw[arrow] (l2) -- (l4);
+\draw[arrow] (l3) -- (lf);
+\draw[arrow] (l4) -- (lf);
+
+\begin{scope}[xshift=8.2cm]
+\node[font=\bfseries] at (0,3.0) {Tightly coupled};
+\node[residual] (t1) at (-2.1,2.0) {Camera\\residuals};
+\node[residual] (t2) at (0,2.0) {LiDAR\\residuals};
+\node[residual] (t3) at (2.1,2.0) {IMU / event\\residuals};
+\node[estimator, text width=4.7cm] (tf) at (0,0.55) {Joint estimator with shared state, residuals, and uncertainty};
+\node[block, text width=4.15cm] (ts) at (0,-0.75) {Pose, velocity, bias, and map state};
+\draw[arrow] (t1) -- (tf);
+\draw[arrow] (t2) -- (tf);
+\draw[arrow] (t3) -- (tf);
+\draw[arrow] (tf) -- (ts);
+\end{scope}
+\end{tikzpicture}
