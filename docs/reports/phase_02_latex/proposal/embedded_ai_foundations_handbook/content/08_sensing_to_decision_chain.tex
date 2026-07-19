@@ -1,0 +1,114 @@
+\chapter{From Sensing to Decision and Action}
+\label{chap:sensing-decision}
+
+\section{Perception Is Not the End of the Pipeline}
+
+A perception system describes what is present in the environment. An autonomous robot must then estimate motion, predict future events, select an action, and control actuators. A detector that identifies a pedestrian but does not provide the result early enough for braking has not solved the system problem.
+
+The sensing-to-decision chain connects several disciplines:
+
+\[
+\begin{aligned}
+&\text{sensing} \rightarrow \text{alignment} \rightarrow \text{fusion} \rightarrow \text{perception/state} \\
+&\qquad \rightarrow \text{prediction} \rightarrow \text{planning} \rightarrow \text{control} \rightarrow \text{action}.
+\end{aligned}
+\]
+
+\section{Perception Tasks}
+
+\begin{table}[H]
+\centering
+\caption{Representative perception outputs.}
+\label{tab:perception-tasks}
+\begin{tabularx}{\textwidth}{@{}p{3.3cm}X@{}}
+\toprule
+\textbf{Task} & \textbf{Output} \\
+\midrule
+Classification & Class label or probability for an input \\
+Object detection & Bounding box, class, and confidence \\
+Semantic segmentation & Class for every pixel or point \\
+Instance segmentation & Separate mask for each object \\
+Tracking & Persistent object identity, state, and trajectory \\
+Free-space estimation & Traversable and occupied regions \\
+Scene understanding & Relations among objects, agents, roads, and context \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Detection is a snapshot; tracking adds temporal identity and motion. Planning normally needs tracks and uncertainty rather than isolated boxes.
+
+\section{Perceptual and Computational Latency}
+
+\emph{Perceptual latency} is the delay between a physical event and its measurement by the sensor. A frame camera has blind intervals between exposures. \emph{Computational latency} is the delay between receiving the measurement and producing an algorithmic output.
+
+The RGB--event system in W7-1 addresses both terms. Event sensing fills the blind interval between frames, and asynchronous graph updates reduce redundant computation~\cite{gehrig2024lowlatency}.
+
+The complete latency budget is
+
+\[
+T_{\text{end-to-end}} =
+T_{\text{sensor}} +
+T_{\text{transfer}} +
+T_{\text{preprocess}} +
+T_{\text{inference}} +
+T_{\text{fusion}} +
+T_{\text{planning}} +
+T_{\text{control}} +
+T_{\text{actuator}}.
+\]
+
+Reducing only \(T_{\text{inference}}\) may have little effect if sensor readout or communication dominates.
+
+\section{Prediction}
+
+Prediction estimates how the scene will evolve. It may produce a single trajectory, a distribution over trajectories, or a risk score. Dynamic agents are uncertain and interactive; a pedestrian can stop, accelerate, or turn. A useful predictor therefore expresses uncertainty and supports multiple plausible futures.
+
+\section{Planning}
+
+Planning selects a path, trajectory, or maneuver that achieves a goal while respecting dynamics, obstacles, traffic rules, and safety constraints. The planner consumes fused state estimates and predictions. It should also understand their uncertainty; a precise-looking but overconfident input can create unsafe behavior.
+
+\section{Control}
+
+Control converts the planned motion into actuator commands. A steering controller, brake controller, and motor controller operate at defined rates and must remain stable under delay and model error. Control closes the loop because actuator commands change the next sensor measurements.
+
+\section{The Nighttime Pedestrian Scenario}
+
+Figure~\ref{fig:pedestrian-scenario} follows the running example through the complete chain.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figures/fig_pedestrian_scenario}}
+    \caption{A multimodal sensing-to-action example for a pedestrian entering the road at night.}
+    \label{fig:pedestrian-scenario}
+\end{figure}
+
+The event camera can signal rapid motion before the next image frame. The RGB camera contributes semantic evidence. LiDAR contributes range. After alignment and fusion, the system creates a track. Prediction estimates whether the track intersects the vehicle path. Planning chooses braking or avoidance. Control produces the physical command.
+
+The chain also reveals failure propagation. A timing offset can corrupt the fused track. An underestimated covariance can make prediction overconfident. A slow planner can miss the deadline even when perception is accurate.
+
+\section{Open-Loop and Closed-Loop Evaluation}
+
+Open-loop evaluation measures a component against a fixed dataset. Examples include mAP, segmentation IoU, trajectory error, and classification accuracy. Closed-loop evaluation allows the component output to influence future system states. Examples include route completion, collision rate, control stability, and mission energy.
+
+Closed-loop evaluation is more representative of deployment but harder to interpret because many components interact. A perception improvement may not change the route if the planner is conservative. A small systematic error may create large feedback effects.
+
+\section{End-to-End Metrics}
+
+A complete evaluation combines several dimensions:
+
+\begin{itemize}
+    \item \textbf{task quality:} detection, tracking, pose, map, or route metrics;
+    \item \textbf{timing:} sensor, inference, and end-to-end latency distributions;
+    \item \textbf{resources:} power, energy per decision, memory, and bandwidth;
+    \item \textbf{robustness:} performance under lighting, weather, motion, and sensor failure;
+    \item \textbf{safety:} missed hazard rate, collision rate, fallback behavior, and worst-case response;
+    \item \textbf{maintainability:} calibration, logging, diagnosability, and update complexity.
+\end{itemize}
+
+\begin{keyinsight}
+A model metric becomes engineering evidence only when its effect on the sensing-to-decision chain is understood. The final question is not merely ``Was the object detected?'' but ``Did the system act correctly, on time, and within its resource and safety limits?''
+\end{keyinsight}
+
+\section{Chapter Summary}
+
+Perception feeds prediction, planning, and control. Sensor latency, transfer time, inference, fusion, and actuation jointly determine response time. Open-loop metrics are necessary but do not guarantee closed-loop behavior. Embedded AI must be designed and evaluated as a feedback system whose decisions alter the next measurements.
