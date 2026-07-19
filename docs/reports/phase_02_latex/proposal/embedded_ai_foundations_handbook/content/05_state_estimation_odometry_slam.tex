@@ -1,0 +1,132 @@
+\chapter{State Estimation, Odometry, and SLAM}
+\label{chap:state-estimation}
+
+\section{What Is a State?}
+
+A state is a compact set of variables that describes the condition of a dynamic system sufficiently for prediction and control. For a mobile robot, a representative state vector may include position, orientation, linear velocity, gyroscope bias, and accelerometer bias:
+
+\[
+    \vec{x}_k =
+    \begin{bmatrix}
+        \vec{p}_k^\top &
+        \vec{q}_k^\top &
+        \vec{v}_k^\top &
+        \vec{b}_{g,k}^\top &
+        \vec{b}_{a,k}^\top
+    \end{bmatrix}^{\top}.
+\]
+
+The state is normally not observed directly. Sensors produce measurements that depend on the state. A motion model predicts how the state evolves, and measurement models correct the prediction.
+
+\begin{definition}{State Estimation}{def:state-estimation}
+State estimation is the process of inferring unobserved physical variables from a dynamic model, control inputs, sensor measurements, and uncertainty.
+\end{definition}
+
+A general recursive structure is
+
+\[
+    \text{Prediction:}\quad
+    \vec{x}_{k}^{-}=f(\vec{x}_{k-1},\vec{u}_{k}) + \vec{w}_{k},
+\]
+
+\[
+    \text{Correction:}\quad
+    \vec{z}_{k}=h(\vec{x}_{k})+\vec{v}_{k}.
+\]
+
+The estimator compares the expected and measured observations. Their difference is the \emph{innovation} or \emph{residual}.
+
+\section{Odometry, Localization, and SLAM}
+
+These terms are related but not identical.
+
+\begin{itemize}
+    \item \textbf{Odometry} estimates incremental motion over time. It commonly drifts because small errors accumulate.
+    \item \textbf{Localization} estimates the robot pose relative to a known map or global reference.
+    \item \textbf{Mapping} constructs a representation of the environment.
+    \item \textbf{SLAM} performs simultaneous localization and mapping when neither pose nor map is fully known.
+\end{itemize}
+
+Wheel odometry, visual odometry, LiDAR odometry, inertial odometry, and event-based odometry differ in the measurements used. A mature autonomous system often combines several sources because no single method remains reliable in every environment.
+
+\section{Why IMU Data Need External Corrections}
+
+An IMU provides high-rate angular velocity and specific force. It is excellent for short-term motion propagation and for bridging gaps between slower sensors. However, integration converts small biases into growing errors. A constant accelerometer bias produces velocity error that grows approximately linearly with time and position error that grows approximately quadratically. Camera, LiDAR, radar, or GNSS measurements are therefore used to constrain drift.
+
+\section{Loose and Tight Coupling}
+
+Figure~\ref{fig:loose-tight} contrasts two important architectures.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figures/fig_loose_tight}}
+    \caption{Loosely coupled fusion combines subsystem estimates. Tightly coupled fusion uses measurements or residuals inside a shared estimator.}
+    \label{fig:loose-tight}
+\end{figure}
+
+\subsection{Loosely Coupled Fusion}
+
+Each subsystem first creates a relatively complete estimate. A visual subsystem may output a camera pose and covariance; a LiDAR subsystem may output a LiDAR pose. A higher-level filter then fuses these estimates.
+
+Advantages include modularity, simpler interfaces, and the ability to replace subsystems. The cost is information loss. Raw observations and cross-correlations are compressed into subsystem outputs. If one subsystem cannot form a complete estimate, its partial information may be discarded.
+
+\subsection{Tightly Coupled Fusion}
+
+Measurements or minimally processed residuals enter a common estimator. A representative optimization problem is
+
+\[
+    \hat{\vec{x}}
+    = \argmin_{\vec{x}}
+      \sum_i \norm{\vec{r}_i(\vec{x})}_{\mat{W}_i}^{2},
+\]
+
+where \(\vec{r}_i\) may be an inertial residual, a camera reprojection residual, a LiDAR point-to-plane residual, or an event-to-map residual. The weight matrix \(\mat{W}_i\) represents confidence or inverse covariance.
+
+Tight coupling uses more of the available information and can remain observable when one sensor is individually insufficient. It also requires careful modeling, synchronization, numerical optimization, and failure isolation.
+
+\begin{definition}{Tight Measurement Fusion}{def:tight-fusion}
+Tight measurement fusion is a joint-estimation architecture in which measurements or residuals from multiple sensors directly constrain a shared state rather than being reduced first to independent final state estimates.
+\end{definition}
+
+\section{Measurement-Level and State-Level Fusion}
+
+The phrase \emph{measurement-level fusion} means that observations influence the joint estimator directly. \emph{State-level fusion} means that subsystem estimates and their uncertainty are combined. Tight coupling is normally measurement-level; loose coupling is normally state-level. Real systems can be hybrid. For example, an estimator may use raw IMU integration, LiDAR residuals, and a separately estimated GNSS position.
+
+\section{Filtering and Optimization}
+
+\subsection{Kalman-Family Filters}
+
+A Kalman filter represents the state estimate with a mean and covariance. An extended Kalman filter linearizes nonlinear motion and measurement models. Filters are recursive and efficient for online systems, but consistency depends on correct models, linearization, and noise assumptions.
+
+\subsection{Factor Graphs and Sliding-Window Optimization}
+
+A factor graph represents states as variables and measurements as factors. Nonlinear optimization minimizes the combined residuals over a window or complete trajectory. This approach handles heterogeneous constraints naturally and can relinearize past states, but it requires more memory and computation than a small recursive filter.
+
+\subsection{Outlier Rejection}
+
+Real measurements contain incorrect correspondences and spurious returns. Robust losses, gating, RANSAC, residual consistency tests, and sensor-health monitors prevent a small number of bad measurements from corrupting the state.
+
+\section{FAST-LIEO as a Case Study}
+
+FAST-LIEO tightly integrates LiDAR, inertial, and event measurements and optionally includes RGB measurements in an extended configuration~\cite{wang2025fastlieo}. Its event-inertial-odometry subsystem uses LiDAR-derived spatial structure and event representations without relying on conventional feature extraction and matching. The design seeks robustness under weak illumination, high dynamic range, aggressive motion, and LiDAR-degenerate conditions.
+
+The paper illustrates several general principles:
+
+\begin{enumerate}[label=\arabic*.]
+    \item Different modalities fail under different physical conditions.
+    \item Tight coupling can use partial information before a complete standalone pose is available.
+    \item Representation and data association are part of estimation, not separate preprocessing details.
+    \item A multimodal estimator must still acknowledge joint failure cases. If LiDAR geometry is degenerate and the event scene contains insufficient structure, observability can be lost.
+\end{enumerate}
+
+\section{Observability}
+
+A state variable is observable when the available measurements constrain it sufficiently. More measurements do not necessarily improve observability if they repeat the same information. A robot moving through a long featureless corridor may have weak constraints in certain directions. An event camera in a static scene may provide few updates. A tightly coupled design should be evaluated by how complementary measurements restore missing constraints.
+
+\begin{engineeringcheck}
+When a paper claims robust localization, identify the specific failure modes tested: low light, fast rotation, repetitive geometry, weak texture, missing sensors, timing offset, and calibration error. ``Real-time'' should also include the platform, sequence rate, and worst-case behavior.
+\end{engineeringcheck}
+
+\section{Chapter Summary}
+
+State estimation combines dynamics, measurements, and uncertainty to infer physical variables. Odometry estimates incremental motion; localization uses a reference; SLAM estimates pose and map together. Loose coupling fuses subsystem estimates, while tight coupling allows heterogeneous measurements to constrain one shared state. The increased information efficiency of tight coupling comes with greater modeling, synchronization, optimization, and failure-management complexity.
