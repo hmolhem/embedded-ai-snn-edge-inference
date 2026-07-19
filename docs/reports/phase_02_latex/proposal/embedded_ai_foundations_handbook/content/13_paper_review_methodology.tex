@@ -1,0 +1,178 @@
+\chapter{A Method for Reading Embedded-AI Papers}
+\label{chap:review-method}
+
+\section{Read the Paper as a System Argument}
+
+A research paper is an argument with five parts:
+
+\begin{enumerate}[label=\arabic*.]
+    \item an important problem exists;
+    \item existing methods leave a gap;
+    \item the proposed method addresses the gap;
+    \item experiments isolate the effect and support the claim;
+    \item limitations define the boundary of validity.
+\end{enumerate}
+
+A strong paper review reconstructs this argument rather than summarizing sections in order.
+
+\section{Step 1: Reconstruct the Research Question}
+
+Papers do not always present the central question as a literal sentence. Reconstruct it from the introduction, failure example, gap, and contribution list. A useful template is:
+
+\begin{quote}
+Can \textit{method or design change} improve \textit{target outcome} under \textit{operating conditions and constraints} compared with \textit{baseline}, without unacceptable loss in \textit{secondary objective}?
+\end{quote}
+
+This form prevents vague summaries such as ``the paper uses attention for sensor fusion.'' It forces the review to identify why attention was needed and how success was judged.
+
+\section{Step 2: Locate the Paper on the Sensing-to-Decision Chain}
+
+Record:
+
+\begin{itemize}
+    \item physical application and environment;
+    \item sensors and modalities;
+    \item data representations;
+    \item fusion or estimation level;
+    \item task output;
+    \item hardware platform;
+    \item embedded constraint;
+    \item downstream use.
+\end{itemize}
+
+Draw the architecture from sensor input to final output. Mark every change of representation and every point at which modalities interact.
+
+\section{Step 3: Identify the Baseline Failure}
+
+The contribution is meaningful only relative to a failure. Ask:
+
+\begin{itemize}
+    \item Does a frame camera miss rapid events?
+    \item Does static fusion waste energy?
+    \item Does attention exceed memory capacity?
+    \item Does a unimodal filter discard complementary data?
+    \item Does LiDAR or camera odometry lose observability?
+    \item Does late fusion lose feature information?
+\end{itemize}
+
+The baseline failure should be demonstrated, not merely asserted.
+
+\section{Step 4: Trace Information and Cost}
+
+For each block, write:
+
+\begin{enumerate}[label=\alph*)]
+    \item input representation and dimensions;
+    \item output representation and dimensions;
+    \item arithmetic operations;
+    \item memory movement;
+    \item latency or rate;
+    \item uncertainty and failure mode;
+    \item hardware mapping.
+\end{enumerate}
+
+This trace reveals hidden costs. A small fusion head may require large aligned feature maps. A near-sensor classifier may save communication but add sensing duty-cycle overhead. An asynchronous model may require dynamic graph maintenance.
+
+\section{Step 5: Audit the Experiments}
+
+\subsection{Dataset and Scenario Coverage}
+
+Determine whether the test conditions represent the claimed deployment. Day/night detection needs both lighting regimes. Robust odometry needs aggressive motion, weak texture, and degenerate geometry. Context-aware fusion needs context transitions and misclassification analysis.
+
+\subsection{Baseline Fairness}
+
+Check whether baselines use the same sensors, backbone capacity, training data, precision, hardware, and latency boundary. A stronger model with more parameters is not a fair algorithmic comparison unless resource differences are acknowledged.
+
+\subsection{Ablation Studies}
+
+An ablation removes one component at a time. It should establish whether attention, reconfiguration, quantization, graph direction, or near-sensor labels actually cause the improvement.
+
+\subsection{Metric Boundaries}
+
+Ask exactly what the metric includes. Is energy neural-core energy or complete-system energy? Is latency kernel latency or sensor-to-actuator latency? Is FLOP count dense theoretical FLOPs or measured sparse operations?
+
+\subsection{Statistical Reliability}
+
+Look for multiple runs, confidence intervals, dataset splits, seed sensitivity, and significance. Closed-loop simulation can have high variance and should not rely on one route or one seed.
+
+\section{Step 6: Separate Results from Interpretation}
+
+A measured result may support several interpretations, but only some are justified. For example:
+
+\begin{itemize}
+    \item lower FLOPs do not prove lower latency;
+    \item fewer parameters do not prove lower peak activation memory;
+    \item high attention weight does not prove sensor reliability;
+    \item simulator improvement does not prove road safety;
+    \item nominal multimodal accuracy does not prove fault tolerance;
+    \item event sparsity does not prove energy savings without hardware skipping.
+\end{itemize}
+
+Use disciplined wording: ``The experiment reports...'', ``The result suggests...'', and ``Deployment would additionally require...''
+
+\section{Step 7: Read Limitations as Technical Content}
+
+Limitations identify where the model, sensor, estimator, or evidence fails. They are not an embarrassment to remove from a presentation. They define the next engineering question.
+
+Useful limitation categories include:
+
+\begin{itemize}
+    \item untested environment or modality failure;
+    \item calibration and synchronization assumptions;
+    \item missing hardware measurements;
+    \item limited dataset diversity;
+    \item preprint or simulation-only evidence;
+    \item scaling to more sensors or larger models;
+    \item safety and fallback not evaluated.
+\end{itemize}
+
+\section{A One-Page Review Structure}
+
+For each paper, prepare the following:
+
+\begin{table}[H]
+\centering
+\caption{One-page paper-review structure.}
+\label{tab:one-page-review}
+\begin{tabularx}{\textwidth}{@{}p{3.0cm}X@{}}
+\toprule
+\textbf{Field} & \textbf{Required content} \\
+\midrule
+Problem & Physical task and why the existing method fails \\
+Research question & Reconstructed question with constraint and baseline \\
+Inputs / outputs & Sensors, modalities, representations, and final output \\
+Method & Main blocks and fusion location \\
+Embedded constraint & Latency, energy, memory, bandwidth, or reliability \\
+Evidence & Datasets, hardware, metrics, baselines, and ablations \\
+Main result & Numerical result with exact condition and denominator \\
+Limitations & Failure cases and untested assumptions \\
+Position in map & Location in the sensing-to-decision chain \\
+Engineering takeaway & Reusable design principle \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Preparing a Presentation}
+
+A concise technical presentation should tell a causal story:
+
+\begin{enumerate}[label=\arabic*.]
+    \item application and failure scenario;
+    \item research question;
+    \item system architecture;
+    \item key technical mechanism;
+    \item experiment design;
+    \item results and trade-offs;
+    \item limitations;
+    \item connection to Embedded AI.
+\end{enumerate}
+
+Avoid spending most of the time on generic background. Background should be selected only to make the paper's contribution understandable.
+
+\begin{engineeringcheck}
+Every numerical claim in a presentation should include its condition: dataset, operating point, baseline, metric definition, and publication status.
+\end{engineeringcheck}
+
+\section{Chapter Summary}
+
+A deep paper review reconstructs the research question, locates the work in the system pipeline, identifies the baseline failure, traces information and cost, audits experiments, separates evidence from interpretation, and treats limitations as part of the engineering result. This method converts reading from passive summarization into technical judgment.
