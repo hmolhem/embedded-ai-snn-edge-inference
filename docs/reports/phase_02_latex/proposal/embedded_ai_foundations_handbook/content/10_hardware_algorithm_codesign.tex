@@ -1,0 +1,114 @@
+\chapter{Hardware Platforms and Hardware--Algorithm Co-Design}
+\label{chap:codesign}
+
+\section{The Compute Continuum}
+
+Embedded intelligence can be placed near the sensor, on a microcontroller, in an FPGA or NPU, on an edge GPU, or in a server. Figure~\ref{fig:compute-continuum} shows the basic continuum.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figures/fig_compute_continuum}}
+    \caption{The compute continuum from near-sensor processing to cloud-scale computing.}
+    \label{fig:compute-continuum}
+\end{figure}
+
+The correct location depends on latency, privacy, energy, connectivity, model size, and update frequency. Hybrid systems divide the pipeline: a sensor may perform filtering, an FPGA may extract features, an edge processor may fuse modalities, and the cloud may retrain models.
+
+\section{Platform Characteristics}
+
+\begin{table}[H]
+\centering
+\caption{Representative embedded-AI hardware platforms.}
+\label{tab:platforms}
+\begin{tabularx}{\textwidth}{@{}p{2.4cm}X X@{}}
+\toprule
+\textbf{Platform} & \textbf{Strengths} & \textbf{Limitations and typical role} \\
+\midrule
+MCU & Low power, low cost, deterministic control & Small memory and compute; TinyML and sensor control \\
+CPU & Flexible software ecosystem & Lower tensor efficiency and variable latency under load \\
+GPU & High dense-tensor throughput & Power, memory traffic, and scheduling variability \\
+DSP & Efficient filtering and signal processing & Narrower programming model; often part of an SoC \\
+FPGA & Custom parallelism, streaming dataflow, deterministic latency & Design effort, timing closure, limited on-chip memory \\
+NPU/DPU & Efficient supported neural operators & Operator and precision constraints; vendor tool dependence \\
+ASIC & Highest efficiency for a fixed workload & High development cost and low post-fabrication flexibility \\
+Compute-in-memory & Reduces data movement for matrix operations & ADC/DAC overhead, analog variation, precision limits \\
+Neuromorphic hardware & Event-driven sparse computation and local state & Immature tooling, portability, and training workflows \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Co-Design Rather Than Porting}
+
+\begin{definition}{Hardware--Algorithm Co-Design}{def:codesign}
+Hardware--algorithm co-design is the joint development of the model, numerical representation, dataflow, memory architecture, and hardware mapping so that the complete implementation meets system objectives.
+\end{definition}
+
+Porting asks, ``How can the existing model run on this device?'' Co-design asks, ``What model and dataflow should exist given the device and application constraints?'' The second question can change the architecture itself.
+
+\section{Quantization}
+
+Quantization reduces weight and activation precision. A real value is mapped to a finite set:
+
+\[
+    x_q = \operatorname{clip}\!\left(
+        \operatorname{round}\left(\frac{x}{s}\right)+z,
+        q_{\min},q_{\max}
+    \right),
+\]
+
+where \(s\) is a scale and \(z\) is a zero point. Lower precision reduces memory and can increase parallelism, but clipping and rounding introduce error. The correct bit width depends on layer sensitivity, dynamic range, hardware operator support, and calibration data.
+
+REM-CiM explicitly combines low-bit quantization and clipping with the analog memory architecture~\cite{ichikawa2024remcim}.
+
+\section{Pruning and Sparsity}
+
+Pruning removes weights, channels, tokens, events, or branches judged unnecessary. Sparsity reduces work only if the hardware and data structure can skip zeros efficiently. Unstructured sparsity can create index overhead and irregular memory access. Structured pruning is often easier to accelerate because entire channels or blocks disappear.
+
+Event cameras and SNNs provide activity sparsity. The engineering value depends on actual spike or event rates and whether inactive operations are physically gated.
+
+\section{Streaming and Pipelining}
+
+A streaming design processes data as it arrives instead of storing a complete frame or matrix. FPGAs are effective for this pattern because stages can operate concurrently. Pipeline initiation interval, buffer depth, memory ports, and recurrence dependencies determine performance.
+
+Streaming is especially valuable when sensor throughput is high and deterministic latency is required. It also changes the interface between preprocessing, neural inference, and control.
+
+\section{Near-Sensor Intelligence}
+
+Near-sensor processing can remove redundant samples before expensive communication. Examples include event generation, simple motion detection, feature compression, and FusionSense-style keep/drop decisions~\cite{yun2026fusionsense}. The near-sensor model must be small enough that its own energy does not exceed the communication savings.
+
+\section{Runtime Reconfiguration}
+
+A context-aware system can activate different sensor sets or model branches at runtime. CARMA uses FPGA/DPU reconfiguration and clock gating to adapt perception to environmental context~\cite{zhang2023carma}. Reconfiguration is beneficial only when switching overhead, context-identification cost, and configuration errors are included.
+
+\section{Compute-in-Memory}
+
+Conventional architectures repeatedly move weights between memory and processing units. Compute-in-memory performs matrix-like operations near or inside memory. Analog arrays can exploit Ohm's and Kirchhoff's laws for parallel accumulation. The approach reduces movement but introduces converter energy, limited precision, device variation, retention error, and mapping constraints.
+
+REM-CiM illustrates the required co-design: attention and fusion operators are simplified, parameter count is reduced, and quantization is selected with ADC and memory limits in mind~\cite{ichikawa2024remcim}.
+
+\section{Neuromorphic Computing}
+
+Neuromorphic systems colocate state and computation in neuron/synapse structures and often operate with event-driven communication. Their potential energy efficiency comes from sparse activity, local state, and parallelism~\cite{roy2019towards,schuman2022opportunities}. Practical challenges include training, mapping, benchmark fairness, precision, and the availability of suitable event-based workloads.
+
+\section{A Co-Design Checklist}
+
+\begin{enumerate}[label=\arabic*.]
+    \item Define the task, deadline, operating environment, and safety boundary.
+    \item Measure the sensor and communication workload before choosing the model.
+    \item Identify the dominant cost: arithmetic, memory movement, transfer, or control overhead.
+    \item Select precision, sparsity, and representation together.
+    \item Map unsupported operators before finalizing the architecture.
+    \item Verify peak memory and sustained throughput, not only average operation count.
+    \item Evaluate end-to-end accuracy after quantization and hardware mapping.
+    \item Measure system energy and worst-case latency on the target platform.
+    \item Test degraded sensors, missing modalities, and thermal conditions.
+    \item Preserve reproducibility: device, clock, compiler, model version, and measurement method.
+\end{enumerate}
+
+\begin{keyinsight}
+A hardware-friendly algorithm is not simply a smaller algorithm. It exposes regular dataflow, predictable memory access, supported precision, useful sparsity, and a measurable system-level advantage.
+\end{keyinsight}
+
+\section{Chapter Summary}
+
+MCUs, CPUs, GPUs, FPGAs, NPUs, ASICs, compute-in-memory, and neuromorphic platforms offer different trade-offs. Co-design jointly shapes the model, numerical precision, dataflow, and hardware. Quantization, structured sparsity, streaming, near-sensor filtering, and runtime reconfiguration are valuable only when their overhead and system boundary are measured.
