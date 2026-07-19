@@ -1,0 +1,146 @@
+\chapter{Sensors, Measurements, and Modalities}
+\label{chap:sensors-modalities}
+
+\section{A Sensor Does Not Observe Reality Perfectly}
+
+A sensor is a physical transducer. It converts a physical quantity into a signal that can be sampled and processed. The output is a \emph{measurement}, not the true state of the world. A generic measurement model is
+
+\[
+    \vec{z}_k = h(\vec{x}_k) + \vec{v}_k,
+\]
+
+where \(\vec{x}_k\) is the physical state, \(h(\cdot)\) is the sensing model, and \(\vec{v}_k\) represents noise and unmodeled effects. In practice, the measurement can also contain bias, saturation, quantization, missed detections, multipath, timing error, and environmental interference.
+
+\begin{definition}{Sensor}{def:sensor}
+A sensor is a physical device that converts a physical phenomenon into a measurable electrical or digital signal.
+\end{definition}
+
+\begin{definition}{Measurement}{def:measurement}
+A measurement is a sensor observation expressed in a defined coordinate system, time reference, unit, and uncertainty model.
+\end{definition}
+
+The distinction matters because algorithms should not treat a pixel, a point, or an inertial sample as unquestionable truth. The sensor model defines what the data can and cannot establish.
+
+\section{Sensor and Modality Are Different Concepts}
+
+\begin{definition}{Modality}{def:modality}
+A modality is a distinct channel or type of information characterized by its sensing physics, data structure, semantic content, temporal behavior, and failure modes.
+\end{definition}
+
+A camera is a physical sensor. RGB is a modality. Depth is another modality. A single RGB-D device can produce two modalities. Two separate RGB cameras are two sensors but may still represent the same modality. Therefore, \emph{multi-sensor} and \emph{multimodal} are related but not identical.
+
+\begin{example}{Multi-sensor but unimodal}{ex:multisensor-unimodal}
+A stereo pair contains two physical cameras. Both produce RGB or grayscale images, so the system is multi-sensor. The two viewpoints cooperate to infer depth, but the individual data channels are of the same visual modality.
+\end{example}
+
+\section{Important Modalities in Autonomous Robotics}
+
+Table~\ref{tab:sensor-families} summarizes common sensor families.
+
+\begin{table}[H]
+\centering
+\caption{Representative sensors and modalities in autonomous systems.}
+\label{tab:sensor-families}
+\begin{tabularx}{\textwidth}{@{}p{2.25cm}p{2.9cm}X X@{}}
+\toprule
+\textbf{Sensor} & \textbf{Typical representation} & \textbf{Primary information} & \textbf{Representative limitations} \\
+\midrule
+RGB camera & Image or video tensor & Appearance, texture, color, semantic detail & Illumination dependence, motion blur, indirect depth \\
+Event camera & Event stream \((x,y,t,p)\) & Brightness change with high temporal resolution & Weak information in static or low-change scenes; specialized processing \\
+LiDAR & 3-D point cloud & Direct range and geometry & Sparse returns, cost, weather/surface sensitivity, data volume \\
+Radar & Range--Doppler--angle detections & Range and radial velocity; robust long-range sensing & Lower shape detail and angular resolution in many configurations \\
+IMU & Acceleration and angular-rate time series & High-rate ego-motion information & Bias and integration drift \\
+GNSS & Global position and time & Global reference & Indoor loss, urban-canyon error, interference and spoofing \\
+Thermal camera & Infrared image & Thermal contrast and heat signatures & Lower spatial/semantic detail; thermal reflections \\
+Microphone array & Multichannel audio & Acoustic direction, speech, machinery signatures & Reverberation, noise, environmental variability \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{RGB Cameras}
+
+An RGB camera measures light intensity through color filters on a regular pixel grid. It provides dense spatial detail and is highly effective for recognition and semantic understanding. However, it does not directly measure metric distance, and its output is strongly influenced by lighting, exposure, blur, lens distortion, and occlusion.
+
+\subsection{Event Cameras}
+
+An event camera reports a change when the logarithmic brightness at a pixel changes beyond a threshold. An idealized event can be written as
+
+\[
+    e_k = (x_k, y_k, t_k, p_k),
+\]
+
+where \((x_k,y_k)\) is the pixel location, \(t_k\) is the timestamp, and \(p_k\) indicates the sign of the brightness change. Event streams are asynchronous, temporally precise, and often sparse. They are therefore attractive for rapid motion, high-dynamic-range scenes, and low-latency perception~\cite{gallego2022event,gehrig2024lowlatency}. They do not, however, provide the same rich static appearance information as a conventional image.
+
+\subsection{LiDAR}
+
+LiDAR stands for \emph{Light Detection and Ranging}. A time-of-flight LiDAR estimates distance from the round-trip propagation time of a laser pulse:
+
+\[
+    R = \frac{c\,\Delta t}{2},
+\]
+
+where \(c\) is the speed of light and \(\Delta t\) is the measured round-trip time. The output is commonly a point cloud containing coordinates, intensity, timestamp, and channel information. LiDAR is valuable because it measures geometry directly. It is widely used in mapping, obstacle detection, localization, and dimensional inspection.
+
+LiDAR also has limitations. Point density decreases with range, reflective or absorptive materials can affect returns, and repetitive or weakly constrained geometry can create localization degeneracy. The sensor may also be expensive and produce substantial data traffic.
+
+\subsection{Radar}
+
+Radar transmits radio-frequency energy and processes reflected signals. Depending on the waveform and array, it can estimate range, Doppler velocity, and angle. Radar often remains useful in darkness, rain, dust, and fog where optical sensors degrade. Its measurements are typically sparser and less visually descriptive than camera or high-resolution LiDAR data, which makes cross-modal fusion valuable.
+
+\subsection{Inertial Measurement Units}
+
+An IMU normally contains accelerometers and gyroscopes. It provides high-rate motion information without requiring external landmarks. After integration, however, small bias and noise errors accumulate into velocity and position drift. This is why IMU data are commonly fused with camera, LiDAR, radar, or GNSS measurements.
+
+\section{What Makes a Modality Suitable?}
+
+A modality is suitable when its physical information, resolution, latency, range, failure behavior, and resource cost match the task and operating context. There is no universally best modality.
+
+\begin{table}[H]
+\centering
+\caption{Engineering criteria for modality suitability.}
+\label{tab:modality-suitability}
+\begin{tabularx}{\textwidth}{@{}p{3.1cm}X@{}}
+\toprule
+\textbf{Criterion} & \textbf{Question} \\
+\midrule
+Task relevance & Does the modality observe the quantity needed for the task? \\
+Operating context & Does it remain informative at night, in fog, during rapid motion, or indoors? \\
+Temporal resolution & Can it detect the change before the system deadline? \\
+Spatial and range resolution & Does it provide sufficient detail and operating range? \\
+Uncertainty and failure modes & Are errors understood, detectable, and sufficiently independent from other sensors? \\
+Resource cost & What are the sensing, transmission, storage, and inference costs? \\
+Calibration burden & Can the modality be aligned accurately with the rest of the sensor suite? \\
+Complementarity & Does it add information that other modalities do not provide reliably? \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+For example, RGB is appropriate for traffic-light color recognition, while LiDAR or radar is more direct for metric range. Event sensing is attractive for fast temporal changes. An IMU is valuable for short-term motion propagation but unsuitable as a long-term absolute position reference.
+
+\section{Redundancy, Complementarity, and Cooperation}
+
+Three relationships explain why multiple sensors are used.
+
+\begin{itemize}
+    \item \textbf{Redundancy:} multiple sources observe similar quantities so that disagreement or failure can be detected.
+    \item \textbf{Complementarity:} different modalities observe different aspects of the same scene, such as camera semantics and LiDAR geometry.
+    \item \textbf{Cooperation:} combined measurements create information not available directly from either source, such as depth inferred from stereo correspondence.
+\end{itemize}
+
+Redundancy is useful only when the failure mechanisms are sufficiently independent. Two identical cameras can both fail in overexposure. A camera and radar may offer stronger diversity because their physical sensing mechanisms differ.
+
+\begin{keyinsight}
+The design question is not ``Which sensor is best?'' It is ``Which combination of information channels remains observable, timely, and affordable under the required operating conditions?''
+\end{keyinsight}
+
+\section{Context-Dependent Modality Selection}
+
+A modality can be valuable in one scene and unnecessary in another. This observation motivates adaptive systems. CARMA selects sensor and model configurations according to context and energy cost~\cite{zhang2023carma}. FusionSense learns whether a modality can be withheld for a particular sample without changing the fused task decision~\cite{yun2026fusionsense}. These methods treat sensing as a managed resource rather than a fixed input assumption.
+
+\begin{paperconnection}
+The Week 7 papers use modality in three distinct ways. W7-1 and W7-3 exploit the complementarity of RGB frames and event streams. W7-5 uses LiDAR, IMU, event, and optional RGB measurements for state estimation. W7-2 and W7-4 ask whether all modalities must be active or transmitted in every context.
+\end{paperconnection}
+
+\section{Chapter Summary}
+
+A sensor is the physical device; a modality is the type of information; a measurement is the time-stamped observation produced by the sensor model. Modality suitability depends on the task, environment, timing, uncertainty, and resource budget. Multimodal systems are valuable because they provide redundancy, complementarity, and cooperation, but they also create calibration, synchronization, computation, and decision-management challenges.
