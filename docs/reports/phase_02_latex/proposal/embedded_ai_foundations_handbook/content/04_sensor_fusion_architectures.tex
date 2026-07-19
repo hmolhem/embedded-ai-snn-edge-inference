@@ -1,0 +1,139 @@
+\chapter{Sensor Fusion: Meaning, Levels, and Architectures}
+\label{chap:sensor-fusion}
+
+\section{A Precise Definition}
+
+Sensor fusion is frequently described as ``combining sensor data,'' but that description is too weak. Simple concatenation does not guarantee a better estimate. Fusion must account for alignment, uncertainty, conflict, missing information, and the intended task.
+
+\begin{definition}{Sensor Fusion}{def:sensor-fusion}
+Sensor fusion is the process of combining information from multiple sensors or modalities to produce an estimate or decision that is more complete, accurate, timely, robust, or reliable than the result available from any single source.
+\end{definition}
+
+A general functional view is
+
+\[
+    \vec{y}_{\text{fused}}
+    = \mathcal{F}\!\left(
+        \vec{z}_1,\ldots,\vec{z}_m;
+        \text{context},\text{uncertainty},\text{history}
+      \right).
+\]
+
+The function \(\mathcal{F}\) may be a probabilistic estimator, a neural network, a logical rule, a voting system, an attention block, or a runtime controller. The correct form depends on the representation and output.
+
+Multisensor data fusion has a long history in tracking, robotics, and decision systems~\cite{hall1997introduction,khaleghi2013multisensor}. Modern embedded AI extends this tradition by learning features and fusion weights while adding strict resource constraints.
+
+\section{Five Operational Levels of Fusion}
+
+Figure~\ref{fig:fusion-levels} organizes the main fusion levels used in this handbook.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.94\textwidth}{!}{\input{figures/fig_fusion_levels}}
+    \caption{Five practical levels of sensor fusion. Runtime fusion management controls whether information should be sensed, transmitted, or processed at all.}
+    \label{fig:fusion-levels}
+\end{figure}
+
+\subsection{Data-Level or Early Fusion}
+
+Raw or minimally processed measurements are combined before modality-specific feature extraction. Examples include concatenating a registered depth map with RGB channels or accumulating synchronized radar and camera measurements into a common spatial grid.
+
+Early fusion preserves detail and allows low-level cross-modal interaction. It also requires accurate alignment, compatible sampling, and substantial memory bandwidth. A corrupted modality can contaminate the shared representation before the network learns to separate it.
+
+\subsection{Feature-Level or Middle Fusion}
+
+Each modality first passes through an encoder suited to its representation:
+
+\[
+    \mat{F}_i = f_i(\vec{z}_i).
+\]
+
+The feature tensors are then combined:
+
+\[
+    \mat{F}_{\text{fused}} = g(\mat{F}_1,\ldots,\mat{F}_m).
+\]
+
+This level is common in multimodal deep learning because a camera, LiDAR, and event stream can use different front ends while still exchanging compact learned information. Attention-based fusion, discussed in Chapter~\ref{chap:attention}, typically operates here.
+
+\subsection{Decision-Level or Late Fusion}
+
+Independent subsystems produce decisions, scores, tracks, or hypotheses, which are then merged. For example, a camera detector and a LiDAR detector may each output object lists. A late-fusion module matches the objects and combines confidence or track state.
+
+Late fusion is modular and tolerant of heterogeneous subsystems. Its weakness is that detailed cross-modal evidence may have been discarded before fusion. The final decisions can also be correlated, making naive voting overconfident.
+
+\subsection{State-Estimation Fusion}
+
+The goal is a physical state rather than a class label. Measurements jointly estimate position, orientation, velocity, sensor bias, target state, or map variables. The method can be recursive, as in a Kalman filter, or optimization-based, as in a factor graph. Chapter~\ref{chap:state-estimation} treats this case in detail.
+
+\subsection{Runtime Fusion Management}
+
+Runtime fusion management decides which sensors, samples, model branches, or hardware configurations should be active. It is not merely another neural fusion layer. It is a control mechanism over the perception pipeline.
+
+CARMA changes the computation path on an FPGA according to context and a system-wide energy--performance objective~\cite{zhang2023carma}. FusionSense learns near-sensor keep/drop decisions so that unnecessary modalities need not be transmitted or processed~\cite{yun2026fusionsense}. These methods act before or around conventional fusion.
+
+\section{Early, Middle, and Late Are Not Absolute Labels}
+
+The labels early, middle, and late depend on the architecture boundary. A bird's-eye-view map may be a processed feature in one system and an input representation in another. A track may be a final result for perception but an intermediate measurement for planning. Therefore, a precise paper review should name the actual objects being combined rather than relying only on the label.
+
+A useful statement is:
+
+\begin{quote}
+The method fuses \emph{camera and LiDAR feature tensors} after independent encoders and before the detection head.
+\end{quote}
+
+This is more informative than simply stating that the system uses middle fusion.
+
+\section{Fusion Requires Reliability Management}
+
+A fusion system must answer what happens when modalities disagree. Possible mechanisms include:
+
+\begin{itemize}
+    \item covariance weighting in probabilistic estimation;
+    \item learned gating or attention;
+    \item sensor-health checks and outlier rejection;
+    \item consistency tests between geometry and semantics;
+    \item fallback to a reduced sensor set;
+    \item temporal filtering and track confirmation;
+    \item explicit missing-modality training.
+\end{itemize}
+
+Learned confidence and attention weights should not automatically be interpreted as calibrated physical uncertainty. A network may assign high weight to a correlated but unreliable feature. Safety-critical systems require independent validation and monitoring.
+
+\section{When Fusion Makes Performance Worse}
+
+More sensors do not guarantee better performance. Fusion can fail because of:
+
+\begin{enumerate}[label=\arabic*.]
+    \item incorrect time synchronization or extrinsic calibration;
+    \item data association between different physical objects;
+    \item a noisy modality dominating the learned representation;
+    \item training data that do not cover missing or degraded sensors;
+    \item excessive latency and memory traffic;
+    \item confidence scores that are not calibrated;
+    \item control logic that cannot degrade gracefully.
+\end{enumerate}
+
+\begin{problem}{The More-Sensors Fallacy}{prob:more-sensors}
+A multimodal architecture is evaluated only when all sensors are healthy and synchronized. The model outperforms a camera-only baseline. Can the result establish robust sensor fusion?
+\end{problem}
+
+No. The experiment establishes nominal multimodal accuracy, but not robustness to sensor degradation, timing error, calibration drift, missing data, or resource limits. The stronger claim requires stress testing.
+
+\section{A Simple Pedestrian Example}
+
+Suppose an RGB detector reports a pedestrian with high semantic confidence. LiDAR reports a cluster at \(18\,\mathrm{m}\). Radar reports an approaching radial velocity. Fusion must first confirm that the measurements correspond to the same object. It can then create a track containing class, position, velocity, covariance, and history. The fused track is more useful for collision prediction than any individual observation.
+
+The system should also be prepared for disagreement. If the camera is overexposed, geometry and motion may remain valid while class confidence drops. If the LiDAR return is sparse, the camera and radar can preserve the track with larger uncertainty.
+
+\begin{keyinsight}
+Fusion is an evidence-management process. Its purpose is not to maximize the number of inputs, but to produce the most defensible estimate under uncertainty and resource constraints.
+\end{keyinsight}
+
+\section{Week 7 Connections}
+
+W7-1 combines image features and asynchronous event processing to obtain high-rate detections~\cite{gehrig2024lowlatency}. W7-3 and W7-6 perform feature-level fusion with attention~\cite{ichikawa2024remcim,zhang2026pentafusion}. W7-5 performs tightly coupled state-estimation fusion~\cite{wang2025fastlieo}. W7-2 and W7-4 manage which modalities and model components are used~\cite{zhang2023carma,yun2026fusionsense}. Together, they show that sensor fusion is a family of system operations, not a single algorithm.
+
+\section{Chapter Summary}
+
+Sensor fusion combines evidence to improve completeness, accuracy, timing, robustness, or reliability. Fusion can occur at data, feature, decision, state, or runtime-management level. The correct architecture depends on representation, uncertainty, resource cost, and task. More inputs can be harmful when alignment, reliability, or deployment constraints are ignored.
