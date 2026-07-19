@@ -1,0 +1,102 @@
+\chapter{Attention-Based Feature Fusion}
+\label{chap:attention}
+
+\section{Why Simple Feature Fusion Is Often Insufficient}
+
+Suppose a camera encoder produces \(\mat{F}_{C}\) and a LiDAR encoder produces \(\mat{F}_{L}\). A simple fusion method concatenates the tensors or adds them after projection. This treats all channels and locations as equally useful. In reality, feature reliability changes with illumination, range, occlusion, motion, and sensor density.
+
+At night, RGB features may become uncertain while event or thermal features remain informative. In a sparse LiDAR region, camera texture may be more useful. Near a reflective surface, the reverse may occur. A fixed fusion rule cannot adapt to every sample.
+
+\section{Definition of Attention-Based Fusion}
+
+\begin{definition}{Attention-Based Feature Fusion}{def:attention-fusion}
+Attention-based feature fusion is a learned, input-dependent mechanism that assigns different weights to features, channels, spatial regions, time steps, or modalities before constructing a fused representation.
+\end{definition}
+
+A simplified weighted fusion is
+
+\[
+    \mat{F}_{\text{fused}}
+    = \boldsymbol{\alpha}_{C}\odot\mat{F}_{C}
+    + \boldsymbol{\alpha}_{L}\odot\mat{F}_{L},
+\]
+
+where the attention weights \(\boldsymbol{\alpha}_{C}\) and \(\boldsymbol{\alpha}_{L}\) are functions of the current input. The symbol \(\odot\) denotes elementwise multiplication.
+
+\section{Types of Attention}
+
+\subsection{Channel Attention}
+
+Channel attention asks: \emph{Which kinds of learned features are important?} A network can strengthen channels associated with edges, motion, object shape, depth discontinuity, or semantic context and suppress weak channels. Squeeze-and-excitation blocks are a common implementation.
+
+\subsection{Spatial Attention}
+
+Spatial attention asks: \emph{Where in the scene is the relevant information?} A spatial mask can emphasize a pedestrian, road boundary, or approaching vehicle while suppressing sky, static background, or uninformative regions.
+
+\subsection{Modality Attention}
+
+Modality attention asks: \emph{Which sensing channel is more useful for this sample?} The network can assign more weight to event features during rapid motion or to RGB features when rich texture is available.
+
+\subsection{Temporal Attention}
+
+Temporal attention asks: \emph{Which observation time is most informative?} It is useful for tracking, event sequences, and motion reasoning.
+
+\subsection{Cross-Attention}
+
+Cross-attention allows one modality to query another. Camera features can select geometrically relevant LiDAR features, or LiDAR regions can guide image feature extraction. Cross-attention can capture interactions that independent channel weights cannot.
+
+\section{Attention Is Not Calibrated Uncertainty}
+
+Attention weights are optimized to improve the task loss. They are not guaranteed to equal sensor reliability, probability of correctness, or causal importance. A large weight can reflect correlation in the training data rather than physical trustworthiness.
+
+\begin{engineeringcheck}
+Do not interpret an attention heatmap as a complete explanation of model reasoning. For safety, attention should be supplemented by uncertainty calibration, sensor-health monitoring, failure testing, and counterfactual evaluation.
+\end{engineeringcheck}
+
+\section{Multiscale Feature Fusion}
+
+Objects appear at different sizes and ranges. Feature-pyramid networks combine high-resolution low-level features with semantically rich low-resolution features. In multimodal systems, the fusion can occur at several pyramid levels. This improves small-object detection but increases memory traffic and alignment complexity.
+
+The key engineering questions are:
+
+\begin{itemize}
+    \item At which scales should modalities interact?
+    \item Are spatial resolutions and coordinate frames aligned?
+    \item How many parameters and intermediate tensors are introduced?
+    \item Does the accuracy benefit justify the latency and energy cost?
+\end{itemize}
+
+\section{REM-CiM: Attention Under Hardware Constraints}
+
+REM-CiM addresses RGB--event object detection for day and night while targeting analog compute-in-memory~\cite{ichikawa2024remcim}. Conventional bidirectional calibration improves feature exchange but introduces many parameters and costly convolution. The proposed architecture removes large convolutional operations from the calibration path while retaining spatial and channel attention. It also applies low-bit quantization with clipping to reduce memory and ADC cost.
+
+The important lesson is broader than the specific architecture. Attention is not free. The fusion method must be redesigned around memory capacity, converter precision, analog non-idealities, and energy. This is algorithm--circuit co-design rather than post-hoc deployment.
+
+\section{PentaFusion: Attention and Closed-Loop Driving}
+
+PentaFusion uses multiple feature branches with channel and spatial attention to combine LiDAR and camera information for autonomous driving~\cite{zhang2026pentafusion}. The paper argues that conventional fusion can overemphasize irrelevant objects and lose important information. It evaluates the effect on driving score and route completion rather than only on an intermediate perception metric.
+
+The paper is a preprint and should be read with appropriate caution. Its conceptual question is useful: does feature weighting improve the behavior of the complete driving system? The evidence should be audited for baseline fairness, computational accounting, statistical variation, and closed-loop scenario diversity.
+
+\section{A Practical Fusion Checklist}
+
+For an attention-based multimodal design, verify:
+
+\begin{enumerate}[label=\arabic*.]
+    \item the coordinate and temporal alignment of the feature maps;
+    \item the location and scale at which fusion occurs;
+    \item whether attention is channel, spatial, temporal, modality, or cross-modal;
+    \item the number of added parameters and activation tensors;
+    \item robustness to missing, degraded, or corrupted modalities;
+    \item whether attention weights are stable and calibrated;
+    \item actual hardware latency and energy, not only FLOP count;
+    \item whether downstream control improves.
+\end{enumerate}
+
+\begin{keyinsight}
+Attention-based fusion means that the system learns what, where, when, and from which modality information should be emphasized. It does not remove the need for physical calibration, uncertainty modeling, and hardware accounting.
+\end{keyinsight}
+
+\section{Chapter Summary}
+
+Attention adapts feature fusion to the current input. Channel attention selects feature types, spatial attention selects locations, modality attention selects sensing channels, temporal attention selects time, and cross-attention models intermodal relationships. Attention can improve fusion but creates memory and compute cost and should not be confused with calibrated uncertainty or causal explanation.
