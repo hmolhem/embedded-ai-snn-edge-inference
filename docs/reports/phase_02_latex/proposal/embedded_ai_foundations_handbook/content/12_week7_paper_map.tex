@@ -1,0 +1,282 @@
+\chapter{The Week 7 Papers as a Connected Research Landscape}
+\label{chap:week7}
+
+\section{The Common Research Theme}
+
+The six Week 7 papers are not direct sequels to one another, but they share a common engineering problem:
+
+\begin{quote}
+How can an autonomous edge system use heterogeneous sensors to perceive or estimate the world reliably while respecting limits on latency, energy, memory, communication, and hardware complexity?
+\end{quote}
+
+Multimodal sensing improves observability and robustness because different sensors provide different physical evidence. The cost is a larger system: more data, more calibration, more computation, more communication, and more failure interactions. The papers therefore explore not only \emph{how to fuse}, but also \emph{when to sense}, \emph{what to transmit}, \emph{which model to activate}, \emph{where to compute}, and \emph{how to evaluate the result in a real-time autonomous task}.
+
+Figure~\ref{fig:week7-map} places the six papers on the sensing-to-decision chain.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figures/fig_week7_map}}
+    \caption{Conceptual map of the Week 7 papers. Several papers span more than one stage of the chain.}
+    \label{fig:week7-map}
+\end{figure}
+
+\clearpage
+\begin{landscape}
+\section{Comparative Overview}
+\small
+\begin{longtable}{@{}p{1.2cm}p{4.0cm}p{4.6cm}p{5.2cm}p{4.0cm}@{}}
+\caption{Comparative map of the Week 7 papers.}
+\label{tab:week7-overview}\\
+\toprule
+\textbf{Code} & \textbf{Primary task} & \textbf{Modalities / representation} & \textbf{Main method} & \textbf{Primary constraint} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Code} & \textbf{Primary task} & \textbf{Modalities / representation} & \textbf{Main method} & \textbf{Primary constraint} \\
+\midrule
+\endhead
+W7-1 & High-rate automotive object detection & RGB frames and asynchronous event graph & CNN plus deep asynchronous GNN & Perceptual/computational latency and bandwidth \\
+W7-2 & Context-adaptive object detection & Multiple sensors and selectable model branches & FPGA/DPU runtime reconfiguration and clock gating & System-wide energy \\
+W7-3 & Day/night edge object detection & RGB and event feature pyramids & Attention fusion redesigned for analog CiM; quantization and clipping & Memory, ADC area, ADC energy \\
+W7-4 & Near-sensor filtering before multimodal fusion & RGB plus depth/LiDAR and compact predictions & Tri-stage learning with filter-out-safe labels & Communication and end-to-end energy \\
+W7-5 & Real-time odometry and localization & LiDAR, IMU, event, optional RGB & Tightly coupled measurement/state estimation & Robust real-time pose estimation \\
+W7-6 & Closed-loop autonomous driving & Camera and LiDAR/BEV features & Five-branch attention-based fusion & Driving quality and compute complexity \\
+\bottomrule
+\end{longtable}
+\end{landscape}
+
+\section{W7-1: Low-Latency Automotive Vision with Event Cameras}
+
+\subsection{Problem and Gap}
+
+Frame cameras face a bandwidth--latency trade-off. Higher frame rates reduce the time during which a scene change is not observed, but they increase data rate and computation. Event cameras measure brightness changes asynchronously and provide high temporal resolution with sparse output. Event-only methods, however, can lose semantic richness, while methods that convert events into dense frames can destroy the sparsity advantage.
+
+\subsection{Reconstructed Research Question}
+
+\begin{quote}
+Can RGB frames and asynchronous events be fused so that the system retains image-level recognition accuracy while using event sparsity and temporal resolution to reduce blind time, bandwidth, and redundant computation?
+\end{quote}
+
+\subsection{Method}
+
+The paper proposes a hybrid architecture that uses a conventional CNN for image frames and an asynchronous GNN for event processing~\cite{gehrig2024lowlatency}. Image features are shared with the event branch. The graph network maintains state and performs localized recursive updates when events arrive. Event pruning and directed graph structure prevent updates from propagating unnecessarily through the complete network.
+
+\subsection{What the Authors Were Seeking}
+
+The authors were not simply asking whether event cameras are useful. They were seeking a representation and execution model that preserves the defining advantages of event sensing. The key idea is sensor--algorithm alignment: sparse asynchronous measurements should produce sparse asynchronous computation.
+
+\subsection{Evidence and Main Result}
+
+The paper reports that a \(20\)-fps RGB camera combined with an event camera can achieve a perceptual latency comparable to an extremely high-frame-rate camera while requiring much lower bandwidth. The paper evaluates accuracy and computation for event-only and RGB--event configurations.
+
+\subsection{Position in the Systems Map}
+
+W7-1 spans sensing, representation, feature sharing, perception, and latency optimization. It is a strong example of how sensor physics should influence network architecture.
+
+\subsection{Limitations to Examine}
+
+The reader should examine event-graph construction cost, hardware realization of asynchronous updates, accuracy under slowly changing scenes, event noise, and the extent to which reported computation translates to complete platform energy.
+
+\section{W7-2: CARMA}
+
+\subsection{Problem and Gap}
+
+Autonomous systems often keep every sensor and model branch active, even when some modalities are unnecessary or harmful in the current context. Existing adaptive fusion methods may optimize only model computation and ignore the energy of sensors and hardware platforms.
+
+\subsection{Reconstructed Research Question}
+
+\begin{quote}
+Can environmental context be used to reconfigure sensors and neural-model branches on an FPGA at runtime so that total perception-system energy is reduced without compromising task performance?
+\end{quote}
+
+\subsection{Method}
+
+CARMA uses context identification, selectable fusion configurations, FPGA DPU execution, clock gating, and a tunable energy--performance objective~\cite{zhang2023carma}. The system can deactivate unused sensors and model components. Context need not be identified continuously; intermittent context checking can reduce overhead.
+
+\subsection{What the Authors Were Seeking}
+
+The central search is for the best \emph{configuration}, not the best single detector. For each context, the system asks which sensors and submodels provide sufficient perception quality at minimum system cost.
+
+\subsection{Evidence and Main Result}
+
+The paper reports substantial system-wide energy reduction and inference speedup across challenging sensing contexts. Its contribution is important because the accounting boundary includes sensing and hardware, not only algorithmic operations.
+
+\subsection{Position in the Systems Map}
+
+W7-2 is a runtime fusion-management paper. It controls sensing and computation around the perception pipeline rather than introducing only a new feature-fusion block.
+
+\subsection{Limitations to Examine}
+
+A critical review should examine context-classification errors, switching latency, the granularity of available configurations, calibration between energy model and measured power, and behavior during rapid context transitions.
+
+\section{W7-3: REM-CiM}
+
+\subsection{Problem and Gap}
+
+RGB and event modalities are complementary for day/night detection, but attention-based multimodal networks can exceed the memory and converter budget of analog compute-in-memory. Large convolutional calibration blocks and high-precision activations create area and energy cost.
+
+\subsection{Reconstructed Research Question}
+
+\begin{quote}
+Can an attention-based RGB--event fusion network be redesigned jointly with analog compute-in-memory constraints so that day/night accuracy is retained while parameter memory, ADC area, and ADC energy are reduced?
+\end{quote}
+
+\subsection{Method}
+
+REM-CiM proposes a memory-capacity-efficient feature-pyramid fusion architecture and convolution-less bidirectional calibration~\cite{ichikawa2024remcim}. It preserves channel and spatial attention while removing expensive convolution. Low-bit quantization with clipping is selected with circuit cost in mind.
+
+\subsection{What the Authors Were Seeking}
+
+The authors are searching for a feasible algorithm--circuit operating point. The model, precision, memory, and ADC design are treated as one problem.
+
+\subsection{Evidence and Main Result}
+
+The paper reports a large parameter reduction relative to an attention-based baseline with limited mAP degradation, along with reductions in ADC area and energy. It also discusses non-ideal memory behavior.
+
+\subsection{Position in the Systems Map}
+
+W7-3 connects feature-level sensor fusion to the hardware-implementation layer. It is the clearest co-design paper in the set.
+
+\subsection{Limitations to Examine}
+
+Important questions include the realism of the circuit model, robustness of low-bit accuracy across datasets, calibration overhead, mapping efficiency, and whether full-system latency and power include peripheral data movement.
+
+\section{W7-4: FusionSense}
+
+\subsection{Problem and Gap}
+
+Near-sensor filters often decide independently whether a sample is interesting. Independent decisions ignore cross-modal dependence. One modality may appear unnecessary alone but be essential to the fused decision; conversely, several modalities may transmit redundant information.
+
+\subsection{Reconstructed Research Question}
+
+\begin{quote}
+Can lightweight near-sensor models learn, from a stronger fused model, when a modality can be safely omitted so that sensing, communication, and edge computation are reduced without unacceptable task-quality loss?
+\end{quote}
+
+\subsection{Method}
+
+FusionSense uses a three-stage learning procedure~\cite{yun2026fusionsense}. First, a server-side multimodal model learns the task. Second, each modality is removed in controlled experiments to create \emph{filter-out-safe} labels indicating when that modality does not change the fused decision. Third, small near-sensor predictors and a compact edge fusion model learn to use these labels and scores.
+
+\subsection{What the Authors Were Seeking}
+
+The authors are searching for a learned transmission policy conditioned on cross-modal value. The question is not how to compress everything, but whether a piece of data needs to leave the sensor at all.
+
+\subsection{Evidence and Main Result}
+
+The preprint reports large energy savings in low-frequency event-of-interest scenarios and lower task-quality loss than independent unimodal filtering at comparable data reduction.
+
+\subsection{Position in the Systems Map}
+
+W7-4 acts before conventional fusion. It is a near-sensor and communication-management architecture that learns from fused decisions.
+
+\subsection{Limitations to Examine}
+
+Because the paper is a preprint, evidence should be treated as preliminary. The reader should examine domain shift, label leakage from the teacher model, class imbalance, sensor duty-cycling cost, real hardware measurement, and the safety risk of false drops.
+
+\section{W7-5: FAST-LIEO}
+
+\subsection{Problem and Gap}
+
+Camera-based odometry degrades under low light, high dynamic range, and motion blur. LiDAR odometry can become degenerate in weak geometry. IMU integration drifts. Event-based odometry provides temporal detail but can lack information in static or low-texture scenes. Previous systems had limited tight fusion of LiDAR, IMU, event, and conventional camera data.
+
+\subsection{Reconstructed Research Question}
+
+\begin{quote}
+Can LiDAR, IMU, event, and optional RGB measurements be tightly coupled in a real-time odometry framework that remains accurate under weak illumination, aggressive motion, and selected LiDAR-degenerate conditions without conventional event-feature matching?
+\end{quote}
+
+\subsection{Method}
+
+FAST-LIEO contains LiDAR--inertial, event--inertial, and optional visual subsystems connected through a common state-estimation framework~\cite{wang2025fastlieo}. LiDAR points help form a semi-dense event map. Event representations are aligned to this map to constrain the state.
+
+\subsection{What the Authors Were Seeking}
+
+The authors are searching for complementary observability. When one modality weakens, another should preserve state constraints. Tight coupling uses measurement information before each modality must form a complete independent pose.
+
+\subsection{Evidence and Main Result}
+
+The paper evaluates public and self-collected datasets and reports real-time performance and robust accuracy under challenging motion and illumination.
+
+\subsection{Position in the Systems Map}
+
+W7-5 is a state-estimation and localization paper. Unlike the object-detection papers, its output is robot motion and pose.
+
+\subsection{Limitations to Examine}
+
+The paper acknowledges cases in which LiDAR degeneracy and weak event texture occur together. Direct alignment also depends on initialization. Additional questions concern calibration stability, compute scaling, and performance during sensor dropout.
+
+\section{W7-6: PentaFusion}
+
+\subsection{Problem and Gap}
+
+Camera and LiDAR provide complementary semantics and geometry, but conventional late fusion can lose feature detail. Complex fusion networks can also attend to irrelevant objects and increase computational cost in dense traffic.
+
+\subsection{Reconstructed Research Question}
+
+\begin{quote}
+Can a multibranch LiDAR--camera fusion architecture with channel and spatial attention preserve important multimodal evidence, suppress irrelevant features, and improve closed-loop autonomous driving while controlling computational complexity?
+\end{quote}
+
+\subsection{Method}
+
+PentaFusion uses camera and LiDAR/BEV encoders, multiple fusion branches, squeeze-and-excitation channel attention, spatial attention, and a driving head that predicts waypoints~\cite{zhang2026pentafusion}. The system is evaluated in a simulator through route and driving scores.
+
+\subsection{What the Authors Were Seeking}
+
+The authors are searching for a feature-selection mechanism whose benefit reaches the closed-loop driving task. The target is not only better feature fusion, but better behavior.
+
+\subsection{Evidence and Main Result}
+
+The preprint reports an improvement in composite driving score and reduced computational complexity relative to the selected baseline. Because the document is explicitly not peer reviewed, numerical claims require careful verification.
+
+\subsection{Position in the Systems Map}
+
+W7-6 spans feature fusion, waypoint prediction, and closed-loop evaluation.
+
+\subsection{Limitations to Examine}
+
+The review should check parameter count versus FLOP count, simulator coverage, random-seed variation, baseline implementation, collision categories, and whether the attention mechanism is truly responsible for the reported improvement.
+
+\section{Three Cross-Paper Research Lines}
+
+\subsection{Event-Based Perception}
+
+W7-1, W7-3, and W7-5 use event cameras for different purposes. W7-1 targets object-detection latency. W7-3 targets low-energy day/night fusion hardware. W7-5 targets odometry and localization. This comparison shows that a modality is not tied to one task; its value depends on where it enters the sensing-to-decision chain.
+
+\subsection{Adaptive Resource Management}
+
+W7-2 and W7-4 reject the assumption that all sensors and models should always be active. W7-2 selects a system configuration at runtime. W7-4 decides whether individual modality samples should be transmitted. One operates primarily at the configuration level; the other at the sample/value-of-information level.
+
+\subsection{Learned Feature Fusion}
+
+W7-1, W7-3, and W7-6 all combine learned features, but with different architecture and hardware goals. W7-1 uses asynchronous graph processing, W7-3 emphasizes analog CiM feasibility, and W7-6 emphasizes attention and closed-loop driving.
+
+\section{Publication Status and Evidence Discipline}
+
+\begin{table}[H]
+\centering
+\caption{Publication status of the Week 7 set.}
+\label{tab:publication-status}
+\begin{tabularx}{\textwidth}{@{}p{1.3cm}p{4.1cm}X@{}}
+\toprule
+\textbf{Code} & \textbf{Status} & \textbf{Interpretation} \\
+\midrule
+W7-1 & Peer-reviewed Nature article & Strong publication venue; still audit task and hardware boundaries \\
+W7-2 & Peer-reviewed IEEE/ACM conference paper & System-level energy contribution; verify context and platform assumptions \\
+W7-3 & Advance-published IEICE article & Peer-reviewed technical work; final typesetting may differ \\
+W7-4 & arXiv preprint & Preliminary evidence; seek independent replication and later publication \\
+W7-5 & Peer-reviewed IEEE Robotics and Automation Letters article & Strong robotics evaluation; inspect failure cases and estimator assumptions \\
+W7-6 & SSRN preprint, explicitly not peer reviewed & Conceptual interest with higher need for numerical and methodological verification \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Publication status is not a substitute for technical reading. It changes the prior confidence and the amount of independent verification required.
+
+\section{The Unifying Lesson}
+
+\begin{keyinsight}
+The Week 7 set describes a single engineering landscape: sensing diversity improves autonomous perception, but the value of additional information depends on representation, alignment, fusion level, runtime context, hardware cost, and closed-loop effect.
+\end{keyinsight}
+
+The papers cease to be isolated islands when each is located by five coordinates: \emph{physical modality}, \emph{representation}, \emph{fusion or estimation level}, \emph{embedded constraint}, and \emph{system output}. This coordinate system is reusable for future literature.
