@@ -1,0 +1,19 @@
+\begin{tikzpicture}[
+    node distance=0.55cm,
+    block/.style={draw, rounded corners=2pt, align=center, minimum height=0.82cm, text width=2.65cm, fill=blue!5},
+    arrow/.style={-{Latex[length=2.4mm]}, thick}
+]
+\node[block] (event) {Event camera detects rapid brightness changes};
+\node[block, right=of event] (rgb) {RGB camera provides appearance and class evidence};
+\node[block, right=of rgb] (lidar) {LiDAR measures geometry and range};
+\node[block, below=0.85cm of rgb] (fusion) {Aligned multimodal fusion creates a pedestrian track};
+\node[block, below=0.65cm of fusion] (prediction) {Prediction estimates crossing trajectory and collision risk};
+\node[block, left=of prediction] (planning) {Planner selects stop or avoidance maneuver};
+\node[block, left=of planning] (control) {Controller commands braking and steering};
+\draw[arrow] (event) -- (fusion);
+\draw[arrow] (rgb) -- (fusion);
+\draw[arrow] (lidar) -- (fusion);
+\draw[arrow] (fusion) -- (prediction);
+\draw[arrow] (prediction) -- (planning);
+\draw[arrow] (planning) -- (control);
+\end{tikzpicture}
