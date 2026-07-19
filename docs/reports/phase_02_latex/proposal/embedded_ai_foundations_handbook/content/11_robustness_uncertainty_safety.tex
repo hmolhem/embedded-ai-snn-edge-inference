@@ -1,0 +1,113 @@
+\chapter{Robustness, Uncertainty, and Safety}
+\label{chap:robustness}
+
+\section{Nominal Accuracy Is Not Robustness}
+
+A system is robust when it maintains acceptable behavior under changes in noise, lighting, weather, motion, sensor health, timing, and environment. Robustness does not mean zero error. It means the system has a known operating envelope, detects degradation, and fails in a controlled manner.
+
+A model evaluated only on clean synchronized data may have high nominal accuracy but poor deployment robustness. Autonomous systems require stress testing because the sensor suite interacts with uncontrolled physical conditions.
+
+\section{Sources of Uncertainty}
+
+Two common categories are:
+
+\begin{itemize}
+    \item \textbf{Aleatoric uncertainty:} irreducible variation or ambiguity in measurements, such as sensor noise, occlusion, or overlapping classes.
+    \item \textbf{Epistemic uncertainty:} uncertainty caused by limited model knowledge, insufficient training coverage, or distribution shift.
+\end{itemize}
+
+A confidence score is useful only when it is calibrated. If predictions assigned \(0.8\) confidence are correct approximately \(80\%\) of the time under the relevant conditions, the score is calibrated. Neural softmax outputs and attention weights are not automatically calibrated.
+
+\section{Uncertainty Propagation}
+
+Uncertainty should move through the sensing-to-decision chain. A LiDAR range covariance influences track uncertainty. Track uncertainty influences collision prediction. Prediction uncertainty influences planning margin. If uncertainty is discarded at feature fusion, the planner may receive an overconfident estimate.
+
+Probabilistic estimators represent uncertainty explicitly. Learned systems can use ensembles, probabilistic heads, evidential methods, calibration layers, or conformal prediction, but each method must be validated under shift.
+
+\section{Fault Detection and Isolation}
+
+A robust system monitors sensor health and cross-modal consistency. Examples include:
+
+\begin{itemize}
+    \item saturation and exposure checks for cameras;
+    \item point-return statistics for LiDAR;
+    \item bias and vibration monitoring for IMUs;
+    \item packet-loss and timestamp checks;
+    \item residual gating in state estimation;
+    \item disagreement between independent modalities;
+    \item watchdogs for latency and computation stalls.
+\end{itemize}
+
+Fault isolation identifies the source and prevents it from dominating fusion. Adaptive systems can then reduce reliance on the failed modality.
+
+\section{Graceful Degradation}
+
+Graceful degradation means that performance decreases in a controlled and predictable way rather than collapsing. A vehicle with a failed camera may reduce speed and rely on radar and LiDAR for a limited safe mode. A robot with weak localization may stop or return to a known landmark.
+
+Redundancy supports graceful degradation only when:
+
+\begin{enumerate}[label=\arabic*.]
+    \item the system can detect which source is unreliable;
+    \item the remaining sources preserve sufficient observability;
+    \item the fallback behavior is designed and tested;
+    \item the compute and control stack can reconfigure safely.
+\end{enumerate}
+
+\section{Common-Cause Failures}
+
+Two sensors can appear redundant yet fail together. Two optical cameras may both fail in glare. Two devices may share the same power rail, clock, network, or calibration reference. Safety analysis must examine common causes, not only independent component failure.
+
+\section{Distribution Shift and Edge Cases}
+
+Training data rarely cover every deployment condition. Edge cases include unusual object shapes, weather, construction zones, reflective surfaces, rare trajectories, and adversarial or spoofed measurements. Robustness requires scenario coverage, simulation, controlled physical testing, and post-deployment logging.
+
+\section{Safety Monitors}
+
+A safety architecture may include:
+
+\begin{itemize}
+    \item a deadline monitor;
+    \item a sensor-health monitor;
+    \item a consistency checker;
+    \item an uncertainty threshold;
+    \item a fallback controller;
+    \item a minimal-risk maneuver;
+    \item event and data logging for traceability.
+\end{itemize}
+
+The safety monitor should not depend entirely on the same model it is supervising. Independent mechanisms reduce correlated failure.
+
+\section{Robustness Test Matrix}
+
+\begin{table}[H]
+\centering
+\caption{Representative robustness test dimensions.}
+\label{tab:robustness-matrix}
+\begin{tabularx}{\textwidth}{@{}p{3.0cm}X X@{}}
+\toprule
+\textbf{Dimension} & \textbf{Stress conditions} & \textbf{Observed outcomes} \\
+\midrule
+Lighting & darkness, glare, HDR transition & detection, event rate, confidence, latency \\
+Weather & rain, fog, dust, snow & sensor availability and fused accuracy \\
+Motion & rapid rotation, vibration, high speed & blur, timing error, estimator stability \\
+Geometry & corridor, open area, repetitive structure & observability and localization drift \\
+Sensor health & dropout, bias, saturation, miscalibration & fault detection and fallback behavior \\
+Compute load & contention, thermal throttling, packet bursts & deadline misses and jitter \\
+Distribution shift & unseen objects and environments & calibration and failure rate \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Evidence Strength}
+
+Technical claims should be interpreted according to evidence. A peer-reviewed paper with public data and ablation studies generally provides stronger evidence than an unreviewed preprint with a single simulation. Neither status proves correctness, but publication state, reproducibility, baseline quality, and experimental breadth affect confidence.
+
+The Week 7 set contains journal papers, a conference paper, an advance-publication article, an arXiv preprint, and an explicitly non-peer-reviewed preprint. Chapter~\ref{chap:week7} keeps these evidence levels visible.
+
+\begin{keyinsight}
+Safety is not a single model property. It emerges from observability, uncertainty, timing, redundancy, monitoring, fallback behavior, validation, and organizational discipline across the full system lifecycle.
+\end{keyinsight}
+
+\section{Chapter Summary}
+
+Robustness concerns behavior outside nominal conditions. Uncertainty must be calibrated and propagated. Fault detection, isolation, graceful degradation, and common-cause analysis are essential. Safety requires independent monitors, controlled fallback, comprehensive stress testing, and disciplined interpretation of evidence.
