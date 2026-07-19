@@ -1,0 +1,28 @@
+\begin{tikzpicture}[
+    stage/.style={draw, rounded corners=2pt, align=center, minimum height=0.82cm, text width=2.7cm, fill=blue!5, font=\small},
+    paper/.style={draw, rounded corners=2pt, align=center, minimum height=0.8cm, text width=2.7cm, fill=violet!5, font=\scriptsize},
+    arrow/.style={-{Latex[length=2.2mm]}, thick}
+]
+\node[stage] (sensing) at (0,0) {Sensing and\\representation};
+\node[stage] (fusion) at (3.6,0) {Fusion and resource\\management};
+\node[stage] (estimate) at (7.2,0) {Perception and\\state estimation};
+\node[stage] (control) at (10.8,0) {Planning and\\closed-loop action};
+\draw[arrow] (sensing) -- (fusion);
+\draw[arrow] (fusion) -- (estimate);
+\draw[arrow] (estimate) -- (control);
+
+\node[paper] (p1) at (0,-1.45) {\textbf{W7-1}\\RGB + event\\low-latency detection};
+\node[paper] (p3) at (3.6,-1.45) {\textbf{W7-3}\\RGB--event fusion\\for analog CiM};
+\node[paper] (p5) at (7.2,-1.45) {\textbf{W7-5}\\LiDAR--IMU--event\\tight odometry};
+\node[paper] (p6) at (10.8,-1.45) {\textbf{W7-6}\\LiDAR--camera attention\\and closed-loop driving};
+
+\node[paper] (p2) at (3.6,-2.75) {\textbf{W7-2}\\Context-aware FPGA\\reconfiguration};
+\node[paper] (p4) at (3.6,-4.05) {\textbf{W7-4}\\Fusion-aware near-sensor\\keep/drop decisions};
+
+\draw[dashed] (sensing) -- (p1);
+\draw[dashed] (fusion) -- (p3);
+\draw[dashed] (fusion) -- (p2);
+\draw[dashed] (p2) -- (p4);
+\draw[dashed] (estimate) -- (p5);
+\draw[dashed] (control) -- (p6);
+\end{tikzpicture}
