@@ -1,0 +1,96 @@
+\chapter{Representations, Calibration, and Alignment}
+\label{chap:representation-alignment}
+
+\section{Algorithms Operate on Representations}
+
+The physical world does not enter a neural network directly. A sensing front end converts physical phenomena into measurements, and software organizes those measurements into a representation. A representation determines which information is preserved, which structure is emphasized, and which processing architecture becomes natural.
+
+\begin{definition}{Representation}{def:representation}
+A representation is the structured form in which measurements or intermediate information are presented to an algorithm, such as an image tensor, point cloud, event graph, range--Doppler map, feature map, occupancy grid, or state vector.
+\end{definition}
+
+Representation design is not neutral. Converting an event stream into dense frames simplifies the use of CNNs but can weaken timestamp precision and sparsity. Converting a point cloud into a bird's-eye-view grid enables efficient convolution but discretizes space and may discard vertical detail. Compressing raw data into learned features reduces bandwidth but makes later processing task-dependent.
+
+\section{Common Representations}
+
+\begin{table}[H]
+\centering
+\caption{Common representations and their computational implications.}
+\label{tab:representations}
+\begin{tabularx}{\textwidth}{@{}p{2.7cm}p{3.1cm}X X@{}}
+\toprule
+\textbf{Representation} & \textbf{Structure} & \textbf{Natural processing} & \textbf{Embedded implication} \\
+\midrule
+Image / frame & Dense regular grid & CNN or vision transformer & Predictable tensor layout but high memory traffic \\
+Point cloud & Unordered or irregular 3-D points & Point networks, voxel/BEV CNN, GNN & Sparse geometry; irregular access and neighborhood search \\
+Event stream & Time-ordered \((x,y,t,p)\) events & Event algorithms, asynchronous GNN, SNN & Activity-dependent computation and fine timing \\
+Range--Doppler map & Dense range--velocity grid & DSP and 2-D CNN & FFT-heavy front end and structured memory \\
+Feature map & Learned intermediate tensor & Attention and multimodal fusion & Lower dimensional than raw data but task-specific \\
+Occupancy grid & Spatial probability grid & Planning and mapping & Supports geometry reasoning but discretizes space \\
+State vector & Pose, velocity, bias, landmarks & Kalman filtering or optimization & Compact but requires explicit dynamics and uncertainty \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Representation and Architecture Must Match}
+
+Grid data naturally support convolution because local neighborhoods are fixed. Graphs support message passing when neighborhood structure is irregular. Temporal event streams favor stateful or incremental processing. A mismatch between representation and architecture can destroy the advantage of a sensor. For example, an event camera may produce sparse asynchronous data, but stacking many events into dense frames and re-running a full CNN can reintroduce the latency and computation that event sensing was intended to avoid.
+
+The asynchronous GNN in the low-latency automotive-vision paper addresses this issue by retaining graph state and updating only affected neighborhoods when new events arrive~\cite{gehrig2024lowlatency}. The architecture is aligned with the temporal sparsity of the sensing modality.
+
+\section{Time Synchronization}
+
+Measurements from multiple sensors must be associated with a common time reference. A camera may run at \(20\) or \(30\) frames per second, a LiDAR at \(10\) or \(20\) scans per second, an IMU at hundreds of samples per second, and an event camera asynchronously. A timestamp error causes a spatial error whenever the platform or target is moving.
+
+If a vehicle travels at velocity \(v\) and two measurements are separated by timing error \(\Delta t\), the approximate displacement mismatch is
+
+\[
+    \Delta s \approx v\,\Delta t.
+\]
+
+At \(20\,\mathrm{m/s}\), a \(20\,\mathrm{ms}\) timing error corresponds to approximately \(0.4\,\mathrm{m}\). That error is large enough to project a LiDAR point onto the wrong image region or to associate a radar detection with the wrong track.
+
+Common synchronization mechanisms include hardware triggering, clock synchronization, precise timestamping, buffering, interpolation, motion compensation, and time-offset calibration.
+
+\section{Coordinate Frames and Spatial Calibration}
+
+Each sensor measures in its own coordinate frame. A LiDAR point \(\vec{p}_L\) can be transformed to a camera frame through an extrinsic rotation and translation:
+
+\[
+    \vec{p}_C = \mat{R}_{C\leftarrow L}\vec{p}_L + \vec{t}_{C\leftarrow L}.
+\]
+
+The camera then uses intrinsic parameters to project the three-dimensional point onto a pixel. Calibration therefore has two levels:
+
+\begin{itemize}
+    \item \textbf{Intrinsic calibration} describes the internal measurement geometry of a sensor, such as focal length, principal point, lens distortion, or LiDAR channel corrections.
+    \item \textbf{Extrinsic calibration} describes the pose of one sensor relative to another sensor or a common body frame.
+\end{itemize}
+
+Small calibration errors can become large fusion errors at distance. Mechanical vibration, thermal expansion, repair, or sensor replacement can also change extrinsic parameters after initial calibration.
+
+\section{Data Association}
+
+Alignment in time and space does not automatically establish that two measurements belong to the same object. \emph{Data association} determines which observations correspond to a common target or landmark. It is central to tracking, mapping, and multimodal fusion.
+
+A camera detection may overlap several LiDAR clusters. A radar return may have uncertain angle. An event cluster may represent only a moving edge. The association process can use geometry, time, appearance, motion prediction, and uncertainty. Incorrect association can be more damaging than measurement noise because it combines evidence from different physical objects.
+
+\section{Uncertainty Must Survive Representation Changes}
+
+A raw sensor may have a known noise model, but a learned feature often lacks an explicit physical covariance. When measurements are projected, averaged, voxelized, or encoded, the uncertainty changes. Robust systems either propagate uncertainty analytically, estimate it from data, or use consistency checks to detect unreliable representations.
+
+\begin{engineeringcheck}
+When reading a fusion paper, ask whether the reported method assumes perfectly synchronized and calibrated data. If so, determine whether the claimed robustness includes or excludes alignment error.
+\end{engineeringcheck}
+
+\section{Industrial Example: Trackside Inspection}
+
+Consider a trackside inspection enclosure with cameras, laser illumination, a laser profiler, and vibration sensors. The protective window opens as a train passes. Correct analysis requires more than an image classifier. The system must know when the window opened, when the train axle crossed the sensing zone, which laser pulse illuminated which image, and which vibration segment belongs to the same vehicle component. Timestamping, trigger logic, coordinate alignment, and event logging are part of the intelligence pipeline.
+
+\section{Connection to the Week 7 Papers}
+
+W7-1 preserves the asynchronous event representation instead of treating it as a conventional frame sequence~\cite{gehrig2024lowlatency}. W7-5 aligns event representations to a LiDAR-derived map inside a state estimator~\cite{wang2025fastlieo}. W7-3 converts multimodal features into a representation suitable for analog compute-in-memory and low-bit arithmetic~\cite{ichikawa2024remcim}. These papers demonstrate that representation is simultaneously an information decision and a hardware decision.
+
+\section{Chapter Summary}
+
+Measurements become useful only after they are organized and aligned. Images, point clouds, event graphs, feature maps, and state vectors expose different structures and costs. Temporal synchronization, intrinsic and extrinsic calibration, coordinate transformation, data association, and uncertainty handling are prerequisites for trustworthy fusion. A representation should preserve the information that matters while matching the intended algorithm and hardware.
