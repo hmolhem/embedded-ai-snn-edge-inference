@@ -1,0 +1,96 @@
+\chapter{A Systems Worldview for Embedded AI}
+\label{chap:worldview}
+
+\section{Why a Systems Map Is Necessary}
+
+Embedded artificial intelligence is often introduced through individual technologies: a compact convolutional network, an FPGA accelerator, an event camera, a sensor-fusion algorithm, or a mobile robot. Studied separately, these technologies can become disconnected topics. A student may understand how a CNN performs object detection yet remain uncertain about how the camera measurement is formed, how the image is synchronized with a LiDAR scan, how the fused estimate reaches a planner, or why a model with excellent accuracy may still fail a real-time safety requirement.
+
+The solution is to begin with a systems map rather than with a particular model. An autonomous device interacts continuously with the physical world. It senses, represents, aligns, combines, interprets, predicts, decides, and acts. Every block is constrained by finite energy, finite memory, finite communication bandwidth, and a deadline. The intelligence of the system therefore emerges from the coordination of sensing physics, algorithms, hardware, and feedback control.
+
+\begin{definition}{Embedded AI}{def:embedded-ai}
+Embedded AI is the placement of perception, estimation, inference, or decision capability inside a physical system with constrained computational resources and explicit requirements on latency, energy, memory, communication, reliability, and safety.
+\end{definition}
+
+This definition is intentionally broader than ``running a neural network on a board.'' A model can be embedded yet still depend on a cloud connection, miss a control deadline, consume too much power, or fail when a sensor degrades. A technically mature embedded-AI design must be evaluated as an end-to-end system.
+
+\section{The Sensing-to-Decision Chain}
+
+Figure~\ref{fig:sensing-to-decision} presents the central organizing structure used throughout this handbook.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figures/fig_sensing_to_decision}}
+    \caption{The sensing-to-decision chain. Embedded-AI performance is determined by the complete closed loop, not by a single inference block.}
+    \label{fig:sensing-to-decision}
+\end{figure}
+
+The chain begins with a physical phenomenon and ends with an action that changes the physical world. The principal stages are:
+
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{Sensing and digitization:} physical energy is converted into electrical and digital measurements.
+    \item \textbf{Representation and alignment:} measurements are organized as images, point clouds, event streams, graphs, feature maps, or state variables and are aligned in time and space.
+    \item \textbf{Fusion and estimation:} information from multiple sources is combined while accounting for uncertainty and consistency.
+    \item \textbf{Perception and prediction:} the system identifies objects, free space, motion, pose, and likely future behavior.
+    \item \textbf{Planning and decision:} a safe or useful action is selected under goals and constraints.
+    \item \textbf{Control and actuation:} the selected action becomes motor torque, steering angle, braking force, or another physical command.
+    \item \textbf{Feedback:} the action changes the environment and the system measures the new condition.
+\end{enumerate}
+
+\begin{keyinsight}
+A correct output produced after the physical deadline may be operationally equivalent to an incorrect output. For that reason, end-to-end latency is part of correctness in autonomous systems.
+\end{keyinsight}
+
+\section{Three Coupled Views}
+
+A useful technical analysis combines three views.
+
+\subsection{The Information View}
+
+The information view asks what must be known about the environment and which sensing modality can observe it. Color, depth, radial velocity, angular rate, thermal radiation, and brightness change are different information channels. Each channel has distinct strengths and failure modes.
+
+\subsection{The Algorithm View}
+
+The algorithm view asks how measurements become representations, features, estimates, and decisions. It includes filtering, feature extraction, sensor fusion, neural inference, probabilistic estimation, tracking, and optimization.
+
+\subsection{The Hardware and Systems View}
+
+The hardware view asks where computation occurs and what it costs. The same algorithm can behave differently on a CPU, GPU, FPGA, microcontroller, NPU, compute-in-memory array, or neuromorphic processor. Memory traffic, dataflow, bit width, parallelism, and scheduling may dominate the arithmetic count.
+
+These views cannot be optimized independently. A new sensor changes the data representation. A new representation changes the natural AI architecture. A new architecture changes memory and compute requirements. A hardware constraint may force quantization, sparsity, or a different fusion strategy. This interdependence is the essence of hardware--algorithm co-design.
+
+\section{A Running Example: A Pedestrian at Night}
+
+A recurring scenario will be used throughout the handbook. An autonomous vehicle approaches an intersection at night. A pedestrian moves rapidly from a poorly illuminated sidewalk into the road.
+
+An RGB camera provides appearance and semantic information, but low illumination may reduce contrast. An event camera responds to rapid brightness changes with microsecond-scale timing. A LiDAR measures three-dimensional range and geometry. A radar can provide robust range and radial-velocity evidence. An IMU describes the motion of the vehicle itself. The system must align these measurements, associate them with the same pedestrian, estimate position and velocity, predict the crossing trajectory, choose a maneuver, and command the brakes before the collision deadline.
+
+This example demonstrates why no isolated block is sufficient. A high-accuracy classifier cannot compensate for a delayed measurement, a miscalibrated transformation, an incorrect track association, or a slow actuator.
+
+\section{Questions for Locating Any Paper}
+
+When a new embedded-AI paper is read, the following questions place it on the systems map:
+
+\begin{enumerate}[label=\alph*)]
+    \item What physical application and operating context are assumed?
+    \item Which sensors and modalities generate the inputs?
+    \item What representation is used at each stage?
+    \item Where does fusion occur: data, feature, decision, state, or runtime-management level?
+    \item What is the output: class, bounding box, track, pose, map, route, or actuator command?
+    \item Which embedded constraint is central: latency, energy, memory, bandwidth, thermal budget, or reliability?
+    \item What baseline fails, and under which conditions?
+    \item What trade-off is improved, and what cost is introduced?
+    \item Are the results open-loop or closed-loop?
+    \item What evidence supports the claims, and what remains untested?
+\end{enumerate}
+
+\begin{engineeringcheck}
+If a paper reports only model accuracy, look for the missing system quantities: sensor rate, synchronization assumptions, end-to-end latency, energy boundary, memory footprint, hardware platform, failure conditions, and control impact.
+\end{engineeringcheck}
+
+\section{The Role of the Week 7 Papers}
+
+The Week 7 papers are not a single sequential research program, but they occupy neighboring positions in the same sensing-to-decision chain. Low-latency RGB--event detection addresses sensing and asynchronous perception~\cite{gehrig2024lowlatency}. CARMA and FusionSense address runtime resource management~\cite{zhang2023carma,yun2026fusionsense}. REM-CiM connects multimodal feature fusion to analog hardware constraints~\cite{ichikawa2024remcim}. FAST-LIEO addresses tightly coupled state estimation~\cite{wang2025fastlieo}. PentaFusion addresses attention-based LiDAR--camera fusion and closed-loop driving evaluation~\cite{zhang2026pentafusion}. Chapter~\ref{chap:week7} develops this relationship in detail.
+
+\section{Chapter Summary}
+
+The foundational idea is that Embedded AI is a complete information-and-control system. A coherent worldview begins with the physical world and follows evidence through sensing, representation, fusion, estimation, decision, and action. The remaining chapters define the terms and engineering tools needed to analyze each stage without losing sight of the full closed loop.
