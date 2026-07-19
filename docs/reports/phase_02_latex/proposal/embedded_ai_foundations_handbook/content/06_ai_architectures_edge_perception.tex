@@ -1,0 +1,115 @@
+\chapter{AI Architectures for Edge Perception}
+\label{chap:ai-architectures}
+
+\section{Architecture Should Follow Data Structure}
+
+A neural architecture is not selected only by popularity. It should match the structure of the representation, the temporal behavior of the task, and the deployment platform. Images are regular grids, point clouds and event neighborhoods are irregular, temporal streams contain state, and multimodal relationships can be long range. The hardware then determines which operations are practical.
+
+\section{Convolutional Neural Networks}
+
+CNNs exploit local spatial neighborhoods and shared weights. They are natural for images, depth maps, range--Doppler maps, and bird's-eye-view grids. Convolution can be implemented efficiently through dense tensor operations and is well supported by GPUs and edge accelerators.
+
+The limitations are equally important. Dense convolution processes all grid locations even when information is sparse. Large feature maps create memory traffic, and irregular data must first be rasterized or voxelized. That conversion can lose temporal or geometric detail.
+
+\section{Graph Neural Networks}
+
+A graph consists of nodes, edges, and attributes. Message-passing GNNs update each node using information from its neighbors. They are appropriate when connectivity is irregular or meaningful: event graphs, point-cloud neighborhoods, road networks, object-interaction graphs, and multi-agent systems~\cite{kipf2017gcn}.
+
+A generic message-passing step is
+
+\[
+    \vec{h}_i^{(\ell+1)}
+    = \phi\!\left(
+        \vec{h}_i^{(\ell)},
+        \operatorname*{AGG}_{j\in\mathcal{N}(i)}
+        \psi(\vec{h}_i^{(\ell)},\vec{h}_j^{(\ell)},\vec{e}_{ij})
+      \right).
+\]
+
+The computational challenge is irregular memory access and dynamic neighborhood management. Efficient GNN deployment therefore depends strongly on graph structure and update sparsity.
+
+\section{Asynchronous GNNs}
+
+An asynchronous GNN processes event-driven changes incrementally. Instead of recomputing all node activations after every new event, it stores previous state and updates only the graph region affected by the event.
+
+Conceptually,
+
+\[
+    \text{new network state}
+    = \text{previous state}
+    + \text{localized event update}.
+\]
+
+The DAGr system in the low-latency automotive-vision paper uses recursive update rules, event pruning, and directed event graphs to reduce redundant computation~\cite{gehrig2024lowlatency}. It combines image features from a CNN with asynchronous graph processing for events.
+
+\begin{keyinsight}
+An asynchronous GNN is not automatically a spiking neural network. Both can be event-driven, but a GNN may use conventional real-valued activations and message passing, while an SNN uses spiking neuron dynamics and discrete spike communication.
+\end{keyinsight}
+
+\section{Transformers and Attention}
+
+Transformers use attention to model relationships between elements without requiring only local connectivity. The scaled dot-product form is
+
+\[
+    \operatorname{Attention}(\mat{Q},\mat{K},\mat{V})
+    = \operatorname{softmax}\!\left(
+        \frac{\mat{Q}\mat{K}^{\top}}{\sqrt{d_k}}
+      \right)\mat{V}.
+\]
+
+Attention supports long-range and cross-modal relationships and has become important in vision and sensor fusion~\cite{vaswani2017attention}. However, matrix multiplication, softmax, transposition, and large activation storage can be expensive at the edge. Hardware-friendly transformer research simplifies operators, exploits sparsity, and changes dataflow~\cite{zhou2025neuromorphictransformer}.
+
+\section{Spiking Neural Networks}
+
+SNNs represent information through discrete spikes and time-dependent neuron states. A simplified leaky integrate-and-fire neuron accumulates input, leaks over time, emits a spike after crossing a threshold, and resets or subtracts the threshold.
+
+A discrete-time representation can be written as
+
+\[
+    u_i[t+1]
+    = \lambda u_i[t]
+    + \sum_j w_{ij}s_j[t]
+    - \vartheta s_i[t],
+\]
+
+where \(u_i[t]\) is membrane potential, \(s_i[t]\in\{0,1\}\) is a spike, \(\lambda\) is the leak factor, and \(\vartheta\) is the threshold.
+
+SNNs are attractive for temporally sparse data and neuromorphic hardware because computation can occur only when spikes are present. The field also faces difficult training, encoding, accuracy, benchmarking, and toolchain questions~\cite{maass1997networks,tavanaei2019deep,roy2019towards,schuman2022opportunities,zhang2025snnedge}.
+
+\section{Event Sensing and SNNs Are Related but Distinct}
+
+Event cameras produce events because of sensor physics. SNNs produce and process spikes because of the computational model. The two are naturally compatible, but either can exist without the other. An event stream can be processed by a GNN, CNN, transformer, or handcrafted algorithm. An SNN can process encoded static images or conventional time series.
+
+This distinction prevents a common conceptual error: ``event-based'' describes the data or execution trigger; ``spiking'' describes the neuron and communication model.
+
+\section{Choosing an Architecture}
+
+\begin{table}[H]
+\centering
+\caption{Architecture selection by representation and system need.}
+\label{tab:architecture-selection}
+\begin{tabularx}{\textwidth}{@{}p{3.0cm}p{3.5cm}X@{}}
+\toprule
+\textbf{Representation or need} & \textbf{Candidate architecture} & \textbf{Reason} \\
+\midrule
+Dense image grid & CNN or vision transformer & Regular spatial structure and mature accelerators \\
+Irregular point/event graph & GNN & Explicit neighborhood and connectivity \\
+Sparse asynchronous stream & Asynchronous GNN or SNN & Activity-dependent state updates \\
+Long-range cross-modal interaction & Transformer / cross-attention & Flexible global relationships \\
+Physical state with known dynamics & Kalman/factor graph with learned features & Combines models, uncertainty, and learned observations \\
+Very small edge controller & Compact MLP, tree, rule, or TinyML network & Deterministic low-cost inference \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Training Architecture Versus Deployment Architecture}
+
+A model can be trained in dense floating point and deployed in quantized, sparse, or event-driven form. The training graph may include operations that are removed or folded during inference. This distinction is critical when evaluating hardware claims. A paper should report the actual deployed precision, activation sparsity, batch size, memory hierarchy, and execution platform.
+
+\section{Week 7 Connections}
+
+W7-1 demonstrates CNN--asynchronous-GNN cooperation~\cite{gehrig2024lowlatency}. W7-3 redesigns an attention-based multimodal network for analog compute-in-memory~\cite{ichikawa2024remcim}. W7-6 uses attention to weight LiDAR and camera features~\cite{zhang2026pentafusion}. W7-2 uses an FPGA DPU and runtime model selection~\cite{zhang2023carma}. The papers show that architecture choice is inseparable from representation, resource budget, and task.
+
+\section{Chapter Summary}
+
+CNNs suit regular grids; GNNs suit irregular relationships; asynchronous GNNs exploit localized event updates; transformers model long-range interactions; SNNs use spike timing and stateful dynamics. Event-driven and spiking are not synonyms. Architecture should be selected by the information structure and deployment constraint, not by model fashion alone.
