@@ -1,0 +1,146 @@
+% =========================================================
+% main.tex
+% Embedded AI Foundations Handbook -- EE 6900
+% Template adapted from the maintained Phase 2 proposal package
+% =========================================================
+
+\documentclass[12pt, a4paper, oneside, openany]{report}
+
+% =========================================================
+% 1. Metadata Variables
+% =========================================================
+
+\newcommand{\coursenumber}{EE 6900}
+\newcommand{\coursetitle}{Special Topics: Embedded AI for Autonomous Robots}
+\newcommand{\coursename}{\coursenumber\ \coursetitle}
+\newcommand{\courseshorttitle}{\coursenumber\ Embedded AI}
+
+\newcommand{\assignmenttype}{Technical Foundations Handbook}
+\newcommand{\projecttitle}{Embedded AI and Autonomous Robotics: A Systems View from Sensing to Decision}
+\newcommand{\projectshorttitle}{Embedded AI Foundations}
+
+\newcommand{\reporttitle}{%
+\assignmenttype:\\[0.35cm]
+Embedded AI and Autonomous Robotics\\[0.15cm]
+A Systems View from Sensing to Decision%
+}
+\newcommand{\reporttitleplain}{\assignmenttype: \projecttitle}
+\newcommand{\reportshorttitle}{\projectshorttitle}
+
+\newcommand{\headerleft}{\courseshorttitle}
+\newcommand{\headerright}{\reportshorttitle}
+
+\newcommand{\departmentname}{Department of Electrical and Computer Engineering}
+\newcommand{\universityname}{Kennesaw State University}
+
+\newcommand{\studentname}{Hossein Molhem}
+\newcommand{\studentid}{001201181}
+\newcommand{\studentidlabel}{KSUID\#}
+\newcommand{\netid}{hmolhem}
+\newcommand{\professorname}{Dr. Lei Feng}
+
+\newcommand{\semestername}{Summer Semester 2026}
+\newcommand{\submissiondate}{\today}
+
+% =========================================================
+% 2. Shared Template Setup
+% =========================================================
+
+\input{../setup/01_packages}
+\input{../setup/02_layout}
+\input{../setup/03_math_macros}
+\input{../setup/04_code_styles}
+\input{../setup/05_environments}
+\input{../setup/06_advanced_math}
+\input{../setup/07_DSP_Radar_macros}
+\input{../setup/08_theme}
+
+\graphicspath{{figures/}{../figures/}}
+
+% Additional handbook-specific TikZ support.
+\usetikzlibrary{calc,fit,backgrounds}
+\usepackage{pdflscape}
+
+% Handbook-specific callout boxes.
+\newtcolorbox{keyinsight}[1][]{
+    enhanced,
+    breakable,
+    colback=blue!4!white,
+    colframe=blue!65!black,
+    fonttitle=\bfseries,
+    title={Key Insight},
+    boxrule=0.8pt,
+    arc=2pt,
+    #1
+}
+
+\newtcolorbox{engineeringcheck}[1][]{
+    enhanced,
+    breakable,
+    colback=yellow!6!white,
+    colframe=orange!70!black,
+    fonttitle=\bfseries,
+    title={Engineering Check},
+    boxrule=0.8pt,
+    arc=2pt,
+    #1
+}
+
+\newtcolorbox{paperconnection}[1][]{
+    enhanced,
+    breakable,
+    colback=violet!4!white,
+    colframe=violet!65!black,
+    fonttitle=\bfseries,
+    title={Connection to the Week 7 Papers},
+    boxrule=0.8pt,
+    arc=2pt,
+    #1
+}
+
+\hypersetup{
+    pdftitle={\reporttitleplain},
+    pdfauthor={\studentname},
+    pdfsubject={\coursename},
+    pdfkeywords={Embedded AI, autonomous robotics, sensor fusion, multimodal perception, state estimation, edge computing, FPGA, event cameras, LiDAR, attention}
+}
+
+\addbibresource{references.bib}
+
+\begin{document}
+
+\input{frontmatter/titlepage}
+
+\clearpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\input{frontmatter/objective}
+\clearpage
+\input{frontmatter/abstract}
+
+\clearpage
+\tableofcontents
+
+\clearpage
+\listoffigures
+
+\clearpage
+\listoftables
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\include{content/00_report_body}
+
+\appendix
+\include{appendices/appendix_glossary}
+\include{appendices/appendix_paper_review_template}
+
+\clearpage
+\printbibliography[heading=bibintoc, title={References}]
+
+\end{document}
