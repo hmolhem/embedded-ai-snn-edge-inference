@@ -1,0 +1,15 @@
+\begin{tikzpicture}[
+    node distance=0.65cm,
+    level/.style={draw, rounded corners=2pt, align=left, text width=12.5cm, minimum height=1.05cm, fill=blue!4},
+    arrow/.style={-{Latex[length=2.4mm]}, thick}
+]
+\node[level] (data) {\textbf{Data-level / early fusion:} combine raw or minimally processed measurements after spatial and temporal alignment.};
+\node[level, below=of data] (feature) {\textbf{Feature-level / middle fusion:} each modality uses a suitable encoder; learned or engineered features are then combined.};
+\node[level, below=of feature] (decision) {\textbf{Decision-level / late fusion:} independent detectors or classifiers produce scores, tracks, or hypotheses that are merged.};
+\node[level, below=of decision] (state) {\textbf{State-estimation fusion:} measurements or residuals jointly update physical variables such as pose, velocity, bias, and map states.};
+\node[level, below=of state] (management) {\textbf{Runtime fusion management:} context determines which sensors, samples, model branches, or hardware configurations should be active.};
+\draw[arrow] (data) -- (feature);
+\draw[arrow] (feature) -- (decision);
+\draw[arrow] (decision) -- (state);
+\draw[arrow] (state) -- (management);
+\end{tikzpicture}
