@@ -12,7 +12,7 @@ multi-seed stress evaluation.
 Base branch: main
 Feature branch: feature/day-05-stress-testing
 Handoff: 024
-Pull request: pending creation after validation
+Pull request: #27 — draft and open
 Merge and remote-branch deletion: reserved for Hossein
 ```
 
