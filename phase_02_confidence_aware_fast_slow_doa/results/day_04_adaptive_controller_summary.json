@@ -1,0 +1,32 @@
+{
+  "checkpoint": "day_04_adaptive_controller",
+  "fast_budget": 32,
+  "full_budget": 128,
+  "t_max": 40,
+  "leak": 0.99,
+  "spike_seed": 742,
+  "always_fast_accuracy": 0.8178571428571428,
+  "always_continuous_accuracy": 0.8690476190476191,
+  "selection_rule": "minimum average snapshots among operating points with final accuracy no more than 0.01 below always-continuous",
+  "selected_operating_point": {
+    "threshold": 0.8,
+    "persistence": 5,
+    "num_samples": 840,
+    "accepted_count": 336,
+    "coverage": 0.4,
+    "selective_accuracy": 0.9375,
+    "false_confidence_rate": 0.0625,
+    "false_acceptance_probability": 0.025,
+    "fallback_rate": 0.6,
+    "final_accuracy": 0.8630952380952381,
+    "average_snapshots": 89.6,
+    "average_lif_steps": 30.383333333333333,
+    "average_spike_count": 38.154761904761905
+  },
+  "validation": {
+    "average_snapshot_formula_matches": true,
+    "fallback_baseline_reproduced": true,
+    "selected_point_meets_accuracy_tolerance": true
+  },
+  "all_checks_pass": true
+}
