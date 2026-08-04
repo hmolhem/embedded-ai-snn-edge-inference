@@ -1,0 +1,51 @@
+{
+  "checkpoint": "day_06_results_visualization",
+  "analysis_policy": "descriptive visualization of frozen Day 5 outputs; no retraining, threshold sweep, persistence sweep, or operating-point reselection",
+  "frozen_operating_point": {
+    "fast_budget": 32,
+    "full_budget": 128,
+    "t_max": 40,
+    "leak": 0.99,
+    "threshold": 0.8,
+    "persistence": 5
+  },
+  "input_sha256": {
+    "day_05_per_seed_metrics.csv": "408b1858bda81a7e717d3c62f1544076898ec17a03d43872f7ffd4cb6e1dde1a",
+    "day_05_aggregate_metrics.csv": "9263b8fce32060ab537ac0762f3b4798feb591d65f3ae98e9ec3560327a14e68",
+    "day_05_stress_test_summary.json": "dde822e162d4856a3af9648df0f114ca55eade21c89205e9e62e54099211b48a",
+    "day_05_stress_config.json": "e90e7f1b081d2ff8c337326f2d6ca87ab7b05f00d25f4aeb489739c251106e2f"
+  },
+  "output_sha256": {
+    "figures/day_06_nominal_accuracy_and_cost.png": "9b9ffcbb8a37f10702c40812b8fb3b5fa5add87006ae1494fed32d38ce6a19aa",
+    "figures/day_06_nominal_accuracy_and_cost.pdf": "5c0ce70f505d4e74b1f132e700a2b6b0870a0789c0933288430db2dbd1ab2e06",
+    "figures/day_06_snr_stress.png": "6087aa6a3774194b2d453c944c4080f2773bec9a1e91e5dddbfd41fed2669b66",
+    "figures/day_06_snr_stress.pdf": "208bb8a82c4019bad0a3d232d93e0efabce13afab778c15dc27f1fecff81cb60",
+    "figures/day_06_boundary_stress.png": "e314ae15933833a7840c1aad6f0d1c8c19f3ec61410a72ac33b5e831d93e569b",
+    "figures/day_06_boundary_stress.pdf": "797173bbc0599ae98b5903ea328dcce044831866da424494028a43f20e18bf28",
+    "figures/day_06_array_mismatch_stress.png": "018c58a8d02352e4b83dc6125d62ab5a9adf7466dfa03d632f6a278548668968",
+    "figures/day_06_array_mismatch_stress.pdf": "c1fd7955aafcb359eecd77bc309ed184b2e6a85d11c8b9222cbf1684fe2ca7b4",
+    "results/day_06_report_tables.md": "c63b2f20a85b36f16c1fecbbde0df793d755f4a8135fdcd7caaf47dae7855075"
+  },
+  "key_findings": {
+    "nominal_adaptive_accuracy": 0.785,
+    "nominal_continuous_accuracy": 0.7845833333333333,
+    "nominal_adaptive_coverage": 0.05354166666666667,
+    "nominal_adaptive_fallback_rate": 0.9464583333333334,
+    "nominal_adaptive_average_snapshots": 122.85999999999999,
+    "snapshot_reduction_fraction": 0.040156250000000115,
+    "low_snr_minus_15_db_accuracy": 0.4166666666666667,
+    "low_snr_minus_15_db_coverage": 0.0,
+    "adaptive_accuracy_drop_nominal_to_severe_mismatch": 0.010208333333333264
+  },
+  "validation": {
+    "day_05_summary_passed": true,
+    "aggregate_row_count": true,
+    "per_seed_group_count": true,
+    "five_rows_per_group": true,
+    "all_three_methods_present": true,
+    "aggregate_statistics_reproduce": true,
+    "operating_point_matches_frozen_config": true,
+    "descriptive_analysis_only": true
+  },
+  "all_checks_pass": true
+}

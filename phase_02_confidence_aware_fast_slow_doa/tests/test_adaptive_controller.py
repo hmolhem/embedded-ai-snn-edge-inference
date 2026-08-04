@@ -64,6 +64,37 @@ class AdaptiveControllerTests(unittest.TestCase):
         self.assertAlmostEqual(float(metrics["final_accuracy"]), 2.0 / 3.0)
         self.assertAlmostEqual(float(metrics["average_snapshots"]), 64.0)
 
+    def test_zero_time_step_spike_sequence_is_rejected(self) -> None:
+        history = np.zeros((1, 1, 2), dtype=float)
+        gate = causal_margin_persistence_gate(
+            history,
+            threshold=0.5,
+            persistence=1,
+        )
+
+        with self.assertRaisesRegex(ValueError, "at least one time step"):
+            compose_adaptive_decisions(
+                gate,
+                fallback_predictions=np.asarray([0]),
+                shared_spikes=np.empty((1, 0, 2), dtype=np.uint8),
+            )
+
+    def test_empty_metrics_input_is_rejected(self) -> None:
+        history = np.empty((0, 1, 2), dtype=float)
+        gate = causal_margin_persistence_gate(
+            history,
+            threshold=0.5,
+            persistence=1,
+        )
+        decisions = compose_adaptive_decisions(
+            gate,
+            fallback_predictions=np.empty(0, dtype=int),
+            shared_spikes=np.empty((0, 1, 2), dtype=np.uint8),
+        )
+
+        with self.assertRaisesRegex(ValueError, "at least one sample"):
+            adaptive_metrics(np.empty(0, dtype=int), gate, decisions)
+
 
 if __name__ == "__main__":
     unittest.main()

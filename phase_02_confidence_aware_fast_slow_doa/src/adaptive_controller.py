@@ -51,6 +51,8 @@ def compose_adaptive_decisions(
         raise ValueError("Every accepted sample must have a valid gate prediction.")
 
     max_time_steps = spikes.shape[1]
+    if max_time_steps <= 0:
+        raise ValueError("shared_spikes must contain at least one time step.")
     if np.any(gate.accepted & (gate.decision_steps < 1)):
         raise ValueError("Every accepted sample must have a positive decision step.")
     if np.any(gate.decision_steps[gate.accepted] > max_time_steps):
@@ -95,6 +97,8 @@ def adaptive_metrics(
     if truth.shape != decisions.final_predictions.shape:
         raise ValueError("true_labels must match final_predictions.")
     num_samples = int(truth.size)
+    if num_samples <= 0:
+        raise ValueError("true_labels must contain at least one sample.")
     accepted_count = int(np.sum(gate.accepted))
     correct_accepted = int(
         np.sum(gate.accepted & (gate.predicted_labels == truth))

@@ -24,3 +24,4 @@
 - Handoff 022: Phase 2 proposal technical rewrite and robustness-study plan.
 - Handoff 023: Documentation cleanup and report-metadata consolidation.
 - Handoff 024: Phase 2 Day 5 multi-seed stress testing.
+- Handoff 025: Phase 2 Day 6 frozen-result visualization and interpretation.
