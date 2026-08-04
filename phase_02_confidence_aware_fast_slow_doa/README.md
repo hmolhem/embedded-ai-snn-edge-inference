@@ -73,3 +73,26 @@ realizations within every condition.
 The Day 5 result is intentionally not used to reselect the threshold. Any
 future gate redesign or recalibration must use a separate development split and
 new validation seeds.
+
+## Day 6 — Frozen-result visualization and interpretation
+
+Day 6 creates report-ready figures, Markdown tables, and a machine-readable
+summary directly from the frozen Day 5 CSV/JSON outputs:
+
+```powershell
+python -m phase_02_confidence_aware_fast_slow_doa.run_day_06_results_visualization
+```
+
+The runner verifies the Day 5 input hashes, reproduces every aggregate mean and
+sample standard deviation from the per-seed rows, and rejects any mismatch
+between the pre-registered operating point and the Day 5 configuration. It does
+not train, sweep, calibrate, or select a new gate.
+
+Primary outputs:
+
+- `figures/day_06_nominal_accuracy_and_cost.{png,pdf}`
+- `figures/day_06_snr_stress.{png,pdf}`
+- `figures/day_06_boundary_stress.{png,pdf}`
+- `figures/day_06_array_mismatch_stress.{png,pdf}`
+- `results/day_06_report_tables.md`
+- `results/day_06_results_summary.json`
