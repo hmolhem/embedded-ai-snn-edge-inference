@@ -1,0 +1,45 @@
+{
+  "checkpoint": "day_03_causal_gate_validation",
+  "fast_snapshot_budget": 32,
+  "t_max": 40,
+  "leak": 0.99,
+  "spike_seed": 742,
+  "test_samples": 840,
+  "always_fast_m32_t40_accuracy": 0.8178571428571428,
+  "shared_prefix_exact_match": {
+    "10": true,
+    "20": true,
+    "40": true
+  },
+  "coverage_monotonic_with_threshold": {
+    "1": true,
+    "2": true,
+    "3": true,
+    "4": true,
+    "5": true
+  },
+  "thresholds": [
+    0.0,
+    0.02,
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95
+  ],
+  "persistence_values": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "all_checks_pass": true
+}

@@ -1,0 +1,79 @@
+{
+  "checkpoint": "day_05_stress_testing",
+  "pre_registered_operating_point": {
+    "fast_budget": 32,
+    "full_budget": 128,
+    "t_max": 40,
+    "leak": 0.99,
+    "threshold": 0.8,
+    "persistence": 5
+  },
+  "seed_pairs": [
+    {
+      "dataset_seed": 43,
+      "spike_seed": 743
+    },
+    {
+      "dataset_seed": 44,
+      "spike_seed": 744
+    },
+    {
+      "dataset_seed": 45,
+      "spike_seed": 745
+    },
+    {
+      "dataset_seed": 46,
+      "spike_seed": 746
+    },
+    {
+      "dataset_seed": 47,
+      "spike_seed": 747
+    }
+  ],
+  "snr_grid_db": [
+    -15.0,
+    -10.0,
+    -5.0,
+    0.0,
+    5.0,
+    10.0,
+    15.0,
+    20.0
+  ],
+  "boundary_protocol": "signed offsets pooled across -30, 0, and 30 degree boundaries and the complete SNR grid",
+  "array_mismatch_protocol": "fixed zero-mean per-element gain/phase vectors; nominal training and normalization; no stress-condition retraining",
+  "nominal_mean_metrics": {
+    "always_fast": {
+      "accuracy": 0.668125,
+      "average_snapshots": 32.0,
+      "average_lif_steps": 40.0
+    },
+    "always_continuous": {
+      "accuracy": 0.7845833333333333,
+      "average_snapshots": 128.0,
+      "average_lif_steps": 0.0
+    },
+    "adaptive": {
+      "accuracy": 0.785,
+      "average_snapshots": 122.85999999999999,
+      "average_lif_steps": 38.928749999999994
+    }
+  },
+  "severe_mismatch_mean_accuracy": {
+    "always_fast": 0.65625,
+    "always_continuous": 0.7737499999999999,
+    "adaptive": 0.7747916666666668
+  },
+  "adaptive_accuracy_drop_nominal_to_severe": 0.010208333333333264,
+  "validation": {
+    "five_unique_seed_pairs_completed": true,
+    "all_expected_aggregate_groups_present": true,
+    "every_aggregate_group_has_five_seeds": true,
+    "mismatch_datasets_preserve_paired_metadata": true,
+    "array_error_rms_matches_configuration": true,
+    "adaptive_snapshot_accounting_matches_formula": true,
+    "operating_point_was_fixed_not_reselected": true,
+    "all_checks_pass": true
+  },
+  "all_checks_pass": true
+}

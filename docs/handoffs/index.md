@@ -23,3 +23,4 @@
 - Handoff 021: Phase 2 proposal LaTeX template.
 - Handoff 022: Phase 2 proposal technical rewrite and robustness-study plan.
 - Handoff 023: Documentation cleanup and report-metadata consolidation.
+- Handoff 024: Phase 2 Day 5 multi-seed stress testing.
