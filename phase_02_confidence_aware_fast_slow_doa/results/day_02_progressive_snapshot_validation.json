@@ -1,0 +1,78 @@
+{
+  "checkpoint": "day_02_progressive_snapshot_validation",
+  "source_reference_commit": "e2f8af33fd9046d5152d4c58f6f8e8f2cf76031f",
+  "python_version": "3.12.13",
+  "numpy_version": "2.3.5",
+  "random_seed": 42,
+  "snapshot_budgets": [
+    32,
+    64,
+    128
+  ],
+  "num_samples": 2800,
+  "num_features": 9,
+  "train_samples": 1960,
+  "test_samples": 840,
+  "feature_shapes": {
+    "32": [
+      2800,
+      9
+    ],
+    "64": [
+      2800,
+      9
+    ],
+    "128": [
+      2800,
+      9
+    ]
+  },
+  "phase_1_metadata_exact_match": {
+    "labels": true,
+    "theta_deg": true,
+    "snr_db": true
+  },
+  "phase_1_m128_max_abs_feature_error": 0.0,
+  "repeatability_exact_match": {
+    "32": true,
+    "64": true,
+    "128": true
+  },
+  "mean_absolute_feature_delta_from_m128": {
+    "32": 0.0472498655739454,
+    "64": 0.028048393093685644,
+    "128": 0.0
+  },
+  "normalization": {
+    "statistics_source": "training split only, separately for each snapshot budget",
+    "train_range_by_budget": {
+      "32": [
+        0.0,
+        1.0
+      ],
+      "64": [
+        0.0,
+        1.0
+      ],
+      "128": [
+        0.0,
+        1.0
+      ]
+    },
+    "test_range_by_budget": {
+      "32": [
+        0.0,
+        1.0
+      ],
+      "64": [
+        0.0,
+        1.0
+      ],
+      "128": [
+        0.0,
+        1.0
+      ]
+    }
+  },
+  "all_checks_pass": true
+}
