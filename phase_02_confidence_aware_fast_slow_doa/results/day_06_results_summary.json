@@ -38,9 +38,12 @@
     "adaptive_accuracy_drop_nominal_to_severe_mismatch": 0.010208333333333264
   },
   "validation": {
+    "input_hashes_match_frozen_manifest": true,
     "day_05_summary_passed": true,
     "aggregate_row_count": true,
+    "aggregate_group_keys_match_config": true,
     "per_seed_group_count": true,
+    "per_seed_group_keys_match_config": true,
     "five_rows_per_group": true,
     "all_three_methods_present": true,
     "aggregate_statistics_reproduce": true,
