@@ -1,0 +1,71 @@
+{
+  "checkpoint": "day_07_confidence_calibration_protocol",
+  "config_sha256": "2fc232b490f88d09fa0e3bf9fb6f70fa00e12396735b5c08abe405af27aabdc2",
+  "calibration_seed_pairs": [
+    {
+      "dataset_seed": 101,
+      "spike_seed": 1101
+    },
+    {
+      "dataset_seed": 102,
+      "spike_seed": 1102
+    },
+    {
+      "dataset_seed": 103,
+      "spike_seed": 1103
+    },
+    {
+      "dataset_seed": 104,
+      "spike_seed": 1104
+    },
+    {
+      "dataset_seed": 105,
+      "spike_seed": 1105
+    }
+  ],
+  "holdout_seed_manifest_sha256": "e2549c689da20987555303f6c6a7996c2299497de3e65cc2067142d43f193420",
+  "holdout_policy": "sealed_until_day_09",
+  "holdout_evaluated": false,
+  "selection_performed": false,
+  "analysis": {
+    "num_calibration_samples": 4800,
+    "always_fast_accuracy": 0.675,
+    "always_continuous_accuracy": 0.7808333333333334,
+    "final_margin_auroc_for_fast_correctness": 0.7614061016144349,
+    "final_margin_expected_calibration_error": 0.5855503620145491,
+    "mean_margin_correct_fast_decisions": 0.11922546602968856,
+    "mean_margin_incorrect_fast_decisions": 0.03740966857961811,
+    "mean_margin_separation": 0.08181579745007045,
+    "reference_gate_tau_0_8_k_5": {
+      "final_accuracy": 0.7810416666666666,
+      "coverage": 0.049375,
+      "selective_accuracy": 0.9451476793248945,
+      "false_confidence_rate": 0.05485232067510549,
+      "fallback_rate": 0.950625,
+      "average_snapshots": 123.26,
+      "average_lif_steps": 39.01770833333333,
+      "snapshot_reduction_fraction": 0.03703124999999996,
+      "accuracy_gap_vs_continuous": 0.00020833333333325488
+    },
+    "eligible_operating_point_count_without_selection": 27
+  },
+  "validation": {
+    "five_unique_calibration_pairs": true,
+    "five_unique_holdout_pairs": true,
+    "calibration_holdout_disjoint": true,
+    "day_05_seeds_not_reused": true,
+    "holdout_policy_is_sealed": true,
+    "only_registered_calibration_seeds_evaluated": true,
+    "holdout_not_evaluated": true,
+    "all_calibration_pairs_completed": true,
+    "complete_operating_point_grid": true,
+    "coverage_monotonic_with_threshold": true,
+    "snapshot_accounting_matches_formula": true,
+    "reliability_bins_account_for_all_samples": true,
+    "risk_coverage_grid_complete": true,
+    "no_operating_point_selected_on_day_07": true,
+    "selection_reserved_for_day_08": true,
+    "all_checks_pass": true
+  },
+  "all_checks_pass": true
+}

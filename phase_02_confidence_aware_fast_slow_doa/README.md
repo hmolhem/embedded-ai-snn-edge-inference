@@ -96,3 +96,31 @@ Primary outputs:
 - `figures/day_06_array_mismatch_stress.{png,pdf}`
 - `results/day_06_report_tables.md`
 - `results/day_06_results_summary.json`
+
+## Day 7 — Independent confidence-calibration protocol
+
+Day 7 evaluates whether the current normalized-margin signal can rank correct
+fast-path decisions on five new calibration seed pairs. The frozen Day 5 seeds
+are excluded, and five additional seed pairs are registered but sealed for the
+one-time Day 9 holdout evaluation.
+
+```powershell
+python -m phase_02_confidence_aware_fast_slow_doa.run_day_07_confidence_calibration
+```
+
+The runner exports per-sample margin, winner-persistence, stable-decision-time,
+and spike-activity diagnostics; a 70-point causal `(tau, K)` grid; reliability
+and risk-coverage tables; and four PNG/PDF figures. Day 7 is analysis-only: it
+does not select an operating point and never evaluates the holdout seeds.
+
+Primary outputs:
+
+- `results/day_07_calibration_samples.csv`
+- `results/day_07_operating_points.csv`
+- `results/day_07_confidence_reliability.csv`
+- `results/day_07_risk_coverage.csv`
+- `results/day_07_confidence_calibration_summary.json`
+- `figures/day_07_confidence_reliability.{png,pdf}`
+- `figures/day_07_risk_coverage.{png,pdf}`
+- `figures/day_07_coverage_snapshot_reduction.{png,pdf}`
+- `figures/day_07_accuracy_gap.{png,pdf}`
