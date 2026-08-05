@@ -34,6 +34,21 @@ AGGREGATE_PATH = RESULTS_DIR / "day_05_aggregate_metrics.csv"
 DAY_05_SUMMARY_PATH = RESULTS_DIR / "day_05_stress_test_summary.json"
 DAY_05_CONFIG_PATH = PACKAGE_ROOT / "day_05_stress_config.json"
 
+FROZEN_DAY_05_SHA256 = {
+    "day_05_per_seed_metrics.csv": (
+        "408b1858bda81a7e717d3c62f1544076898ec17a03d43872f7ffd4cb6e1dde1a"
+    ),
+    "day_05_aggregate_metrics.csv": (
+        "9263b8fce32060ab537ac0762f3b4798feb591d65f3ae98e9ec3560327a14e68"
+    ),
+    "day_05_stress_test_summary.json": (
+        "dde822e162d4856a3af9648df0f114ca55eade21c89205e9e62e54099211b48a"
+    ),
+    "day_05_stress_config.json": (
+        "e90e7f1b081d2ff8c337326f2d6ca87ab7b05f00d25f4aeb489739c251106e2f"
+    ),
+}
+
 METHOD_ORDER = ("always_fast", "always_continuous", "adaptive")
 METHOD_LABELS = {
     "always_fast": "Always fast",
@@ -127,34 +142,79 @@ def _ordered_rows(
     return sorted(selected, key=lambda row: _parse_condition(row["condition"]))
 
 
+def _condition_label(value: object, unit: str, *, signed: bool = False) -> str:
+    """Match the condition-label format emitted by the frozen Day 5 runner."""
+    numeric = float(value)
+    formatted = f"{numeric:+g}" if signed else f"{numeric:g}"
+    return f"{formatted}_{unit}"
+
+
+def _expected_group_keys(
+    config: Mapping[str, object],
+) -> set[tuple[str, str, str]]:
+    """Derive every expected experiment/condition/method cell from config."""
+    snr_conditions = {
+        _condition_label(value, "db") for value in config["snr_db_values"]
+    }
+    boundary_conditions = {
+        _condition_label(value, "deg", signed=True)
+        for value in config["boundary_stress"]["signed_offsets_deg"]
+    }
+    mismatch_conditions = {
+        str(level["name"]) for level in config["array_mismatch"]["levels"]
+    }
+    experiment_conditions = {
+        "snr": snr_conditions,
+        "boundary_offset": boundary_conditions,
+        "array_mismatch": mismatch_conditions,
+    }
+    return {
+        (experiment, condition, method)
+        for experiment, conditions in experiment_conditions.items()
+        for condition in conditions
+        for method in METHOD_ORDER
+    }
+
+
 def _validate_inputs(
     per_seed: list[Mapping[str, str]],
     aggregate: list[Mapping[str, str]],
     config: Mapping[str, object],
     day_05_summary: Mapping[str, object],
+    input_hashes: Mapping[str, str],
 ) -> dict[str, bool]:
-    expected_conditions = {
-        "snr": 8,
-        "array_mismatch": 4,
-        "boundary_offset": 10,
-    }
-    expected_rows = sum(count * len(METHOD_ORDER) for count in expected_conditions.values())
+    expected_keys = _expected_group_keys(config)
+    expected_rows = len(expected_keys)
+    aggregate_keys = [
+        (row["experiment"], row["condition"], row["method"])
+        for row in aggregate
+    ]
     aggregate_shape_ok = len(aggregate) == expected_rows
+    aggregate_group_keys_ok = (
+        set(aggregate_keys) == expected_keys
+        and len(aggregate_keys) == len(set(aggregate_keys))
+    )
 
     groups: dict[tuple[str, str, str], list[Mapping[str, str]]] = defaultdict(list)
     for row in per_seed:
         groups[(row["experiment"], row["condition"], row["method"])].append(row)
 
     group_count_ok = len(groups) == expected_rows
+    per_seed_group_keys_ok = set(groups) == expected_keys
     five_seeds_ok = all(len(group_rows) == 5 for group_rows in groups.values())
     methods_ok = {
         row["method"] for row in aggregate
     } == set(METHOD_ORDER)
+    input_hashes_ok = dict(input_hashes) == FROZEN_DAY_05_SHA256
 
     aggregates_match = True
     tolerance = 1e-12
     for row in aggregate:
-        group = groups[(row["experiment"], row["condition"], row["method"])]
+        key = (row["experiment"], row["condition"], row["method"])
+        group = groups.get(key)
+        if group is None:
+            aggregates_match = False
+            continue
         for metric in NUMERIC_METRICS:
             values = np.asarray([float(item[metric]) for item in group], dtype=float)
             finite = values[np.isfinite(values)]
@@ -183,9 +243,12 @@ def _validate_inputs(
     )
 
     checks = {
+        "input_hashes_match_frozen_manifest": input_hashes_ok,
         "day_05_summary_passed": bool(day_05_summary["all_checks_pass"]),
         "aggregate_row_count": aggregate_shape_ok,
+        "aggregate_group_keys_match_config": aggregate_group_keys_ok,
         "per_seed_group_count": group_count_ok,
+        "per_seed_group_keys_match_config": per_seed_group_keys_ok,
         "five_rows_per_group": five_seeds_ok,
         "all_three_methods_present": methods_ok,
         "aggregate_statistics_reproduce": aggregates_match,
@@ -546,7 +609,13 @@ def main() -> None:
         DAY_05_CONFIG_PATH,
     )
     input_hashes = {path.name: _sha256(path) for path in input_paths}
-    checks = _validate_inputs(per_seed, aggregate, config, day_05_summary)
+    checks = _validate_inputs(
+        per_seed,
+        aggregate,
+        config,
+        day_05_summary,
+        input_hashes,
+    )
 
     plt.rcParams.update(
         {
