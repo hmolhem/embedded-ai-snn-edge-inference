@@ -1,0 +1,123 @@
+{
+  "all_checks_pass": true,
+  "calibration_metrics": {
+    "accepted_count": 1166,
+    "accuracy_gap_vs_continuous": -0.009583333333333388,
+    "always_continuous_accuracy": 0.7808333333333334,
+    "always_fast_accuracy": 0.675,
+    "average_lif_steps": 33.70395833333333,
+    "average_snapshots": 104.68,
+    "average_snapshots_seed_mean": 104.67999999999999,
+    "average_snapshots_seed_std": 2.0498780451529286,
+    "average_spike_count": 41.27625,
+    "coverage": 0.24291666666666667,
+    "coverage_seed_mean": 0.24291666666666661,
+    "coverage_seed_std": 0.02135289630367635,
+    "fallback_rate": 0.7570833333333333,
+    "false_acceptance_probability": 0.032916666666666664,
+    "false_confidence_rate": 0.13550600343053174,
+    "final_accuracy": 0.77125,
+    "final_accuracy_seed_mean": 0.77125,
+    "final_accuracy_seed_std": 0.01996361708069066,
+    "num_samples": 4800,
+    "selective_accuracy": 0.8644939965694682,
+    "snapshot_reduction_fraction": 0.18218749999999995
+  },
+  "checkpoint": "day_08_gate_selection_freeze",
+  "config_sha256": "6574c6792de4a481aa3dfdbe8b3c3d12eb7bf9c5b1e8dd0db3fcfbc56ffedea6",
+  "delta_vs_reference_gate": {
+    "coverage": 0.19354166666666667,
+    "final_accuracy": -0.009791666666666643,
+    "snapshot_reduction_fraction": 0.14515625
+  },
+  "eligible_operating_point_count": 27,
+  "frozen_input_sha256": {
+    "day_07_config": "2fc232b490f88d09fa0e3bf9fb6f70fa00e12396735b5c08abe405af27aabdc2",
+    "day_07_operating_points": "d38ff0fe896b02632bde04d693bba75e306051147c7c713e72a2520666e25b9a",
+    "day_07_summary": "8a23c900664f193ba2f7c5431ebaee0086822ab0992fbca13936a60237f5fed5"
+  },
+  "grid_size": 70,
+  "holdout_evaluated": false,
+  "holdout_manifest_sha256": "e2549c689da20987555303f6c6a7996c2299497de3e65cc2067142d43f193420",
+  "holdout_policy": "sealed_until_day_09",
+  "reference_gate_tau_0_8_k_5": {
+    "accepted_count": 237,
+    "accuracy_gap_vs_continuous": 0.00020833333333325488,
+    "always_continuous_accuracy": 0.7808333333333334,
+    "always_fast_accuracy": 0.675,
+    "average_lif_steps": 39.01770833333333,
+    "average_snapshots": 123.26,
+    "average_snapshots_seed_mean": 123.26000000000002,
+    "average_snapshots_seed_std": 1.059716943339119,
+    "average_spike_count": 43.22666666666667,
+    "coverage": 0.049375,
+    "coverage_seed_mean": 0.049375,
+    "coverage_seed_std": 0.011038718159782461,
+    "fallback_rate": 0.950625,
+    "false_acceptance_probability": 0.0027083333333333334,
+    "false_confidence_rate": 0.05485232067510549,
+    "final_accuracy": 0.7810416666666666,
+    "final_accuracy_seed_mean": 0.7810416666666666,
+    "final_accuracy_seed_std": 0.025134188480147018,
+    "num_samples": 4800,
+    "persistence": 5,
+    "selective_accuracy": 0.9451476793248945,
+    "snapshot_reduction_fraction": 0.03703124999999996,
+    "threshold": 0.8
+  },
+  "selected_gate": {
+    "persistence": 5,
+    "threshold": 0.2
+  },
+  "selection_locked_for_day_09": true,
+  "selection_rule": {
+    "accuracy_tolerance": 0.01,
+    "expected_eligible_count": 27,
+    "expected_grid_size": 70,
+    "expected_num_calibration_samples": 4800,
+    "objective": {
+      "direction": "maximize",
+      "field": "snapshot_reduction_fraction"
+    },
+    "require_source_eligibility_flag": true,
+    "tie_breakers": [
+      {
+        "direction": "maximize",
+        "field": "final_accuracy"
+      },
+      {
+        "direction": "minimize",
+        "field": "false_confidence_rate"
+      },
+      {
+        "direction": "maximize",
+        "field": "persistence"
+      },
+      {
+        "direction": "maximize",
+        "field": "threshold"
+      }
+    ]
+  },
+  "source_revision": "ab5d5eae25fdb9a8253d92131928e2f17310ff58",
+  "validation": {
+    "accuracy_tolerance_matches_day_07": true,
+    "calibration_sample_count_fixed": true,
+    "complete_unique_grid": true,
+    "continuous_reference_is_constant": true,
+    "day_07_checks_passed": true,
+    "day_07_config_hash_matches_summary": true,
+    "day_07_holdout_not_evaluated": true,
+    "day_07_selection_not_performed": true,
+    "day_07_selection_reserved_for_day_08": true,
+    "eligible_count_matches_manifest": true,
+    "exactly_one_gate_selected": true,
+    "holdout_manifest_matches_day_07": true,
+    "holdout_not_evaluated_on_day_08": true,
+    "holdout_policy_remains_sealed": true,
+    "selected_gate_is_source_row": true,
+    "selected_gate_maximizes_snapshot_reduction": true,
+    "selected_gate_meets_accuracy_tolerance": true,
+    "source_eligibility_flags_reproduced": true
+  }
+}
