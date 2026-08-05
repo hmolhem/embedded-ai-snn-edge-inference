@@ -41,6 +41,30 @@ Primary record:
 docs/handoffs/handoff_022_phase02_proposal_technical_rewrite.md
 ```
 
+## Phase 2 — Fast–Slow DOA Through Day 7
+
+- Implemented aligned progressive snapshots, a causal confidence gate, and a
+  mandatory full-data fallback.
+- Completed five-seed SNR, sector-boundary, and array-mismatch stress testing.
+- Froze and visualized the Day 5 result: baseline accuracy was preserved, but
+  the fixed gate generalized to only about 4 percent snapshot reduction.
+- Added strict frozen-input hash and condition-identity validation.
+- Completed Day 7 on five independent calibration seed pairs while keeping
+  five additional holdout pairs sealed for Day 9.
+- Confirmed that final normalized margin has useful ranking ability but is not
+  calibrated as a probability; no new operating point has yet been selected.
+
+Primary records:
+
+```text
+docs/handoffs/handoff_024_phase02_day05_stress_testing.md
+docs/handoffs/handoff_025_phase02_day06_results_visualization.md
+docs/handoffs/handoff_026_day06_frozen_input_validation.md
+docs/handoffs/handoff_027_phase02_day07_confidence_calibration.md
+```
+
 ## Current Technical Target
 
-Begin Phase 2 Run 001 by reproducing the Phase 1 reference point inside the Phase 2 experiment structure before introducing any new stress model.
+Day 8 will apply a pre-declared selection rule to the frozen Day 7 calibration
+table. Day 9 will then evaluate that single selected gate once on the sealed
+holdout seed pairs.
