@@ -124,3 +124,27 @@ Primary outputs:
 - `figures/day_07_risk_coverage.{png,pdf}`
 - `figures/day_07_coverage_snapshot_reduction.{png,pdf}`
 - `figures/day_07_accuracy_gap.{png,pdf}`
+
+## Day 8 — Frozen gate selection
+
+Day 8 applies the declared accuracy-constrained cost rule to the byte-verified
+Day 7 operating-point table:
+
+```powershell
+python -m phase_02_confidence_aware_fast_slow_doa.run_day_08_gate_selection
+```
+
+The rule keeps points whose pooled adaptive accuracy is no more than one
+percentage point below the continuous reference, then maximizes snapshot
+reduction with deterministic tie-breakers. It selects and freezes exactly one
+gate for Day 9: `tau=0.2`, `K=5`.
+
+Day 8 performs no training, simulation, spike generation, or holdout
+evaluation. The three Day 7 source files and the sealed holdout manifest are
+protected by SHA-256 checks.
+
+Primary outputs:
+
+- `day_08_gate_selection_config.json`
+- `results/day_08_selected_operating_point.json`
+- `results/day_08_gate_selection_report.md`

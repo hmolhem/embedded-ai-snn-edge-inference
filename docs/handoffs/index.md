@@ -27,3 +27,4 @@
 - Handoff 025: Phase 2 Day 6 frozen-result visualization and interpretation.
 - Handoff 026: Day 6 frozen-input validation hardening after PR #28 review.
 - Handoff 027: Day 7 independent confidence-calibration protocol and analysis.
+- Handoff 028: Day 8 deterministic gate selection and Day 9 freeze.

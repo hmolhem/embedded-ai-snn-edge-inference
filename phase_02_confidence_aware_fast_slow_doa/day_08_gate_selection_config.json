@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "purpose": "Select and freeze exactly one Day 9 gate from frozen Day 7 calibration outputs without evaluating the sealed holdout.",
+  "source_revision": "ab5d5eae25fdb9a8253d92131928e2f17310ff58",
+  "inputs": {
+    "day_07_config": {
+      "path": "day_07_confidence_calibration_config.json",
+      "sha256": "2fc232b490f88d09fa0e3bf9fb6f70fa00e12396735b5c08abe405af27aabdc2"
+    },
+    "day_07_operating_points": {
+      "path": "results/day_07_operating_points.csv",
+      "sha256": "d38ff0fe896b02632bde04d693bba75e306051147c7c713e72a2520666e25b9a"
+    },
+    "day_07_summary": {
+      "path": "results/day_07_confidence_calibration_summary.json",
+      "sha256": "8a23c900664f193ba2f7c5431ebaee0086822ab0992fbca13936a60237f5fed5"
+    }
+  },
+  "holdout": {
+    "manifest_sha256": "e2549c689da20987555303f6c6a7996c2299497de3e65cc2067142d43f193420",
+    "policy": "sealed_until_day_09",
+    "evaluation_allowed": false
+  },
+  "selection_rule": {
+    "accuracy_tolerance": 0.01,
+    "require_source_eligibility_flag": true,
+    "objective": {
+      "field": "snapshot_reduction_fraction",
+      "direction": "maximize"
+    },
+    "tie_breakers": [
+      {"field": "final_accuracy", "direction": "maximize"},
+      {"field": "false_confidence_rate", "direction": "minimize"},
+      {"field": "persistence", "direction": "maximize"},
+      {"field": "threshold", "direction": "maximize"}
+    ],
+    "expected_grid_size": 70,
+    "expected_eligible_count": 27,
+    "expected_num_calibration_samples": 4800
+  }
+}
